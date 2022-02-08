@@ -203,6 +203,11 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
 
     const c3 = require("c3")
     this.chart = c3.generate(chartOptions)
+
+    // Remove listener for window focus (https://github.com/c3js/c3/issues/2742)
+    window.removeEventListener("focus", this.chart.internal.windowFocusHandler)
+    this.chart.internal.windowFocusHandler = () => {}
+    window.addEventListener("focus", this.chart.internal.windowFocusHandler)
   }
 
   componentDidUpdate(prevProps: any, prevState: any) {

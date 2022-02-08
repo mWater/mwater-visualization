@@ -129,6 +129,12 @@ line, path {fill: none;stroke: rgb(0, 0, 0);}
     }
     chartOptions.onrendered = _.debounce(_.once(onRender), 1000)
     const c3 = require("c3")
-    return (chart = c3.generate(chartOptions))
+    chart = c3.generate(chartOptions)
+
+    // Remove listener for window focus (https://github.com/c3js/c3/issues/2742)
+    window.removeEventListener("focus", chart.internal.windowFocusHandler)
+    chart.internal.windowFocusHandler = () => {}
+    window.addEventListener("focus", chart.internal.windowFocusHandler)
+
   }
 }
