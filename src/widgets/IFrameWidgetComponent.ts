@@ -102,7 +102,7 @@ export default class IFrameWidgetComponent extends React.Component<
             width: this.props.width,
             height: this.props.height,
             frameborder: 0,
-            allowfullscreen: true
+            allowfullscreen: "allowfullscreen"
           })
         } else {
           if (this.props.onDesignChange != null) {
