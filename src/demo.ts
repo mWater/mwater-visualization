@@ -191,12 +191,12 @@ class MWaterDirectDashboardPane extends React.Component {
       // design: { items: {}, layout: "grid" } # dashboardDesign
       // design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
       design: window.localStorage.getItem("MWaterDirectDashboardPane.design")
-        ? JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.design"))
+        ? JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.design")!)
         : mapAndChartDashboard,
       // design: imageWidgetDashboardDesign
       // design: dashboardDesign
       extraTables: window.localStorage.getItem("MWaterDirectDashboardPane.extraTables")
-        ? JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.extraTables"))
+        ? JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.extraTables")!)
         : []
     }
   }
