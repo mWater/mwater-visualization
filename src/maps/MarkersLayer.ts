@@ -253,9 +253,9 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       selects: [
         {
           type: "select",
-          expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }] },
+          expr: { type: "field", tableAlias: "innerquery", column: "id" },
           alias: "id"
-        }, // innerquery._id::text as id
+        }, // innerquery._id as id
         {
           type: "select",
           expr: {
@@ -427,9 +427,9 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       selects: [
         {
           type: "select",
-          expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }] },
+          expr: { type: "field", tableAlias: "innerquery", column: "id" },
           alias: "id"
-        }, // innerquery._id::text as id
+        }, // innerquery._id as id
         {
           type: "select",
           expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" },
