@@ -126,6 +126,14 @@ export interface Props {
 
 /** Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer */
 export default class LeafletMapComponent extends Component<Props> {
+  baseLayer: any
+  hasBounds: boolean
+  map: L.Map
+  loaded: boolean
+  popupDiv: HTMLElement
+  popupLayer: L.Popup | null
+  mapElem: HTMLDivElement | null
+  
   constructor(props: Props) {
     super(props)
   }
@@ -203,7 +211,7 @@ export default class LeafletMapComponent extends Component<Props> {
 
   componentDidMount() {
     // Create map
-    const mapOptions = {
+    const mapOptions: L.MapOptions = {
       fadeAnimation: false,
       dragging: this.props.dragging,
       touchZoom: this.props.touchZoom,
@@ -249,7 +257,7 @@ export default class LeafletMapComponent extends Component<Props> {
       }
     })
 
-    this.setBounds(this.props.initialBounds)
+    this.setBounds(this.props.initialBounds || null)
 
     if (this.props.loadingSpinner) {
       const loadingControl = new LeafletLoading({
@@ -286,7 +294,7 @@ export default class LeafletMapComponent extends Component<Props> {
     })
   }
 
-  updateMap(prevProps: any) {
+  updateMap(prevProps?: Props) {
     // Update size
     if (prevProps && (prevProps.width !== this.props.width || prevProps.height !== this.props.height)) {
       this.map.invalidateSize()
@@ -551,8 +559,8 @@ export default class LeafletMapComponent extends Component<Props> {
           React.cloneElement(this.props.legend, { zoom: this.map.getZoom() })
         : undefined,
       R("div", {
-        ref: (c: any) => {
-          return (this.mapElem = c)
+        ref: (c: HTMLDivElement | null) => {
+          this.mapElem = c
         },
         style: { width: this.props.width, height: this.props.height }
       })
