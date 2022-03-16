@@ -8,7 +8,7 @@ import AxisBuilder from "../axes/AxisBuilder"
 import { ClusterLayerDesign } from "./ClusterLayerDesign"
 import Layer, { VectorTileDef } from "./Layer"
 import LayerLegendComponent from "./LayerLegendComponent"
-import { AnyLayer } from "maplibre-gl"
+import { LayerSpecification } from "maplibre-gl"
 
 export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   /** Gets the type of layer definition */
@@ -25,7 +25,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const mapLayers: AnyLayer[] = []
+    const mapLayers: LayerSpecification[] = []
 
     mapLayers.push({
       id: `${sourceId}:circles-single`,

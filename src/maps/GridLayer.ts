@@ -21,6 +21,7 @@ import { Axis } from "../axes/Axis"
 import { JsonQLExpr, JsonQLQuery, JsonQLScalar } from "jsonql"
 import { compileColorMapToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
+import { LayerSpecification } from "maplibre-gl"
 
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
 export default class GridLayer extends Layer<GridLayerDesign> {
@@ -38,7 +39,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const mapLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: LayerSpecification[] = []
 
     // If color axes, add color conditions
     const color = compileColorMapToMapbox(design.colorAxis, "transparent")

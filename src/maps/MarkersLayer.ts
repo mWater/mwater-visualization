@@ -13,6 +13,7 @@ import { MarkersLayerDesign } from "./MarkersLayerDesign"
 import { compileColorMapToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import { LayerSpecification } from "maplibre-gl"
 
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */
@@ -29,7 +30,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const mapLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: LayerSpecification[] = []
 
     // If color axes, add color conditions
     const color = compileColorMapToMapbox(design.axes.color, design.color || "#666666")

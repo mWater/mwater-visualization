@@ -9,6 +9,7 @@ import { JsonQLFilter } from "../index"
 import { OnGridClickResults } from "./maps"
 import { ReactNode } from "react"
 import { JsonQLExpr, JsonQLQuery, JsonQLSelectQuery } from "jsonql"
+import { LayerSpecification } from "maplibre-gl"
 
 export interface JsonQLCssLayerDefinition {
   layers: Array<{
@@ -52,7 +53,7 @@ export interface VectorTileDef {
   ctes: VectorTileCTE[]
 
   /** Map layers must be mapbox layers that reference the source layers */
-  mapLayers: mapboxgl.AnyLayer[]
+  mapLayers: LayerSpecification[]
 
   /** Which layer ids have click handlers attached. Should be non-overlapping */
   mapLayersHandleClicks: string[]

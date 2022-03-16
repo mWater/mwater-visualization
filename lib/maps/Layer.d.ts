@@ -1,9 +1,9 @@
-/// <reference types="mapbox-gl" />
 import { Schema, DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 import { ReactNode } from "react";
 import { JsonQLQuery } from "jsonql";
+import { LayerSpecification } from "maplibre-gl";
 export interface JsonQLCssLayerDefinition {
     layers: Array<{
         /** Layer id */
@@ -40,7 +40,7 @@ export interface VectorTileDef {
     /** Common table expressions of the tiles */
     ctes: VectorTileCTE[];
     /** Map layers must be mapbox layers that reference the source layers */
-    mapLayers: mapboxgl.AnyLayer[];
+    mapLayers: LayerSpecification[];
     /** Which layer ids have click handlers attached. Should be non-overlapping */
     mapLayersHandleClicks: string[];
     /** Enforced minimum zoom level */

@@ -200,7 +200,7 @@
   }
 
   /* Hide mapbox controls */
-  .mapboxgl-control-container {
+  .maplibregl-control-container {
     display: none;
   }
 
@@ -491,7 +491,7 @@
 }
 
 /* Remove black outline in mapbox map */
-.mapboxgl-map * {
+.maplibregl-map * {
   outline: none;
 }
 

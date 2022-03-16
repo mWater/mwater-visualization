@@ -1,5 +1,5 @@
 import _ from "lodash"
-import maplibregl from "maplibre-gl"
+import maplibregl, { LayerSpecification, MapLayerEventType, MapLayerMouseEvent } from "maplibre-gl"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties, ReactNode, useEffect, useState } from "react"
 import { useRef } from "react"
@@ -24,8 +24,8 @@ import darkMatter from "./map-styles/dark-matter.json"
 import positron from "./map-styles/positron.json"
 
 type LayerClickHandlerEvent = maplibregl.MapMouseEvent & {
-  features?: maplibregl.MapboxGeoJSONFeature[] | undefined
-} & maplibregl.EventData
+  features?: maplibregl.GeoJSONFeature[] | undefined
+} //& maplibregl.EEventData
 
 /** Component that displays just the map */
 export function NewMapViewComponent(props: {
@@ -78,10 +78,10 @@ export function NewMapViewComponent(props: {
   const userStyleIncrRef = useRef(0)
 
   /** Style of the base layer */
-  const [baseStyle, setBaseStyle] = useState<maplibregl.Style>()
+  const [baseStyle, setBaseStyle] = useState<maplibregl.StyleSpecification>()
 
   /** Style of user layers */
-  const [userStyle, setUserStyle] = useState<maplibregl.Style>()
+  const [userStyle, setUserStyle] = useState<maplibregl.StyleSpecification>()
 
   /** Busy incrementable counter. Is busy if > 0 */
   const [busy, setBusy] = useState(0)
@@ -187,8 +187,8 @@ export function NewMapViewComponent(props: {
     const scopedCompiledFilters = props.scope ? compiledFilters.concat([props.scope.filter]) : compiledFilters
 
     // Sources to add
-    const newSources: { [id: string]: maplibregl.AnySourceData } = {}
-    const newLayers: { layerViewId: string | null; layer: maplibregl.AnyLayer }[] = []
+    const newSources: { [id: string]: maplibregl.SourceSpecification } = {}
+    const newLayers: { layerViewId: string | null; layer: LayerSpecification }[] = []
 
     // Mapbox layers with click handlers. Each is in format
     let newClickHandlers: { layerViewId: string; mapLayerId: string }[] = []
@@ -329,7 +329,6 @@ export function NewMapViewComponent(props: {
   useEffect(() => {
     const m = new maplibregl.Map({
       container: divRef.current!,
-      accessToken: "pk.eyJ1IjoiZ3Jhc3NpY2siLCJhIjoiY2ozMzU1N3ZoMDA3ZDJxbzh0aTRtOTRoeSJ9.fFWBZ88vbdezyhfw-I-fag",
       bounds: props.design.bounds
         ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n]
         : undefined,
@@ -386,7 +385,7 @@ export function NewMapViewComponent(props: {
       // Load style
       fetch(styleUrl)
         .then((response) => response.json())
-        .then((styleData: maplibregl.Style) => {
+        .then((styleData: maplibregl.StyleSpecification) => {
           // Set style and update layers
           setBaseStyle(styleData)
         })
@@ -424,7 +423,7 @@ export function NewMapViewComponent(props: {
     }
 
     // Create background layer to simulate base layer opacity
-    const baseLayerOpacityLayer: maplibregl.AnyLayer = {
+    const baseLayerOpacityLayer: LayerSpecification = {
       id: "baseLayerOpacity",
       type: "background",
       paint: {
@@ -443,7 +442,7 @@ export function NewMapViewComponent(props: {
 
     layers = layers.concat(userStyle.layers || [])
 
-    const style: maplibregl.Style = {
+    const style: maplibregl.StyleSpecification = {
       ...baseStyle,
       sources: {
         ...baseStyle.sources,
@@ -465,7 +464,7 @@ export function NewMapViewComponent(props: {
     const removes: { (): void }[] = []
 
     for (const clickHandler of layerClickHandlers) {
-      const onClick = (ev: LayerClickHandlerEvent) => {
+      const onClick = (ev: MapLayerMouseEvent) => {
         if (ev.features && ev.features[0]) {
           handleLayerClickRef.current!(clickHandler.layerViewId, {
             data: ev.features![0].properties,

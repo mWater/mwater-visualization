@@ -13,7 +13,7 @@ import { compileColorMapToMapbox } from "./mapboxUtils"
 import LegendGroup from "./LegendGroup"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
-import { AnyLayer } from "maplibre-gl"
+import { LayerSpecification } from "maplibre-gl"
 
 /*
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -51,7 +51,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
   ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const mapLayers: AnyLayer[] = []
+    const mapLayers: LayerSpecification[] = []
 
     // If color axes, add color conditions
     const color = compileColorMapToMapbox(design.axes.color || undefined, design.color || "transparent")

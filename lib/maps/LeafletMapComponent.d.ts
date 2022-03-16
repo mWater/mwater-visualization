@@ -95,24 +95,31 @@ export interface Props {
 }
 /** Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer */
 export default class LeafletMapComponent extends Component<Props> {
+    baseLayer: any;
+    hasBounds: boolean;
+    map: L.Map;
+    loaded: boolean;
+    popupDiv: HTMLElement;
+    popupLayer: L.Popup | null;
+    mapElem: HTMLDivElement | null;
     constructor(props: Props);
     /** Reloads all layers */
     reload(): void;
     /** Gets the underlying Leaflet map */
     getLeafletMap(): L.Map;
     getBounds(): {
-        n: any;
-        e: any;
-        s: any;
-        w: any;
+        n: number;
+        e: number;
+        s: number;
+        w: number;
     };
     /** Set bounds. Padding is optional fractional pad */
     setBounds(bounds: MapBounds | null, pad?: number): void;
     componentDidMount(): any[] | undefined;
     componentDidUpdate(prevProps: any): any[] | undefined;
-    componentWillUnmount(): any;
+    componentWillUnmount(): L.Map;
     openPopup(options: any): Element;
-    updateMap(prevProps: any): any[] | undefined;
+    updateMap(prevProps?: Props): any[] | undefined;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};

@@ -23,7 +23,7 @@ import { JsonQLExpr, JsonQLOp, JsonQLQuery, JsonQLScalar } from "jsonql"
 import { compileColorMapToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
-import { AnyLayer } from "maplibre-gl"
+import { LayerSpecification } from "maplibre-gl"
 
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   /** Gets the type of layer definition */
@@ -204,7 +204,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // Create layers
-    const mapLayers: AnyLayer[] = []
+    const mapLayers: LayerSpecification[] = []
 
     mapLayers.push({
       id: `${sourceId}:polygon-fill`,
@@ -538,7 +538,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
 
     // Create layers
-    const mapLayers: AnyLayer[] = []
+    const mapLayers: LayerSpecification[] = []
 
     mapLayers.push({
       id: `${sourceId}:polygon-fill`,
@@ -761,7 +761,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
 
     // Create layers
-    const mapLayers: AnyLayer[] = []
+    const mapLayers: LayerSpecification[] = []
 
     mapLayers.push({
       id: `${sourceId}:polygon-fill`,

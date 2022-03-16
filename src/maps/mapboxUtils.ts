@@ -1,9 +1,9 @@
-import { Expression } from "maplibre-gl"
+import { DataDrivenPropertyValueSpecification } from "maplibre-gl"
 import { Axis } from "../axes/Axis"
 
 /** Compile a color mapped axis to mapbox format case statement */
-export function compileColorMapToMapbox(axis: Axis | null | undefined, defaultColor: string): Expression | string {
-  let compiled: Expression | string
+export function compileColorMapToMapbox(axis: Axis | null | undefined, defaultColor: string): DataDrivenPropertyValueSpecification<string> | string {
+  let compiled: DataDrivenPropertyValueSpecification<string> | string
 
   if (axis && axis.colorMap) {
     const excludedValues = axis.excludedValues || []
