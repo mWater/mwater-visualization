@@ -94,6 +94,11 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       expr: { type: "field", tableAlias: "tile", column: "envelope" },
       from: { type: "table", table: "tile", alias: "tile" }
     }
+    const envelopeWithMarginExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope_with_margin" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
 
     const pixelWidth = { type: "op", op: "/", exprs: [scaleExpr, 768] }
 
@@ -163,7 +168,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [compiledGeometryExpr, { type: "op", op: "ST_Expand", exprs: [envelopeExpr, compiledSizeExpr] }]
+        exprs: [compiledGeometryExpr, { type: "op", op: "ST_Expand", exprs: [envelopeWithMarginExpr, compiledSizeExpr] }]
       }
     ]
 
@@ -214,7 +219,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         kind: "left",
         left: {
           type: "subexpr",
-          expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [envelopeExpr, compiledSizeExpr] },
+          expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [envelopeWithMarginExpr, compiledSizeExpr] },
           alias: "grid"
         },
         right: { type: "subquery", query: innerQuery, alias: "data" },

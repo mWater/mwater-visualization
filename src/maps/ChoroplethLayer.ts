@@ -68,10 +68,15 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   ): VectorTileDef {
     const regionsTable = design.regionsTable || "admin_regions"
 
-    // Expression of scale and envelope from tile table
+    // Expression of envelope from tile table
     const envelopeExpr: JsonQLScalar = {
       type: "scalar",
       expr: { type: "field", tableAlias: "tile", column: "envelope" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
+    const envelopeWithMarginExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope_with_margin" },
       from: { type: "table", table: "tile", alias: "tile" }
     }
 
@@ -83,7 +88,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       admin_regions as regions, tile as tile
       where regions.level0 = 242
       and regions.level = 1
-      and shape && tile.envelope
+      and shape && tile.envelope_with_margin
 
     points:
       select name, ST_AsMVTGeom(
@@ -92,7 +97,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       admin_regions as regions, tile as tile
       where regions.level0 = 242
       and regions.level = 1
-      and shape && tile.envelope
+      and shape && tile.envelope_with_margin
 
       */
 
@@ -111,7 +116,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         {
           type: "op",
           op: "&&",
-          exprs: [{ type: "field", tableAlias: "regions", column: "shape" }, envelopeExpr]
+          exprs: [{ type: "field", tableAlias: "regions", column: "shape" }, envelopeWithMarginExpr]
         }
       ]
     }
@@ -307,7 +312,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         (select ST_Centroid(polys.geom) from ST_Dump(shape_simplified) as polys order by ST_Area(polys.geom) desc limit 1), tile.envelope) as the_geom_webmercator, regions.color from
       admin_regions as regions2
       left outer join regions as regions on regions.id = regions2._id, tile as tile
-      where regions2.level = 1 and regions2.level0 = 242 and shape && tile.envelope
+      where regions2.level = 1 and regions2.level0 = 242 and shape && tile.envelope_with_margin
 
     */
     const compiledAdminRegionExpr = exprCompiler.compileExpr({
@@ -614,6 +619,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       expr: { type: "field", tableAlias: "tile", column: "envelope" },
       from: { type: "table", table: "tile", alias: "tile" }
     }
+    const envelopeWithMarginExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope_with_margin" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
 
     /*
     Returns two source layers, "polygons" and "points". Points are used for labels.
@@ -623,7 +633,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       admin_regions as regions, tile as tile
       where regions.level0 = 242
       and regions.level = 1
-      and shape && tile.envelope
+      and shape && tile.envelope_with_margin
 
     points:
       select name, ST_AsMVTGeom(
@@ -632,7 +642,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       admin_regions as regions, tile as tile
       where regions.level0 = 242
       and regions.level = 1
-      and shape && tile.envelope
+      and shape && tile.envelope_with_margin
 
       */
 
@@ -651,7 +661,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         {
           type: "op",
           op: "&&",
-          exprs: [{ type: "field", tableAlias: "regions", column: "shape" }, envelopeExpr]
+          exprs: [{ type: "field", tableAlias: "regions", column: "shape" }, envelopeWithMarginExpr]
         }
       ]
     }

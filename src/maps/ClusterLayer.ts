@@ -1,5 +1,5 @@
 import produce, { original } from "immer"
-import { JsonQLExpr, JsonQLQuery } from "jsonql"
+import { JsonQLExpr, JsonQLQuery, JsonQLScalar } from "jsonql"
 import _ from "lodash"
 import { DataSource, ExprCleaner, ExprCompiler, ExprValidator, injectTableAlias, Schema } from "mwater-expressions"
 import React from "react"
@@ -88,14 +88,19 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression of scale and envelope from tile table
-    const scaleExpr: JsonQLExpr = {
+    const scaleExpr: JsonQLScalar = {
       type: "scalar",
       expr: { type: "field", tableAlias: "tile", column: "scale" },
       from: { type: "table", table: "tile", alias: "tile" }
     }
-    const envelopeExpr: JsonQLExpr = {
+    const envelopeExpr: JsonQLScalar = {
       type: "scalar",
       expr: { type: "field", tableAlias: "tile", column: "envelope" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
+    const envelopeWithMarginExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope_with_margin" },
       from: { type: "table", table: "tile", alias: "tile" }
     }
 
@@ -195,7 +200,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [geometryExpr, envelopeExpr]
+        exprs: [geometryExpr, envelopeWithMarginExpr]
       }
     ]
 

@@ -150,6 +150,11 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       expr: { type: "field", tableAlias: "tile", column: "envelope" },
       from: { type: "table", table: "tile", alias: "tile" }
     }
+    const envelopeWithMarginExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope_with_margin" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
 
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "innerquery" })
@@ -223,7 +228,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [geometryExpr, envelopeExpr]
+        exprs: [geometryExpr, envelopeWithMarginExpr]
       }
     ]
 

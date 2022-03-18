@@ -1,6 +1,6 @@
 import _ from "lodash"
 import produce, { original } from "immer"
-import { JsonQLExpr, JsonQLQuery, JsonQLSelect } from "jsonql"
+import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect } from "jsonql"
 import { DataSource, ExprCleaner, ExprCompiler, ExprValidator, injectTableAlias, Schema } from "mwater-expressions"
 import React from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
@@ -97,10 +97,15 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression for the envelope of the tile
-    const envelopeExpr: JsonQLExpr = {
+    const envelopeExpr: JsonQLScalar = {
       type: "scalar",
-      from: { type: "table", table: "tile", alias: "tile" },
-      expr: { type: "field", tableAlias: "tile", column: "envelope" }
+      expr: { type: "field", tableAlias: "tile", column: "envelope" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
+    const envelopeWithMarginExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope_with_margin" },
+      from: { type: "table", table: "tile", alias: "tile" }
     }
 
     /*
@@ -205,7 +210,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
               type: "op",
               op: "ST_Intersection",
               exprs: [
-                { type: "op", op: "ST_Transform", exprs: [envelopeExpr, 4326] },
+                { type: "op", op: "ST_Transform", exprs: [envelopeWithMarginExpr, 4326] },
                 {
                   type: "op",
                   op: "ST_Expand",
