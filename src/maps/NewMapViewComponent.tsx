@@ -20,9 +20,6 @@ import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
 
-import darkMatter from "./map-styles/dark-matter.json"
-import positron from "./map-styles/positron.json"
-
 type LayerClickHandlerEvent = maplibregl.MapMouseEvent & {
   features?: maplibregl.GeoJSONFeature[] | undefined
 } //& maplibregl.EEventData
@@ -392,11 +389,9 @@ export function NewMapViewComponent(props: {
     }
 
     if (props.design.baseLayer == "cartodb_positron") {
-      setBaseStyle(positron as any)
-      return
+      loadStyle("https://api.maptiler.com/maps/positron/style.json?key=wXgjrSOKxcDdRfpMMNYl")
     } else if (props.design.baseLayer == "cartodb_dark_matter") {
-      setBaseStyle(darkMatter as any)
-      return
+      loadStyle("https://api.maptiler.com/maps/darkmatter/style.json?key=wXgjrSOKxcDdRfpMMNYl")
     } else if (props.design.baseLayer == "bing_road") {
       loadStyle("https://api.maptiler.com/maps/streets/style.json?key=wXgjrSOKxcDdRfpMMNYl")
     } else if (props.design.baseLayer == "bing_aerial") {
