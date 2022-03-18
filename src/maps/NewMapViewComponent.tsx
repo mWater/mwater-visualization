@@ -398,9 +398,9 @@ export function NewMapViewComponent(props: {
       setBaseStyle(darkMatter as any)
       return
     } else if (props.design.baseLayer == "bing_road") {
-      loadStyle("https://api.maptiler.com/maps/streets/style.json?key=K5i6tDA2NhSkq80oO102")
+      loadStyle("https://api.maptiler.com/maps/streets/style.json?key=wXgjrSOKxcDdRfpMMNYl")
     } else if (props.design.baseLayer == "bing_aerial") {
-      loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=K5i6tDA2NhSkq80oO102")
+      loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=wXgjrSOKxcDdRfpMMNYl")
     } else if (props.design.baseLayer == "blank") {
       setBaseStyle({
         version: 8,
