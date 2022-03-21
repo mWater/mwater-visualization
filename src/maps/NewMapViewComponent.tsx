@@ -479,6 +479,35 @@ export function NewMapViewComponent(props: {
     }
   }, [map, layerClickHandlers])
 
+  // Setup hover effect
+  useEffect(() => {
+    if (!map || !userStyle) {
+      return
+    }
+
+    const removes: { (): void }[] = []
+
+    for (const layer of userStyle.layers) {
+      const onEnter = (ev: MapLayerMouseEvent) => {
+        map.getCanvas().style.cursor = 'pointer'
+      }
+      const onLeave = (ev: MapLayerMouseEvent) => {
+        map.getCanvas().style.cursor = ''
+      }
+      map.on("mouseenter", layer.id, onEnter)
+      map.on("mouseleave", layer.id, onLeave)
+      removes.push(() => {
+        map.off("mouseenter", layer.id, onEnter)
+        map.off("mouseleave", layer.id, onLeave)
+      })
+    }
+    return () => {
+      for (const remove of removes) {
+        remove()
+      }
+    }
+  }, [map, userStyle])
+  
   // Capture movements on map to update bounds
   useEffect(() => {
     if (!map) {
