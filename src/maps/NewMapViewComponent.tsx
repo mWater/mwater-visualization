@@ -443,7 +443,7 @@ export function NewMapViewComponent(props: {
         ...baseStyle.sources,
         ...userStyle.sources
       },
-      glyphs: baseStyle.glyphs || "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+      glyphs: baseStyle.glyphs || "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=wXgjrSOKxcDdRfpMMNYl",
       layers
     }
 
@@ -689,9 +689,10 @@ function HiddenLegend(props: { onShow: () => void }) {
 function AttributionControl(props: { extraText?: string }) {
   return (
     <div className="newmap-attribution-control">
-      <a href="https://www.mapbox.com/about/maps/" target="_blank">
-        © Mapbox
-      </a>{" "}
+      <a href="https://www.maptiler.com/copyright/" target="_blank">
+        &copy; MapTiler
+      </a> 
+      {" "}
       <a href="http://www.openstreetmap.org/about/" target="_blank">
         © OpenStreetMap
       </a>
