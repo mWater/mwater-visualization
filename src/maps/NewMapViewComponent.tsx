@@ -408,7 +408,7 @@ export function NewMapViewComponent(props: {
   // Update user layers
   useEffect(() => {
     updateUserStyle()
-  }, [props.design.layerViews, props.scope, baseStyle, layersCreatedAfter])
+  }, [props.design.layerViews, props.scope, baseStyle, layersCreatedAfter, props.extraFilters, props.design.filters, props.design.globalFilters])
 
   // Update map style
   useEffect(() => {
