@@ -11,7 +11,7 @@ export interface LayerLegendComponentProps {
   schema: Schema
   name: string
   radiusLayer?: boolean
-  axis?: Axis
+  axis?: Axis | null
   symbol?: string
   markerSize?: number
   defaultColor?: string

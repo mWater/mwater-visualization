@@ -5,6 +5,7 @@ import { OnGridClickResults } from "./maps";
 import { JsonQLFilter } from "../index";
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql";
 import { MarkersLayerDesign } from "./MarkersLayerDesign";
+import LayerLegendComponent from "./LayerLegendComponent";
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     /** Gets the type of layer definition */
     getLayerDefinitionType(): "VectorTile";
@@ -30,7 +31,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     getBounds(design: MarkersLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: MarkersLayerDesign): number | undefined;
     getMaxZoom(design: MarkersLayerDesign): number;
-    getLegend(design: MarkersLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    getLegend(design: MarkersLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.CElement<import("./LayerLegendComponent").LayerLegendComponentProps, LayerLegendComponent>;
     getFilterableTables(design: MarkersLayerDesign, schema: Schema): string[];
     isEditable(): boolean;
     createDesignerElement(options: {

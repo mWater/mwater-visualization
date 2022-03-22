@@ -20,7 +20,7 @@ import { LayerDefinition, OnGridClickResults } from "./maps"
 import { JsonQLFilter } from "../index"
 import ChoroplethLayerDesign from "./ChoroplethLayerDesign"
 import { JsonQLExpr, JsonQLOp, JsonQLQuery, JsonQLScalar } from "jsonql"
-import { compileColorMapToMapbox } from "./mapboxUtils"
+import { compileColorMapToMapbox, compileColorToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import { LayerSpecification } from "maplibre-gl"
@@ -564,7 +564,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       "source-layer": "polygons",
       paint: {
         // Because of https://github.com/mapbox/mapbox-gl-js/issues/4090, line opacities < 1 create artifacts
-        "line-color": design.borderColor || "#000",
+        "line-color": compileColorToMapbox(design.borderColor || "#000", design.axes.color?.excludedValues),
         "line-opacity": opacity, // 0.5 * opacity,
         "line-width": 1,
         "line-blur": 1.5
@@ -582,8 +582,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           "text-size": 10
         },
         paint: {
-          "text-color": "black",
-          "text-halo-color": "rgba(255, 255, 255, 0.5)",
+          "text-color": compileColorToMapbox("black", design.axes.color?.excludedValues),
+          "text-halo-color": compileColorToMapbox("rgba(255, 255, 255, 0.5)", design.axes.color?.excludedValues),
           "text-halo-width": 2,
           "text-opacity": opacity
         }

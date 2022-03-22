@@ -10,7 +10,7 @@ import { OnGridClickResults } from "./maps"
 import { JsonQLFilter } from "../index"
 import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect, JsonQLSelectQuery } from "jsonql"
 import { MarkersLayerDesign } from "./MarkersLayerDesign"
-import { compileColorMapToMapbox } from "./mapboxUtils"
+import { compileColorMapToMapbox, compileColorToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import { LayerSpecification } from "maplibre-gl"
@@ -94,7 +94,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         paint: {
           "circle-color": color,
           "circle-opacity": 0.8 * opacity,
-          "circle-stroke-color": "white",
+          "circle-stroke-color": compileColorToMapbox("white", design.axes.color?.excludedValues),
           "circle-stroke-width": 1,
           "circle-stroke-opacity": 0.5 * opacity,
           "circle-radius": (design.markerSize || 10) / 2
@@ -725,7 +725,6 @@ polygon-fill: ` +
       symbol: design.symbol || "font-awesome/circle",
       markerSize: design.markerSize,
       name,
-      dataSource,
       filters: _.compact(_filters),
       axis: axisBuilder.cleanAxis({
         axis: design.axes.color || null,
@@ -800,13 +799,13 @@ polygon-fill: ` +
         table: design.table,
         types: ["geometry"],
         aggrNeed: "none"
-      })
+      })!
       draft.axes.color = axisBuilder.cleanAxis({
         axis: draft.axes.color ? original(draft.axes.color) || null : null,
         table: design.table,
         types: ["enum", "text", "boolean", "date"],
         aggrNeed: "none"
-      })
+      })!
 
       draft.filter = exprCleaner.cleanExpr(design.filter || null, { table: draft.table })
     })

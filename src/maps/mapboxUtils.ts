@@ -27,3 +27,33 @@ export function compileColorMapToMapbox(axis: Axis | null | undefined, defaultCo
 
   return compiled
 }
+
+/** Compile a color that is transparent if excluded to mapbox format case statement */
+export function compileColorToMapbox(color: string, excludedValues?: any[]): DataDrivenPropertyValueSpecification<string> | string {
+  let compiled: DataDrivenPropertyValueSpecification<string> | string
+
+  if (excludedValues) {
+    // Create match operator
+    compiled = ["case"]
+    for (let value of excludedValues) {
+      // If value is numeric, cast to number as ST_AsMVT makes numeric types into strings
+      if (typeof value == "number") {
+        compiled.push(["==", ["to-number", ["get", "color"]], value])
+      } else {
+        compiled.push(["==", ["get", "color"], value])
+      }
+      compiled.push("transparent")
+    }
+    // Else
+    compiled.push(color)
+
+    // Handle simple case
+    if (compiled.length == 2) {
+      compiled = color
+    }
+  } else {
+    compiled = color
+  }
+
+  return compiled
+}

@@ -636,7 +636,6 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     return React.createElement(LayerLegendComponent, {
       schema,
       name,
-      dataSource,
       axis: axisBuilder.cleanAxis({
         axis: design.colorAxis!,
         table: design.table,
@@ -699,7 +698,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
           table: draft.table,
           types: ["enum", "text", "boolean", "date"],
           aggrNeed: "required"
-        })
+        })!
       }
 
       // Clean filter
