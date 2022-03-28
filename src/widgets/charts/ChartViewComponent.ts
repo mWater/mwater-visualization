@@ -43,6 +43,7 @@ interface ChartViewComponentState {
   validDesign?: any
   dataError?: any
   data?: any
+  showErrorDetails: boolean
 }
 
 /** Inner view part of the chart widget. Uses a query data loading component
@@ -63,10 +64,9 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
       data: null, // data for chart
       dataLoading: false, // True when loading data
       dataError: null, // Set when data loading returned error
-      cacheExpiry: props.dataSource.getCacheExpiry() // Save cache expiry to see if changes
+      cacheExpiry: props.dataSource.getCacheExpiry(), // Save cache expiry to see if changes
+      showErrorDetails: false
     }
-
-    this.state = {}
   }
 
   componentDidMount() {
@@ -125,6 +125,42 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
     )
   }
 
+  renderError() {
+    const errorText = (this.state.dataError.message || this.state.dataError || "") + ""
+
+    const isTimeout = errorText.match(/timeout/) != null
+
+    return R("div", { style: { position: "absolute", bottom: "50%", left: 0, right: 0, textAlign: "center" } }, 
+      R("div", { className: "text-danger" }, 
+        isTimeout ?
+          "This widget has timed out. Placing widgets across console tabs instead of having them all in one dashboard can improve performance."
+          : "There was an error loading data for this widget."
+        ),
+      R("div", { className: "mt-3" },
+        R("button", { 
+          className: "btn btn-secondary btn-sm", 
+          disabled: this.state.dataLoading,
+          onClick: () => {
+            this.updateData() 
+          }
+        }, 
+          R("i", { className: "fas fa-redo" }),
+          " Try again"
+        ),
+      ),
+      R("button", { 
+        className: "btn btn-link btn-sm mt-2",
+        onClick: () => this.setState({ showErrorDetails: !this.state.showErrorDetails })
+      },
+         this.state.showErrorDetails ? "Hide details" : "Show details"
+      ),
+      this.state.showErrorDetails ?
+        R("div", { style: { marginTop: 10, fontSize: 10 } },
+          `Error: ${this.state.dataError.message || this.state.dataError}`
+        ) : null
+    )
+  }
+
   render() {
     const style: CSSProperties = { width: this.props.width, height: this.props.height }
 
@@ -146,11 +182,7 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
     }
 
     if (this.state.dataError) {
-      return R(
-        "div",
-        { className: "alert alert-danger" },
-        `Error loading data: ${this.state.dataError.message || this.state.dataError}`
-      )
+      return this.renderError()
     }
 
     return R(

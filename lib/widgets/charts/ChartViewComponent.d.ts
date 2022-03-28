@@ -31,6 +31,7 @@ interface ChartViewComponentState {
     validDesign?: any;
     dataError?: any;
     data?: any;
+    showErrorDetails: boolean;
 }
 /** Inner view part of the chart widget. Uses a query data loading component
  * to handle loading and continues to display old data if design becomes
@@ -53,8 +54,23 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
             fontSize: number;
         };
     }, HTMLElement>;
+    renderError(): React.DetailedReactHTMLElement<{
+        style: {
+            position: "absolute";
+            bottom: string;
+            left: number;
+            right: number;
+            textAlign: "center";
+        };
+    }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<{
-        className: string;
+        style: {
+            position: "absolute";
+            bottom: string;
+            left: number;
+            right: number;
+            textAlign: "center";
+        };
     }, HTMLElement> | React.DetailedReactHTMLElement<{
         style: React.CSSProperties;
     }, HTMLElement>;
