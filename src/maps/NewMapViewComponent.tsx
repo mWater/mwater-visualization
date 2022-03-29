@@ -655,6 +655,7 @@ export function NewMapViewComponent(props: {
       {renderLegend()}
       {renderBusy()}
       <AttributionControl extraText={props.design.attribution} />
+      <MapTilerLogo />
     </div>
   )
 }
@@ -699,4 +700,11 @@ function AttributionControl(props: { extraText?: string }) {
       {props.extraText ? " " + props.extraText : null}
     </div>
   )
+}
+
+function MapTilerLogo(props: {}) {
+  return <img 
+    src={require("./Maptiler-logo.png").default} 
+    style={{ position: "absolute", bottom: 38, left: 11, height: 22, zIndex: 1000, pointerEvents: "none" }} 
+  />
 }
