@@ -81,7 +81,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         "line-width": design.lineWidth != null ? design.lineWidth : 3,
         "line-opacity": opacity
       },
-      filter: ["any", ["==", ["get", "geometry_type"], "ST_Linestring"]]
+      filter: ["any", ["==", ["get", "geometry_type"], "ST_LineString"]]
     })
 
     // Add markers
