@@ -69,6 +69,15 @@ export function NewMapViewComponent(props: {
   const [map, setMap] = useState<maplibregl.Map>()
   const divRef = useRef<HTMLDivElement | null>(null)
 
+  // Tracks if map div is visible
+  const [mapDivVisible, setMapDivVisible] = useState(false)
+
+  // Tracks if map has webgl context
+  const [hasWebGLContext, setHasWebGLContext] = useState(false)
+
+  // Increments to trigger a map reload
+  const [mapReloadCount, setMapReloadCount] = useState(0)
+
   /** Increments when a new user style is being generated. Indicates that
    * a change was made, so to discard current one
    */
@@ -322,8 +331,35 @@ export function NewMapViewComponent(props: {
     }
   })
 
+  // Observe visibility of map
+  useEffect(() => {
+    if (!divRef.current) {
+      return
+    }
+    
+    const observer = new IntersectionObserver(function(entries) {
+      setMapDivVisible(entries[0].isIntersecting)
+    })
+    observer.observe(divRef.current)
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
+  // If map div is visible, and no webgl context, trigger map load
+  useEffect(() => {
+    if (mapDivVisible && !hasWebGLContext) {
+      setMapReloadCount(rc => rc + 1)
+    }
+  }, [mapDivVisible, hasWebGLContext])
+
   // Load map and symbols
   useEffect(() => {
+    // Don't enable if invisible
+    if (!mapDivVisible) {
+      return
+    }
+
     const m = new maplibregl.Map({
       container: divRef.current!,
       bounds: props.design.bounds
@@ -338,6 +374,14 @@ export function NewMapViewComponent(props: {
         layers: [],
         sources: {}
       }
+    })
+
+    setHasWebGLContext(true)
+
+    // Add listener for losing context
+    m.on("webglcontextlost", () => {
+      console.warn("Lost WebGL context")
+      setHasWebGLContext(false)
     })
 
     // Add zoom controls to the map.
@@ -369,8 +413,9 @@ export function NewMapViewComponent(props: {
 
     return () => {
       m.remove()
+      setHasWebGLContext(false)
     }
-  }, [])
+  }, [mapReloadCount])
 
   // Load base layer
   useEffect(() => {
