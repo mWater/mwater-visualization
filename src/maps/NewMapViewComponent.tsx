@@ -369,6 +369,7 @@ export function NewMapViewComponent(props: {
       dragPan: props.dragging === false ? false : true,
       touchZoomRotate: props.touchZoom === false ? false : true,
       attributionControl: false,
+      boxZoom: false,
       style: {
         version: 8,
         layers: [],
