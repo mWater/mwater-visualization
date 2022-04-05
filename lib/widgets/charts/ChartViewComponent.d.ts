@@ -56,19 +56,13 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
     }, HTMLElement>;
     renderError(): React.DetailedReactHTMLElement<{
         style: {
-            position: "absolute";
-            bottom: string;
-            left: number;
-            right: number;
+            marginTop: number;
             textAlign: "center";
         };
     }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<{
         style: {
-            position: "absolute";
-            bottom: string;
-            left: number;
-            right: number;
+            marginTop: number;
             textAlign: "center";
         };
     }, HTMLElement> | React.DetailedReactHTMLElement<{

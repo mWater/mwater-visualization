@@ -130,7 +130,7 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
 
     const isTimeout = errorText.match(/timeout/) != null
 
-    return R("div", { style: { position: "absolute", bottom: "50%", left: 0, right: 0, textAlign: "center" } }, 
+    return R("div", { style: { marginTop: 20, textAlign: "center" } }, 
       R("div", { className: "text-danger" }, 
         isTimeout ?
           "This widget has timed out. Placing widgets across console tabs instead of having them all in one dashboard can improve performance."
