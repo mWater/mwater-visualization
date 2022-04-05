@@ -235,7 +235,7 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
           ? R(PaletteItemComponent, {
               createItem: this.createBlockItem({
                 type: "widget",
-                aspectRatio: 1.4,
+                aspectRatio: 2,
                 widgetType: "Map",
                 design: {
                   baseLayer: "bing_road",
@@ -283,7 +283,7 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
           subtitle: "Mosaic"
         }),
         R(PaletteItemComponent, {
-          createItem: this.createBlockItem({ type: "spacer", aspectRatio: 1.4 }),
+          createItem: this.createBlockItem({ type: "spacer", aspectRatio: 2 }),
           title: R("i", { className: "fa fa-square-o" }),
           subtitle: "Spacer"
         }),
