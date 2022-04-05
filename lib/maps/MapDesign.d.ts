@@ -12,12 +12,7 @@ export interface MapDesign {
         [tableId: string]: Expr;
     };
     /** bounds as { w:, n:, e:, s: } */
-    bounds: {
-        w: number;
-        n: number;
-        e: number;
-        s: number;
-    };
+    bounds: MapBounds;
     /** User defined attribution string, added with other required attributions to the map */
     attribution?: string;
     /** true to automatically zoom to bounds of data */
@@ -30,6 +25,13 @@ export interface MapDesign {
     showLayerSwitcher?: boolean;
     /** Mode of initial legend display. Default is "open" */
     initialLegendDisplay?: "open" | "closed" | "closedIfSmall";
+}
+/** bounds as { w:, n:, e:, s: } */
+export interface MapBounds {
+    w: number;
+    n: number;
+    e: number;
+    s: number;
 }
 /** Is a view of a layer including whether visible, opacity. */
 export interface MapLayerView {

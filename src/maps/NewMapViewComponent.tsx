@@ -5,7 +5,7 @@ import React, { CSSProperties, ReactNode, useEffect, useState } from "react"
 import { useRef } from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
 import { default as LayerFactory } from "./LayerFactory"
-import { MapDesign, MapLayerView } from "./MapDesign"
+import { MapBounds, MapDesign, MapLayerView } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
 import { mapSymbols } from "./mapSymbols"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
@@ -77,6 +77,9 @@ export function NewMapViewComponent(props: {
 
   // Increments to trigger a map reload
   const [mapReloadCount, setMapReloadCount] = useState(0)
+
+  /** Last published bounds, to avoid recentering when self-changed bounds */
+  const boundsRef = useRef<MapBounds>()
 
   /** Increments when a new user style is being generated. Indicates that
    * a change was made, so to discard current one
@@ -573,11 +576,14 @@ export function NewMapViewComponent(props: {
         return
       }
       const bounds = map!.getBounds()
+      const mapBounds = { n: bounds.getNorth(), e: bounds.getEast(), s: bounds.getSouth(), w: bounds.getWest() }
 
       const design = {
         ...props.design,
-        bounds: { n: bounds.getNorth(), e: bounds.getEast(), s: bounds.getSouth(), w: bounds.getWest() }
+        bounds: mapBounds
       }
+      // Record bounds to prevent repeated application
+      boundsRef.current = mapBounds
       props.onDesignChange(design)
     }
 
@@ -619,9 +625,12 @@ export function NewMapViewComponent(props: {
     }
 
     if (!props.design.autoBounds && props.design.bounds) {
-      map.fitBounds([props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n])
+      // If we set the new bounds, do not update map bounds
+      if (props.design.bounds != boundsRef.current) {
+        map.fitBounds([props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n])
+      }
     }
-  }, [map])
+  }, [map, props.design.autoBounds, props.design.bounds])
 
   // Update max zoom
   useEffect(() => {
