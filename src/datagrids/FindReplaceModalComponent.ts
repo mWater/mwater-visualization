@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -13,8 +12,7 @@ import { DataSource, Expr, ExprCleaner, ExprUtils, Schema } from "mwater-express
 import { ExprCompiler } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import { DatagridDesign, JsonQLFilter } from ".."
-import { expr } from "jquery"
-import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
+import { JsonQLSelectQuery } from "jsonql"
 
 export interface FindReplaceModalComponentProps {
   schema: Schema
