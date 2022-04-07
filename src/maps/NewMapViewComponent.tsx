@@ -1,7 +1,7 @@
 import _ from "lodash"
 import maplibregl, { LayerSpecification, MapLayerEventType, MapLayerMouseEvent } from "maplibre-gl"
 import { DataSource, Schema } from "mwater-expressions"
-import React, { CSSProperties, ReactNode, useEffect, useState } from "react"
+import React, { CSSProperties, ReactNode, useEffect, useMemo, useState } from "react"
 import { useRef } from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
 import { default as LayerFactory } from "./LayerFactory"
@@ -112,6 +112,18 @@ export function NewMapViewComponent(props: {
   const [legendHidden, setLegendHidden] = useState(
     initialLegendDisplay == "closed" || (props.width < 500 && initialLegendDisplay == "closedIfSmall")
   )
+
+  // Throttle resize updates to avoid flicker
+  const throttledResize = useMemo(() => {
+    return _.debounce((map: maplibregl.Map) => {
+      map.resize()
+    }, 250, { leading: false, trailing: true })
+  }, [])
+  useEffect(() => {
+    if (map) {
+      throttledResize(map)
+    }
+  }, [props.width, props.height, map])
 
   // Store handleClick function in a ref
   const handleLayerClickRef = useRef<(layerViewId: string, ev: { data: any; event: any }) => void>()
