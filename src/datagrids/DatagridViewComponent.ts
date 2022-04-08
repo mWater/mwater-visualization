@@ -26,18 +26,6 @@ export interface DatagridViewComponentProps {
 
   filters?: JsonQLFilter[]
 
-  /** Check if cell is editable
-   * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-   * @deprecated
-   */
-  canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void
-
-  /** Update cell value
-   * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-   * @deprecated
-   */
-  updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void
-
   /** Check if a cell is editable by testing if underlying expression is editable */
   canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>
 
@@ -219,7 +207,7 @@ export default class DatagridViewComponent extends React.Component<
     }
 
     // Check if can edit
-    if (!this.props.canEditValue) {
+    if (!this.props.canEditExpr) {
       return
     }
 
@@ -239,22 +227,15 @@ export default class DatagridViewComponent extends React.Component<
       return
     }
 
-    this.props.canEditValue(
-      this.props.design.table!,
-      this.state.rows[rowIndex].id,
-      column.expr,
-      (error: any, canEdit: any) => {
-        // TODO handle error
-        if (error) {
-          throw error
-        }
-
+    this.props.canEditExpr(this.props.design.table!, this.state.rows[rowIndex].id, column.expr)
+      .then(canEdit => {
         if (canEdit) {
           // Start editing
           return this.setState({ editingCell: { rowIndex, columnIndex } })
         }
-      }
-    )
+      }).catch(error => {
+        console.error(error)
+      })
   }
 
   // Called to save
@@ -270,14 +251,16 @@ export default class DatagridViewComponent extends React.Component<
     const value = this.editCellComp.getValue()
 
     this.setState({ savingCell: true }, () => {
-      this.props.updateValue!(this.props.design.table!, rowId, expr, value, (error: any) => {
-        // TODO handle error
-
-        // Reload row
-        this.reloadRow(this.state.editingCell!.rowIndex, () => {
-          this.setState({ editingCell: null, savingCell: false })
+      this.props.updateExprValues!(this.props.design.table!, [{ primaryKey: rowId, expr, value }])
+        .then(() => {
+          // Reload row
+          this.reloadRow(this.state.editingCell!.rowIndex, () => {
+            this.setState({ editingCell: null, savingCell: false })
+          })
+        }).catch(error => {
+          alert("Error saving data")
+          console.error(error)
         })
-      })
     })
   }
 

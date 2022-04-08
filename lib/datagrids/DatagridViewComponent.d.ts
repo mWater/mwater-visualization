@@ -17,16 +17,6 @@ export interface DatagridViewComponentProps {
     design: DatagridDesign;
     onDesignChange?: (design: DatagridDesign) => void;
     filters?: JsonQLFilter[];
-    /** Check if cell is editable
-     * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-     * @deprecated
-     */
-    canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void;
-    /** Update cell value
-     * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-     * @deprecated
-     */
-    updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void;
     /** Check if a cell is editable by testing if underlying expression is editable */
     canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>;
     /** Update cell values by updating set of expressions and values */

@@ -37,18 +37,6 @@ export interface DatagridComponentProps {
   /** Extra elements to add to right */
   extraTitleButtonsElem?: ReactNode
 
-  /** Check if cell is editable
-   * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-   * @deprecated
-   */
-  canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void
-
-   /** Update cell value
-    * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    * @deprecated
-   */
-  updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void
- 
   /** Check if a cell is editable by testing if underlying expression is editable */
   canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>
  
@@ -206,7 +194,7 @@ export default class DatagridComponent extends React.Component<
 
   // Toggle to allow cell editing
   renderCellEdit() {
-    if (!this.props.canEditValue || this.props.onDesignChange == null) {
+    if (!this.props.canEditExpr || this.props.onDesignChange == null) {
       return null
     }
 
@@ -333,8 +321,7 @@ export default class DatagridComponent extends React.Component<
       datagridDataSource: this.props.datagridDataSource,
       design: this.props.design,
       filters,
-      canEditValue: this.props.canEditValue,
-      updateValue: this.props.updateValue,
+      updateExprValues: this.props.updateExprValues!,
       onUpdate: () => {
         // Reload
         return this.datagridView?.reload()
@@ -386,8 +373,6 @@ export default class DatagridComponent extends React.Component<
             onDesignChange: this.props.onDesignChange,
             onRowClick: this.props.onRowClick,
             onRowDoubleClick: this.props.onRowDoubleClick,
-            canEditValue: this.state.cellEditingEnabled ? this.props.canEditValue : undefined,
-            updateValue: this.state.cellEditingEnabled ? this.props.updateValue : undefined,
             canEditExpr: this.state.cellEditingEnabled ? this.props.canEditExpr : undefined,
             updateExprValues: this.state.cellEditingEnabled ? this.props.updateExprValues : undefined,
           })

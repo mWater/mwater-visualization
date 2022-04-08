@@ -6,7 +6,7 @@ import ReactDOM from "react-dom"
 const R = React.createElement
 import querystring from "querystring"
 import $ from "jquery"
-import { Schema } from "mwater-expressions"
+import { Expr, Schema } from "mwater-expressions"
 import { DataSource } from "mwater-expressions"
 import * as visualization from "./index"
 
@@ -433,13 +433,14 @@ class MWaterDatagridPane extends React.Component {
             onRowDoubleClick: function () {
               return console.log(arguments)
             }.bind(this),
-            // Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-            canEditValue: (tableId: any, rowId: any, expr: any, callback: any) => callback(null, true),
-            updateValue: (tableId: any, rowId: any, expr: any, value: any, callback: any) => {
-              console.log(value)
-              return setTimeout(() => {
-                return callback(null)
-              }, 500)
+            canEditExpr: (tableId: string, rowId: any, expr: Expr) => { return Promise.resolve(true) },
+            updateExprValues: (tableId: string, rowUpdates: any[]) => {
+              console.log(rowUpdates)
+              return new Promise<void>((resolve) => {
+                setTimeout(() => {
+                  resolve()
+                }, 1000)
+              })
             }
           })
         )

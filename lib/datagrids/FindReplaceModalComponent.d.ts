@@ -1,5 +1,6 @@
 import React from "react";
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
+import { RowUpdate } from "./DatagridViewComponent";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
 import { DataSource, Expr, Schema } from "mwater-expressions";
 import { DatagridDesign, JsonQLFilter } from "..";
@@ -8,8 +9,8 @@ export interface FindReplaceModalComponentProps {
     dataSource: DataSource;
     design: DatagridDesign;
     filters?: JsonQLFilter[];
-    canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, canEdit?: boolean) => void) => void;
-    updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void;
+    /** Update cell values by updating set of expressions and values */
+    updateExprValues: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>;
     onUpdate: () => void;
 }
 interface FindReplaceModalComponentState {
@@ -21,13 +22,13 @@ interface FindReplaceModalComponentState {
     withExpr: Expr;
     /** Condition expr */
     conditionExpr: Expr;
-    /** 0-100 when working */
-    progress: null | number;
+    /** True when working */
+    busy: boolean;
 }
 export default class FindReplaceModalComponent extends React.Component<FindReplaceModalComponentProps, FindReplaceModalComponentState> {
     constructor(props: any);
     show(): void;
-    performReplace(): void;
+    performReplace(): Promise<void>;
     renderPreview(): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent>;
     renderContents(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     render(): React.CElement<import("react-library/lib/ModalPopupComponent").ModalPopupComponentProps, ModalPopupComponent> | null;

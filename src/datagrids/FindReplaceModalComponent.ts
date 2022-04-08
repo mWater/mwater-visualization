@@ -1,10 +1,9 @@
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
-import async from "async"
 import { default as ReactSelect } from "react-select"
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
-import DatagridViewComponent from "./DatagridViewComponent"
+import DatagridViewComponent, { RowUpdate } from "./DatagridViewComponent"
 import DirectDatagridDataSource from "./DirectDatagridDataSource"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { ExprComponent } from "mwater-expressions-ui"
@@ -22,14 +21,9 @@ export interface FindReplaceModalComponentProps {
 
   filters?: JsonQLFilter[]
 
-  // Check if expression of table row is editable
-  // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-  canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, canEdit?: boolean) => void) => void
-
-  // Update table row expression with a new value
-  // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-  updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void
-
+  /** Update cell values by updating set of expressions and values */
+  updateExprValues: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>
+ 
   onUpdate: () => void
 }
 
@@ -42,8 +36,9 @@ interface FindReplaceModalComponentState {
   withExpr: Expr
   /** Condition expr */
   conditionExpr: Expr
-  /** 0-100 when working */
-  progress: null | number
+
+  /** True when working */
+  busy: boolean
 }
 
 // Modal to perform find/replace on datagrid
@@ -59,15 +54,15 @@ export default class FindReplaceModalComponent extends React.Component<
       replaceColumn: null, // Column id to replace
       withExpr: null, // Replace with expression
       conditionExpr: null, // Condition expr
-      progress: null // 0-100 when working
+      busy: false
     }
   }
 
   show() {
-    return this.setState({ open: true, progress: null })
+    return this.setState({ open: true, busy: false })
   }
 
-  performReplace() {
+  async performReplace() {
     const exprUtils = new ExprUtils(this.props.schema)
     const exprCompiler = new ExprCompiler(this.props.schema)
     const exprCleaner = new ExprCleaner(this.props.schema)
@@ -141,89 +136,30 @@ export default class FindReplaceModalComponent extends React.Component<
 
     query.where = { type: "op", op: "and", exprs: _.compact(wheres) }
 
-    this.setState({ progress: 0 })
-    // Number completed (twice for each row, once to check can edit and other to perform)
-    let completed = 0
-    return this.props.dataSource.performQuery(query, (error, rows) => {
-      if (error) {
-        this.setState({ progress: null })
-        alert(`Error: ${error.message}`)
+    this.setState({ busy: true })
+    try {
+      const rows = await this.props.dataSource.performQuery(query)
+
+      // Confirm
+      if (!confirm(`Replace ${rows.length} values? This cannot be undone.`)) {
         return
       }
 
-      // Check canEditValue on each one
-      return async.mapLimit(
-        rows,
-        10,
-        (row, cb) => {
-          // Abort if closed
-          if (!this.state.open) {
-            return
-          }
-
-          // Prevent stack overflow
-          _.defer(() => {
-            // First half
-            completed += 1
-            this.setState({ progress: (completed * 50) / rows.length })
-
-            this.props.canEditValue!(this.props.design.table!, row.id, replaceExpr, cb)
-          })
-        },
-        (error, canEdits?: boolean[]) => {
-          if (error) {
-            this.setState({ progress: null })
-            alert(`Error: ${error.message}`)
-            return
-          }
-
-          if (!_.all(canEdits!)) {
-            this.setState({ progress: null })
-            alert("You do not have permission to replace all values")
-            return
-          }
-
-          // Confirm
-          if (!confirm(`Replace ${canEdits!.length} values? This cannot be undone.`)) {
-            this.setState({ progress: null })
-            return
-          }
-
-          // Perform updateValue on each one
-          // Do one at a time to prevent conflicts. TODO should do all at once in a transaction.
-          return async.eachLimit(
-            rows,
-            1,
-            (row, cb) => {
-              // Abort if closed
-              if (!this.state.open) {
-                return
-              }
-
-              // Prevent stack overflow
-              _.defer(() => {
-                // First half
-                completed += 1
-                this.setState({ progress: (completed * 50) / rows.length })
-
-                this.props.updateValue!(this.props.design.table!, row.id, replaceExpr, row.withValue, cb)
-              })
-            },
-            (error) => {
-              if (error) {
-                this.setState({ progress: null })
-                alert(`Error: ${error.message}`)
-                return
-              }
-
-              alert("Success")
-              this.setState({ progress: null, open: false })
-              return this.props.onUpdate?.()
-            }
-          )
-        }
-      )
-    })
+      // Perform updates
+      await this.props.updateExprValues(this.props.design.table!, rows.map(row => ({
+        primaryKey: row.id,
+        expr: replaceExpr,
+        value: row.withValue
+      })))
+      
+      alert("Success")
+      this.setState({ open: false })
+      this.props.onUpdate()
+    } catch(error) {
+      alert(`Error: ${error.message}`)
+    } finally {
+      this.setState({ busy: false })
+    }
   }
 
   renderPreview() {
@@ -288,7 +224,7 @@ export default class FindReplaceModalComponent extends React.Component<
     }))
 
     // Show progress
-    if (this.state.progress != null) {
+    if (this.state.busy) {
       return R(
         "div",
         null,
@@ -296,7 +232,7 @@ export default class FindReplaceModalComponent extends React.Component<
         R(
           "div",
           { className: "progress" },
-          R("div", { className: "progress-bar", style: { width: `${this.state.progress}%` } })
+          R("div", { className: "progress-bar progress-bar-striped progress-bar-animated", style: { width: `100%` } })
         )
       )
     }
@@ -391,7 +327,7 @@ export default class FindReplaceModalComponent extends React.Component<
             {
               key: "apply",
               type: "button",
-              disabled: !this.state.replaceColumn || this.state.progress != null,
+              disabled: !this.state.replaceColumn || this.state.busy,
               onClick: () => this.performReplace(),
               className: "btn btn-primary"
             },
