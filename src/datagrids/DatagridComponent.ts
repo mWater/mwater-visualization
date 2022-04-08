@@ -53,7 +53,7 @@ export interface DatagridComponentProps {
   canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>
  
   /** Update cell values by updating set of expressions and values */
-  updateExprs?: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>
+  updateExprValues?: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>
  
   /** Called when row is clicked with (tableId, rowId) */
   onRowClick?: (tableId: string, rowId: any) => void
@@ -387,7 +387,9 @@ export default class DatagridComponent extends React.Component<
             onRowClick: this.props.onRowClick,
             onRowDoubleClick: this.props.onRowDoubleClick,
             canEditValue: this.state.cellEditingEnabled ? this.props.canEditValue : undefined,
-            updateValue: this.state.cellEditingEnabled ? this.props.updateValue : undefined
+            updateValue: this.state.cellEditingEnabled ? this.props.updateValue : undefined,
+            canEditExpr: this.state.cellEditingEnabled ? this.props.canEditExpr : undefined,
+            updateExprValues: this.state.cellEditingEnabled ? this.props.updateExprValues : undefined,
           })
         } else if (this.props.onDesignChange) {
           return R(

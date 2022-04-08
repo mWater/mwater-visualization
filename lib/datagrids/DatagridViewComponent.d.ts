@@ -30,7 +30,7 @@ export interface DatagridViewComponentProps {
     /** Check if a cell is editable by testing if underlying expression is editable */
     canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>;
     /** Update cell values by updating set of expressions and values */
-    updateExprs?: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>;
+    updateExprValues?: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>;
     /** Called when row is double-clicked with (tableId, rowId, rowIndex) */
     onRowDoubleClick?: (tableId: string, rowId: any, rowIndex: number) => void;
     /** Called when a row is clicked with (tableId, rowId, rowIndex) */
