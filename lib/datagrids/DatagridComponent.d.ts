@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import { DataSource, Expr, Schema } from "mwater-expressions";
-import DatagridViewComponent from "./DatagridViewComponent";
+import DatagridViewComponent, { RowUpdate } from "./DatagridViewComponent";
 import FindReplaceModalComponent from "./FindReplaceModalComponent";
 import DatagridDataSource from "./DatagridDataSource";
 import { DatagridDesign, JsonQLFilter } from "..";
@@ -19,11 +19,20 @@ export interface DatagridComponentProps {
     titleElem?: ReactNode;
     /** Extra elements to add to right */
     extraTitleButtonsElem?: ReactNode;
-    canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, canEdit?: boolean) => void) => void;
-    /** Update table row expression with a new value
-     * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+    /** Check if cell is editable
+     * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+     * @deprecated
      */
+    canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void;
+    /** Update cell value
+     * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+     * @deprecated
+    */
     updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void;
+    /** Check if a cell is editable by testing if underlying expression is editable */
+    canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>;
+    /** Update cell values by updating set of expressions and values */
+    updateExprs?: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>;
     /** Called when row is clicked with (tableId, rowId) */
     onRowClick?: (tableId: string, rowId: any) => void;
     /** Called when row is double-clicked with (tableId, rowId) */

@@ -19,16 +19,28 @@ export interface DatagridViewComponentProps {
     filters?: JsonQLFilter[];
     /** Check if cell is editable
      * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+     * @deprecated
      */
-    canEditCell?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void;
+    canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void;
     /** Update cell value
      * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+     * @deprecated
      */
-    updateCell?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void;
+    updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void;
+    /** Check if a cell is editable by testing if underlying expression is editable */
+    canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>;
+    /** Update cell values by updating set of expressions and values */
+    updateExprs?: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>;
     /** Called when row is double-clicked with (tableId, rowId, rowIndex) */
     onRowDoubleClick?: (tableId: string, rowId: any, rowIndex: number) => void;
     /** Called when a row is clicked with (tableId, rowId, rowIndex) */
     onRowClick?: (tableId: string, rowId: any, rowIndex: number) => void;
+}
+/** Update to one row expression value */
+export interface RowUpdate {
+    primaryKey: string;
+    expr: Expr;
+    value: any;
 }
 export interface DatagridViewComponentState {
     rows: any[];

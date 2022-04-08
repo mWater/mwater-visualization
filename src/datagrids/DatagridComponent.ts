@@ -8,7 +8,7 @@ import ActionCancelModalComponent from "react-library/lib/ActionCancelModalCompo
 import { DataSource, Expr, ExprUtils, FieldExpr, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
-import DatagridViewComponent from "./DatagridViewComponent"
+import DatagridViewComponent, { RowUpdate } from "./DatagridViewComponent"
 import DatagridDesignerComponent from "./DatagridDesignerComponent"
 import DatagridUtils from "./DatagridUtils"
 
@@ -37,15 +37,24 @@ export interface DatagridComponentProps {
   /** Extra elements to add to right */
   extraTitleButtonsElem?: ReactNode
 
-  // Check if expression of table row is editable
-  // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-  canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, canEdit?: boolean) => void) => void
+  /** Check if cell is editable
+   * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+   * @deprecated
+   */
+  canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void
 
-  /** Update table row expression with a new value
-   * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+   /** Update cell value
+    * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+    * @deprecated
    */
   updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void
-
+ 
+  /** Check if a cell is editable by testing if underlying expression is editable */
+  canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>
+ 
+  /** Update cell values by updating set of expressions and values */
+  updateExprs?: (tableId: string, rowUpdates: RowUpdate[]) => Promise<void>
+ 
   /** Called when row is clicked with (tableId, rowId) */
   onRowClick?: (tableId: string, rowId: any) => void
 
@@ -377,8 +386,8 @@ export default class DatagridComponent extends React.Component<
             onDesignChange: this.props.onDesignChange,
             onRowClick: this.props.onRowClick,
             onRowDoubleClick: this.props.onRowDoubleClick,
-            canEditCell: this.state.cellEditingEnabled ? this.props.canEditValue : undefined,
-            updateCell: this.state.cellEditingEnabled ? this.props.updateValue : undefined
+            canEditValue: this.state.cellEditingEnabled ? this.props.canEditValue : undefined,
+            updateValue: this.state.cellEditingEnabled ? this.props.updateValue : undefined
           })
         } else if (this.props.onDesignChange) {
           return R(
