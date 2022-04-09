@@ -37,7 +37,7 @@ export interface DatagridComponentProps {
   /** Extra elements to add to right */
   extraTitleButtonsElem?: ReactNode
 
-  /** Check if a cell is editable by testing if underlying expression is editable */
+  /** Check if a value is editable by testing if underlying expression is editable */
   canEditExpr?: (tableId: string, rowId: any, expr: Expr) => Promise<boolean>
  
   /** Update cell values by updating set of expressions and values */

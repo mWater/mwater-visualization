@@ -1,11 +1,8 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import _ from "lodash"
-import React from "react"
+import React, { ReactElement } from "react"
 const R = React.createElement
 
 import { DataSource, Schema } from "mwater-expressions"
-import querystring from "querystring"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import LoadingComponent from "react-library/lib/LoadingComponent"
 import mWaterLoader from "./mWaterLoader"
@@ -29,7 +26,7 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
     onExtraTablesChange?: (extraTables: string[]) => void
     /**  Override default add layer component. See AddLayerComponent for details */
     addLayerElementFactory?: any
-    children: (error: any, config: { schema: Schema; dataSource: DataSource }) => ReactElement<any>
+    children: (error: any, config?: { schema: Schema; dataSource: DataSource }) => ReactElement<any>
     /** Custom error formatter that returns React node or string, gets passed the error response from server */
     errorFormatter: (data: any, defaultError: string) => string
   },
@@ -37,6 +34,7 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
     error: any
     schema: Schema | null
     dataSource: DataSource | null
+    loading: boolean
   }
 > {
   mounted: boolean
@@ -46,7 +44,8 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
     this.state = {
       error: null,
       schema: null,
-      dataSource: null
+      dataSource: null,
+      loading: false
     }
 
     this.mounted = false
@@ -89,6 +88,10 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
       return React.createElement(LoadingComponent)
     }
 
+    if (this.state.error) {
+      return this.props.children(this.state.error)
+    }
+
     // Inject context
     return R(
       MWaterContextComponent,
@@ -96,7 +99,7 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
         apiUrl: this.props.apiUrl,
         client: this.props.client,
         user: this.props.user,
-        schema: this.state.schema,
+        schema: this.state.schema!,
         extraTables: this.props.extraTables,
         onExtraTablesChange: this.props.onExtraTablesChange,
         addLayerElementFactory: this.props.addLayerElementFactory
