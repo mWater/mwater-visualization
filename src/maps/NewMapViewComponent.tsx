@@ -9,6 +9,7 @@ import { MapBounds, MapDesign, MapLayerView } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
 import { mapSymbols } from "./mapSymbols"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
+import { useStableCallback } from "react-library/lib/useStableCallback"
 import {
   getCompiledFilters as utilsGetCompiledFilters,
   getFilterableTables as utilsGetFilterableTables,
@@ -125,11 +126,8 @@ export function NewMapViewComponent(props: {
     }
   }, [props.width, props.height, map])
 
-  // Store handleClick function in a ref
-  const handleLayerClickRef = useRef<(layerViewId: string, ev: { data: any; event: any }) => void>()
-
   /** Handle a click on a layer */
-  function handleLayerClick(layerViewId: string, ev: { data: any; event: any }) {
+  const handleLayerClick = useStableCallback((layerViewId: string, ev: { data: any; event: any }) => {
     const layerView = props.design.layerViews.find((lv) => lv.id == layerViewId)!
 
     // Create layer
@@ -181,10 +179,7 @@ export function NewMapViewComponent(props: {
 
       props.onScopeChange(scope)
     }
-  }
-
-  // Store most up-to-date handleClick function in a ref
-  handleLayerClickRef.current = handleLayerClick
+  })
 
   /** Get filters from extraFilters combined with map filters */
   function getCompiledFilters() {
@@ -522,7 +517,7 @@ export function NewMapViewComponent(props: {
     for (const clickHandler of layerClickHandlers) {
       const onClick = (ev: MapLayerMouseEvent) => {
         if (ev.features && ev.features[0]) {
-          handleLayerClickRef.current!(clickHandler.layerViewId, {
+          handleLayerClick(clickHandler.layerViewId, {
             data: ev.features![0].properties,
             event: ev
           })
@@ -540,35 +535,17 @@ export function NewMapViewComponent(props: {
     }
   }, [map, layerClickHandlers])
 
+  // Get user style layer ids
+  const userLayerIds = useMemo(() => {
+    if (!userStyle) {
+      return []
+    }
+    return userStyle.layers.map((l) => l.id)
+  }, [userStyle])
+
   // Setup hover effect
-  useEffect(() => {
-    if (!map || !userStyle) {
-      return
-    }
+  useHoverCursor(map, userLayerIds)
 
-    const removes: { (): void }[] = []
-
-    for (const layer of userStyle.layers) {
-      const onEnter = (ev: MapLayerMouseEvent) => {
-        map.getCanvas().style.cursor = 'pointer'
-      }
-      const onLeave = (ev: MapLayerMouseEvent) => {
-        map.getCanvas().style.cursor = ''
-      }
-      map.on("mouseenter", layer.id, onEnter)
-      map.on("mouseleave", layer.id, onLeave)
-      removes.push(() => {
-        map.off("mouseenter", layer.id, onEnter)
-        map.off("mouseleave", layer.id, onLeave)
-      })
-    }
-    return () => {
-      for (const remove of removes) {
-        remove()
-      }
-    }
-  }, [map, userStyle])
-  
   // Capture movements on map to update bounds
   useEffect(() => {
     if (!map) {
@@ -774,4 +751,36 @@ function MapTilerLogo(props: {}) {
     src={require("./Maptiler-logo.png").default} 
     style={{ position: "absolute", bottom: 38, left: 11, height: 22, zIndex: 1000, pointerEvents: "none" }} 
   />
+}
+
+/** Sets cursor as pointer when over any layers with the specified ids */
+function useHoverCursor(map: maplibregl.Map | undefined, layerIds: string[]) {
+  // Setup hover effect
+  useEffect(() => {
+    if (!map) {
+      return
+    }
+
+    const removes: { (): void }[] = []
+
+    for (const layerId of layerIds) {
+      const onEnter = (ev: MapLayerMouseEvent) => {
+        map.getCanvas().style.cursor = 'pointer'
+      }
+      const onLeave = (ev: MapLayerMouseEvent) => {
+        map.getCanvas().style.cursor = ''
+      }
+      map.on("mouseenter", layerId, onEnter)
+      map.on("mouseleave", layerId, onLeave)
+      removes.push(() => {
+        map.off("mouseenter", layerId, onEnter)
+        map.off("mouseleave", layerId, onLeave)
+      })
+    }
+    return () => {
+      for (const remove of removes) {
+        remove()
+      }
+    }
+  }, [map, layerIds])
 }
