@@ -87,9 +87,6 @@ export function NewMapViewComponent(props: {
    */
   const userStyleIncrRef = useRef(0)
 
-  /** Style of the base layer */
-  const [baseStyle, setBaseStyle] = useState<maplibregl.StyleSpecification>()
-
   /** Style of user layers */
   const [userStyle, setUserStyle] = useState<maplibregl.StyleSpecification>()
 
@@ -428,83 +425,25 @@ export function NewMapViewComponent(props: {
     }
   }, [mapReloadCount])
 
-  // Load base layer
-  useEffect(() => {
-    if (!map) {
-      return
-    }
-
-    function loadStyle(styleUrl: string) {
-      // Load style
-      fetch(styleUrl)
-        .then((response) => response.json())
-        .then((styleData: maplibregl.StyleSpecification) => {
-          // Set style and update layers
-          setBaseStyle(styleData)
-        })
-    }
-
-    if (props.design.baseLayer == "cartodb_positron") {
-      loadStyle("https://api.maptiler.com/maps/positron/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (props.design.baseLayer == "cartodb_dark_matter") {
-      loadStyle("https://api.maptiler.com/maps/darkmatter/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (props.design.baseLayer == "bing_road") {
-      loadStyle("https://api.maptiler.com/maps/streets/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (props.design.baseLayer == "bing_aerial") {
-      loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (props.design.baseLayer == "blank") {
-      setBaseStyle({
-        version: 8,
-        layers: [],
-        sources: {}
-      })
-    }
-  }, [map, props.design.baseLayer])
-
   // Update user layers
   useEffect(() => {
     updateUserStyle()
-  }, [props.design.layerViews, props.scope, baseStyle, layersCreatedAfter, props.extraFilters, props.design.filters, props.design.globalFilters])
+  }, [props.design.layerViews, props.scope, layersCreatedAfter, props.extraFilters, props.design.filters, props.design.globalFilters])
+  
+  // Load base style
+  const baseStyle = useBaseStyle(props.design.baseLayer)
 
   // Update map style
+  const style = useMemo(() => mergeBaseAndUserStyle(baseStyle, userStyle, props.design.baseLayerOpacity), [baseStyle, userStyle, props.design.baseLayerOpacity])
+
+  // Set map style
   useEffect(() => {
-    // Can't load until map, baseStyle and userStyle are present
-    if (!map || !baseStyle || !userStyle) {
+    // Can't load until map and style are present
+    if (!map || !style) {
       return
     }
-
-    // Create background layer to simulate base layer opacity
-    const baseLayerOpacityLayer: LayerSpecification = {
-      id: "baseLayerOpacity",
-      type: "background",
-      paint: {
-        "background-color": "white",
-        "background-opacity": 1 - (props.design.baseLayerOpacity != null ? props.design.baseLayerOpacity : 1)
-      }
-    }
-
-    // Create style
-    let layers = baseStyle.layers || []
-
-    // Simulate base opacity
-    if (props.design.baseLayerOpacity != null && props.design.baseLayerOpacity < 1) {
-      layers = layers.concat([baseLayerOpacityLayer])
-    }
-
-    layers = layers.concat(userStyle.layers || [])
-
-    const style: maplibregl.StyleSpecification = {
-      ...baseStyle,
-      sources: {
-        ...baseStyle.sources,
-        ...userStyle.sources
-      },
-      glyphs: baseStyle.glyphs || "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=wXgjrSOKxcDdRfpMMNYl",
-      layers
-    }
-
     map.setStyle(style)
-  }, [map, baseStyle, userStyle, props.design.baseLayerOpacity])
+  }, [map, style])
 
   // Setup click handlers
   useEffect(() => {
@@ -783,4 +722,82 @@ function useHoverCursor(map: maplibregl.Map | undefined, layerIds: string[]) {
       }
     }
   }, [map, layerIds])
+}
+
+/** Loads a base style for the map */
+function useBaseStyle(baseLayer: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "blank") {
+  // Load base layer
+  const [baseStyle, setBaseStyle] = useState<maplibregl.StyleSpecification | null>(null)
+
+  useEffect(() => {
+    function loadStyle(styleUrl: string) {
+      // Load style
+      fetch(styleUrl)
+        .then((response) => response.json())
+        .then((styleData: maplibregl.StyleSpecification) => {
+          // Set style and update layers
+          setBaseStyle(styleData)
+        })
+    }
+
+    if (baseLayer == "cartodb_positron") {
+      loadStyle("https://api.maptiler.com/maps/positron/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+    } else if (baseLayer == "cartodb_dark_matter") {
+      loadStyle("https://api.maptiler.com/maps/darkmatter/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+    } else if (baseLayer == "bing_road") {
+      loadStyle("https://api.maptiler.com/maps/streets/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+    } else if (baseLayer == "bing_aerial") {
+      loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+    } else if (baseLayer == "blank") {
+      setBaseStyle({
+        version: 8,
+        layers: [],
+        sources: {}
+      })
+    }
+  }, [baseLayer])
+
+  return baseStyle
+}
+
+/** Combines a base style and a user style */
+function mergeBaseAndUserStyle(
+  baseStyle: maplibregl.StyleSpecification | null | undefined, 
+  userStyle: maplibregl.StyleSpecification | null | undefined, 
+  baseLayerOpacity?: number | null) {
+  // Merge until baseStyle and userStyle are present
+  if (!baseStyle || !userStyle) {
+    return null
+  }
+
+  // Create background layer to simulate base layer opacity
+  const baseLayerOpacityLayer: LayerSpecification = {
+    id: "baseLayerOpacity",
+    type: "background",
+    paint: {
+      "background-color": "white",
+      "background-opacity": 1 - (baseLayerOpacity != null ? baseLayerOpacity : 1)
+    }
+  }
+
+  // Create style
+  let layers = baseStyle.layers || []
+
+  // Simulate base opacity
+  if (baseLayerOpacity != null && baseLayerOpacity < 1) {
+    layers = layers.concat([baseLayerOpacityLayer])
+  }
+
+  layers = layers.concat(userStyle.layers || [])
+
+  const style: maplibregl.StyleSpecification = {
+    ...baseStyle,
+    sources: {
+      ...baseStyle.sources,
+      ...userStyle.sources
+    },
+    glyphs: baseStyle.glyphs || "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=wXgjrSOKxcDdRfpMMNYl",
+    layers
+  }
+  return style
 }
