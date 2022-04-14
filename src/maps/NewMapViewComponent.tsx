@@ -1,5 +1,5 @@
 import _ from "lodash"
-import maplibregl, { LayerSpecification, MapLayerEventType, MapLayerMouseEvent } from "maplibre-gl"
+import { LayerSpecification, MapLayerEventType, MapLayerMouseEvent } from "maplibre-gl"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties, ReactNode, useEffect, useMemo, useState } from "react"
 import { useRef } from "react"
@@ -7,7 +7,6 @@ import { JsonQLFilter } from "../JsonQLFilter"
 import { default as LayerFactory } from "./LayerFactory"
 import { MapBounds, MapDesign, MapLayerView } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
-import { mapSymbols } from "./mapSymbols"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { useStableCallback } from "react-library/lib/useStableCallback"
 import {
@@ -20,6 +19,7 @@ import "maplibre-gl/dist/maplibre-gl.css"
 import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
+import { AttributionControl, MapTilerLogo, mergeBaseAndUserStyle, useBaseStyle, useHoverCursor, useStyleMap, useThrottledMapResize, useVectorMap } from "./vectorMaps"
 
 type LayerClickHandlerEvent = maplibregl.MapMouseEvent & {
   features?: maplibregl.GeoJSONFeature[] | undefined
@@ -67,17 +67,7 @@ export function NewMapViewComponent(props: {
   /** Locale to use */
   locale: string
 }) {
-  const [map, setMap] = useState<maplibregl.Map>()
-  const divRef = useRef<HTMLDivElement | null>(null)
-
-  // Tracks if map div is visible
-  const [mapDivVisible, setMapDivVisible] = useState(false)
-
-  // Tracks if map has webgl context
-  const [hasWebGLContext, setHasWebGLContext] = useState(false)
-
-  // Increments to trigger a map reload
-  const [mapReloadCount, setMapReloadCount] = useState(0)
+  const [mapDiv, setMapDiv] = useState<HTMLDivElement | null>(null)
 
   /** Last published bounds, to avoid recentering when self-changed bounds */
   const boundsRef = useRef<MapBounds>()
@@ -111,17 +101,18 @@ export function NewMapViewComponent(props: {
     initialLegendDisplay == "closed" || (props.width < 500 && initialLegendDisplay == "closedIfSmall")
   )
 
-  // Throttle resize updates to avoid flicker
-  const throttledResize = useMemo(() => {
-    return _.debounce((map: maplibregl.Map) => {
-      map.resize()
-    }, 250, { leading: false, trailing: true })
-  }, [])
-  useEffect(() => {
-    if (map) {
-      throttledResize(map)
-    }
-  }, [props.width, props.height, map])
+  // Load map
+  const map = useVectorMap({
+    divRef: mapDiv,
+    bounds: props.design.bounds
+      ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n]
+      : undefined,
+      scrollZoom: props.scrollWheelZoom,
+      dragPan: props.dragging,
+      touchZoomRotate: props.touchZoom,
+  })
+
+  useThrottledMapResize(map, props.width, props.height)
 
   /** Handle a click on a layer */
   const handleLayerClick = useStableCallback((layerViewId: string, ev: { data: any; event: any }) => {
@@ -338,112 +329,18 @@ export function NewMapViewComponent(props: {
     }
   })
 
-  // Observe visibility of map
-  useEffect(() => {
-    if (!divRef.current) {
-      return
-    }
-    
-    const observer = new IntersectionObserver(function(entries) {
-      setMapDivVisible(entries[0].isIntersecting)
-    })
-    observer.observe(divRef.current)
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
-
-  // If map div is visible, and no webgl context, trigger map load
-  useEffect(() => {
-    if (mapDivVisible && !hasWebGLContext) {
-      setMapReloadCount(rc => rc + 1)
-    }
-  }, [mapDivVisible, hasWebGLContext])
-
-  // Load map and symbols
-  useEffect(() => {
-    // Don't enable if invisible
-    if (!mapDivVisible) {
-      return
-    }
-
-    const m = new maplibregl.Map({
-      container: divRef.current!,
-      bounds: props.design.bounds
-        ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n]
-        : undefined,
-      scrollZoom: props.scrollWheelZoom === false ? false : true,
-      dragPan: props.dragging === false ? false : true,
-      touchZoomRotate: props.touchZoom === false ? false : true,
-      attributionControl: false,
-      boxZoom: false,
-      style: {
-        version: 8,
-        layers: [],
-        sources: {}
-      }
-    })
-
-    setHasWebGLContext(true)
-
-    // Add listener for losing context
-    m.on("webglcontextlost", () => {
-      console.warn("Lost WebGL context")
-      setHasWebGLContext(false)
-    })
-
-    // Add zoom controls to the map.
-    m.addControl(new maplibregl.NavigationControl({}), "top-left")
-
-    // Add scale control
-    const scale = new maplibregl.ScaleControl({
-      unit: "metric"
-    })
-    m.addControl(scale)
-
-    // Speed up wheel scrolling
-    m.scrollZoom.setWheelZoomRate(1 / 250)
-
-    // Dynamically load symbols
-    m.on("styleimagemissing" as any, function (ev: { id: string }) {
-      // Check if known
-      const mapSymbol = mapSymbols.find((s) => s.value == ev.id)
-      if (mapSymbol) {
-        m.loadImage(mapSymbol.url, (err: any, image: any) => {
-          if (image && !m.hasImage(mapSymbol.value)) {
-            m.addImage(mapSymbol.value, image, { sdf: true })
-          }
-        })
-      }
-    })
-
-    setMap(m)
-
-    return () => {
-      m.remove()
-      setHasWebGLContext(false)
-    }
-  }, [mapReloadCount])
-
   // Update user layers
   useEffect(() => {
     updateUserStyle()
   }, [props.design.layerViews, props.scope, layersCreatedAfter, props.extraFilters, props.design.filters, props.design.globalFilters])
-  
-  // Load base style
-  const baseStyle = useBaseStyle(props.design.baseLayer)
 
-  // Update map style
-  const style = useMemo(() => mergeBaseAndUserStyle(baseStyle, userStyle, props.design.baseLayerOpacity), [baseStyle, userStyle, props.design.baseLayerOpacity])
-
-  // Set map style
-  useEffect(() => {
-    // Can't load until map and style are present
-    if (!map || !style) {
-      return
-    }
-    map.setStyle(style)
-  }, [map, style])
+  // Style map
+  useStyleMap({
+    map,
+    userStyle,
+    baseLayer: props.design.baseLayer,
+    baseLayerOpacity: props.design.baseLayerOpacity,
+  })
 
   // Setup click handlers
   useEffect(() => {
@@ -634,7 +531,7 @@ export function NewMapViewComponent(props: {
       {props.onDesignChange != null && props.design.showLayerSwitcher ? (
         <LayerSwitcherComponent design={props.design} onDesignChange={props.onDesignChange} />
       ) : null}
-      <div style={{ width: props.width, height: props.height }} ref={divRef} />
+      <div style={{ width: props.width, height: props.height }} ref={setMapDiv} />
       {renderLegend()}
       {renderBusy()}
       <AttributionControl extraText={props.design.attribution} />
@@ -668,136 +565,4 @@ function HiddenLegend(props: { onShow: () => void }) {
       <i className="fa fa-angle-double-left" />
     </div>
   )
-}
-
-function AttributionControl(props: { extraText?: string }) {
-  return (
-    <div className="newmap-attribution-control">
-      <a href="https://www.maptiler.com/copyright/" target="_blank">
-        &copy; MapTiler
-      </a> 
-      {" "}
-      <a href="http://www.openstreetmap.org/about/" target="_blank">
-        © OpenStreetMap
-      </a>
-      {props.extraText ? " " + props.extraText : null}
-    </div>
-  )
-}
-
-function MapTilerLogo(props: {}) {
-  return <img 
-    src={require("./Maptiler-logo.png").default} 
-    style={{ position: "absolute", bottom: 38, left: 11, height: 22, zIndex: 1000, pointerEvents: "none" }} 
-  />
-}
-
-/** Sets cursor as pointer when over any layers with the specified ids */
-function useHoverCursor(map: maplibregl.Map | undefined, layerIds: string[]) {
-  // Setup hover effect
-  useEffect(() => {
-    if (!map) {
-      return
-    }
-
-    const removes: { (): void }[] = []
-
-    for (const layerId of layerIds) {
-      const onEnter = (ev: MapLayerMouseEvent) => {
-        map.getCanvas().style.cursor = 'pointer'
-      }
-      const onLeave = (ev: MapLayerMouseEvent) => {
-        map.getCanvas().style.cursor = ''
-      }
-      map.on("mouseenter", layerId, onEnter)
-      map.on("mouseleave", layerId, onLeave)
-      removes.push(() => {
-        map.off("mouseenter", layerId, onEnter)
-        map.off("mouseleave", layerId, onLeave)
-      })
-    }
-    return () => {
-      for (const remove of removes) {
-        remove()
-      }
-    }
-  }, [map, layerIds])
-}
-
-/** Loads a base style for the map */
-function useBaseStyle(baseLayer: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "blank") {
-  // Load base layer
-  const [baseStyle, setBaseStyle] = useState<maplibregl.StyleSpecification | null>(null)
-
-  useEffect(() => {
-    function loadStyle(styleUrl: string) {
-      // Load style
-      fetch(styleUrl)
-        .then((response) => response.json())
-        .then((styleData: maplibregl.StyleSpecification) => {
-          // Set style and update layers
-          setBaseStyle(styleData)
-        })
-    }
-
-    if (baseLayer == "cartodb_positron") {
-      loadStyle("https://api.maptiler.com/maps/positron/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (baseLayer == "cartodb_dark_matter") {
-      loadStyle("https://api.maptiler.com/maps/darkmatter/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (baseLayer == "bing_road") {
-      loadStyle("https://api.maptiler.com/maps/streets/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (baseLayer == "bing_aerial") {
-      loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=wXgjrSOKxcDdRfpMMNYl")
-    } else if (baseLayer == "blank") {
-      setBaseStyle({
-        version: 8,
-        layers: [],
-        sources: {}
-      })
-    }
-  }, [baseLayer])
-
-  return baseStyle
-}
-
-/** Combines a base style and a user style */
-function mergeBaseAndUserStyle(
-  baseStyle: maplibregl.StyleSpecification | null | undefined, 
-  userStyle: maplibregl.StyleSpecification | null | undefined, 
-  baseLayerOpacity?: number | null) {
-  // Merge until baseStyle and userStyle are present
-  if (!baseStyle || !userStyle) {
-    return null
-  }
-
-  // Create background layer to simulate base layer opacity
-  const baseLayerOpacityLayer: LayerSpecification = {
-    id: "baseLayerOpacity",
-    type: "background",
-    paint: {
-      "background-color": "white",
-      "background-opacity": 1 - (baseLayerOpacity != null ? baseLayerOpacity : 1)
-    }
-  }
-
-  // Create style
-  let layers = baseStyle.layers || []
-
-  // Simulate base opacity
-  if (baseLayerOpacity != null && baseLayerOpacity < 1) {
-    layers = layers.concat([baseLayerOpacityLayer])
-  }
-
-  layers = layers.concat(userStyle.layers || [])
-
-  const style: maplibregl.StyleSpecification = {
-    ...baseStyle,
-    sources: {
-      ...baseStyle.sources,
-      ...userStyle.sources
-    },
-    glyphs: baseStyle.glyphs || "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=wXgjrSOKxcDdRfpMMNYl",
-    layers
-  }
-  return style
 }
