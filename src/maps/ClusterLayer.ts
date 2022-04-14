@@ -834,4 +834,3 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     return null
   }
 }
-// TODO NO KML SUPPORT

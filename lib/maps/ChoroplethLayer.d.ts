@@ -67,17 +67,4 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         onDesignChange: (design: ChoroplethLayerDesign) => void;
         filters: JsonQLFilter[];
     }): React.ReactElement<{}>;
-    createKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): import("jsonql").JsonQLSelectQuery;
-    getKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
-        layers: {
-            id: string;
-            jsonql: import("jsonql").JsonQLSelectQuery;
-            style: {
-                color?: string | null | undefined;
-                opacity?: number | undefined;
-                colorMap: any;
-            };
-        }[];
-    };
-    acceptKmlVisitorForRow(visitor: any, row: any): any;
 }
