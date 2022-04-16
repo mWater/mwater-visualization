@@ -3,7 +3,7 @@ import $ from "jquery"
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
-import * as uiComponents from "./UIComponents"
+import { ToggleEditComponent, OptionListComponent } from "./UIComponents"
 import { ExprUtils, Schema } from "mwater-expressions"
 import MWaterResponsesFilterComponent from "./MWaterResponsesFilterComponent"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
@@ -42,6 +42,7 @@ export default class MWaterTableSelectComponent extends React.Component<
     // Optional list of tables (ids) being used. Use this to present an initially short list to select from
     activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
   }
+  toggleEdit: any
 
   constructor(props: any) {
     super(props)
@@ -134,9 +135,9 @@ export default class MWaterTableSelectComponent extends React.Component<
           )
         : undefined,
 
-      R(uiComponents.ToggleEditComponent, {
+      R(ToggleEditComponent, {
         ref: (c: any) => {
-          return (this.toggleEdit = c)
+          this.toggleEdit = c
         },
         forceOpen: !this.props.table, // Must have table
         label: this.props.table
@@ -208,12 +209,12 @@ class EditModeTableSelectComponent extends React.Component<
   // Get list of tables that should be included in shortlist
   // This is all active tables and all responses tables in schema (so as to include rosters) and all extra tables
   // Also includes current table
-  getTableShortlist() {
-    let tables = this.context.activeTables || []
+  getTableShortlist(): string[] {
+    let tables: string[] = this.context.activeTables || []
 
     // Remove dead tables
     tables = tables.filter(
-      (t: any) => this.props.schema.getTable(t) != null && !this.props.schema.getTable(t).deprecated
+      (t: any) => this.props.schema.getTable(t) != null && !this.props.schema.getTable(t)!.deprecated
     )
     tables = _.union(
       tables,
@@ -233,7 +234,7 @@ class EditModeTableSelectComponent extends React.Component<
         }
       } else {
         // Add if exists
-        if (this.props.schema.getTable(extraTable) && !this.props.schema.getTable(extraTable).deprecated) {
+        if (this.props.schema.getTable(extraTable) && !this.props.schema.getTable(extraTable)!.deprecated) {
           tables = _.union(tables, [extraTable])
         }
       }
@@ -241,7 +242,7 @@ class EditModeTableSelectComponent extends React.Component<
 
     // Sort by name
     tables = _.sortBy(tables, (tableId) =>
-      ExprUtils.localizeString(this.props.schema.getTable(tableId).name, this.context.locale)
+      ExprUtils.localizeString(this.props.schema.getTable(tableId)!.name, this.context.locale)
     )
 
     return tables
@@ -254,7 +255,7 @@ class EditModeTableSelectComponent extends React.Component<
 
   render() {
     const items = _.map(this.getTableShortlist(), (tableId) => {
-      const table = this.props.schema.getTable(tableId)
+      const table = this.props.schema.getTable(tableId)!
 
       return {
         name: ExprUtils.localizeString(table.name, this.context.locale),
@@ -292,7 +293,7 @@ class EditModeTableSelectComponent extends React.Component<
         ? [
             R("div", { className: "text-muted" }, "Select Data Source:"),
 
-            R(uiComponents.OptionListComponent, { items }),
+            R(OptionListComponent, { items }),
 
             R(
               "div",
