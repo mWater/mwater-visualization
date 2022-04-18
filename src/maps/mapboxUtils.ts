@@ -5,7 +5,7 @@ import { Axis } from "../axes/Axis"
 export function compileColorMapToMapbox(axis: Axis | null | undefined, defaultColor: string): DataDrivenPropertyValueSpecification<string> | string {
   let compiled: DataDrivenPropertyValueSpecification<string> | string
 
-  if (axis && axis.colorMap) {
+  if (axis && axis.colorMap && axis.colorMap.length > 0) {
     const excludedValues = axis.excludedValues || []
 
     // Create match operator
