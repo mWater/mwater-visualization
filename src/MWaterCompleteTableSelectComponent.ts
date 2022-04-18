@@ -4,13 +4,15 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import querystring from "querystring"
-import TabbedComponent from "react-library/lib/TabbedComponent"
+import { default as TabbedComponent, TabbedComponentTab } from "react-library/lib/TabbedComponent"
 import * as uiComponents from "./UIComponents"
 import { ExprUtils, Schema } from "mwater-expressions"
 import moment from "moment"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { MWaterCustomTablesetListComponent } from "./MWaterCustomTablesetListComponent"
 import { MWaterMetricsTableListComponent } from "./MWaterMetricsTableListComponent"
+import { Form } from "mwater-forms"
+import { MWaterAssetSystemsListComponent } from "./MWaterAssetSystemsListComponent"
 
 const sitesOrder = {
   "entities.water_point": 1,
@@ -80,7 +82,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
     return R(uiComponents.OptionListComponent, {
       items: _.compact(
         _.map(types, (tableId) => {
-          table = this.props.schema.getTable(tableId)
+          table = this.props.schema.getTable(tableId)!
           return {
             name: ExprUtils.localizeString(table.name, this.context.locale),
             desc: ExprUtils.localizeString(table.desc, this.context.locale),
@@ -173,6 +175,20 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
     })
   }
 
+  renderAssets() {
+    return R(MWaterAssetSystemsListComponent, {
+      schema: this.props.schema,
+      client: this.props.client,
+      apiUrl: this.props.apiUrl,
+      user: this.props.user,
+      onChange: this.props.onChange,
+      extraTables: this.props.extraTables,
+      onExtraTableAdd: this.handleExtraTableAdd,
+      onExtraTableRemove: this.handleExtraTableRemove,
+      locale: this.context.locale
+    })
+  }
+
   renderOther() {
     let otherTables = _.filter(this.props.schema.getTables(), (table) => {
       // Remove deprecated
@@ -215,6 +231,11 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
         return false
       }
 
+      // Remove assets
+      if (table.id.match(/^assets:/)) {
+        return false
+      }
+
       return true
     })
 
@@ -247,7 +268,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
   render() {
     const sweetSenseTables = this.getSweetSenseTables()
 
-    const tabs = [
+    const tabs: TabbedComponentTab[] = [
       { id: "sites", label: [R("i", { className: "fa fa-map-marker" }), " Sites"], elem: this.renderSites() },
       { id: "forms", label: [R("i", { className: "fa fa-th-list" }), " Surveys"], elem: this.renderForms() },
       {
@@ -261,7 +282,8 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
         elem: this.renderIssues()
       },
       { id: "tablesets", label: [R("i", { className: "fa fa-table" }), " Tables"], elem: this.renderTablesets() },
-      { id: "metrics", label: [R("i", { className: "fa fa-line-chart" }), " Metrics"], elem: this.renderMetrics() }
+      { id: "metrics", label: [R("i", { className: "fa fa-line-chart" }), " Metrics"], elem: this.renderMetrics() },
+      { id: "assets", label: [R("i", { className: "fas fa-map-pin" }), " Assets"], elem: this.renderAssets() }
     ]
 
     if (sweetSenseTables.length > 0) {
@@ -303,9 +325,9 @@ interface FormsListComponentProps {
 }
 
 interface FormsListComponentState {
-  error: any
+  error?: any
   search: any
-  forms: any
+  forms: { id: string, name: string, desc?: string }[] | null
 }
 
 // Searchable list of forms
@@ -322,7 +344,7 @@ class FormsListComponent extends React.Component<FormsListComponentProps, FormsL
 
   componentDidMount() {
     // Get names and basic of forms
-    const query = {}
+    const query: any = {}
     query.fields = JSON.stringify({
       "design.name": 1,
       "design.description": 1,
@@ -336,26 +358,26 @@ class FormsListComponent extends React.Component<FormsListComponentProps, FormsL
     query.client = this.props.client
 
     // Get list of all form names
-    return $.getJSON(this.props.apiUrl + "forms?" + querystring.stringify(query), (forms) => {
+    $.getJSON(this.props.apiUrl + "forms?" + querystring.stringify(query), (forms: Form[]) => {
       // Sort by modified.on desc but first by user
       forms = _.sortByOrder(
         forms,
         [
           (form) => ((this.props.extraTables || []).includes("responses:" + form._id) ? 1 : 0),
           (form) => (form.created.by === this.props.user ? 1 : 0),
-          (form) => form.modified.on
+          (form) => form.modified?.on
         ],
         ["desc", "desc", "desc"]
       )
 
       // TODO use name instead of design.name
-      return this.setState({
+      this.setState({
         forms: _.map(forms, (form) => {
           let desc = ExprUtils.localizeString(form.design.description, this.context.locale) || ""
           if (desc) {
             desc += " - "
           }
-          desc += `Modified ${moment(form.modified.on, moment.ISO_8601).format("ll")}`
+          desc += `Modified ${moment(form.modified?.on, moment.ISO_8601).format("ll")}`
 
           return {
             id: form._id,
@@ -365,7 +387,7 @@ class FormsListComponent extends React.Component<FormsListComponentProps, FormsL
         })
       })
     }).fail((xhr) => {
-      return this.setState({ error: xhr.responseText })
+      this.setState({ error: xhr.responseText })
     })
   }
 
@@ -401,13 +423,13 @@ class FormsListComponent extends React.Component<FormsListComponentProps, FormsL
 
       const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i")
 
-      forms = _.filter(this.state.forms, (form) => form.name.match(searchStringRegExp))
+      forms = _.filter(this.state.forms!, (form) => form.name.match(searchStringRegExp))
     } else {
       ;({ forms } = this.state)
     }
 
     // Remove if already included
-    forms = _.filter(forms, (f) => !(this.props.extraTables || []).includes(`responses:${f.id}`))
+    forms = _.filter(forms || [], (f) => !(this.props.extraTables || []).includes(`responses:${f.id}`))
 
     let tables = _.filter(
       this.props.schema.getTables(),
@@ -482,14 +504,15 @@ interface IndicatorsListComponentProps {
 }
 
 interface IndicatorsListComponentState {
-  error: any
+  error?: any
   search: any
-  indicators: any
+  indicators: any[] | null
 }
 
 // Searchable list of indicators
 class IndicatorsListComponent extends React.Component<IndicatorsListComponentProps, IndicatorsListComponentState> {
   static contextTypes = { locale: PropTypes.string }
+  addIndicatorConfirmPopup: AddIndicatorConfirmPopupComponent | null
 
   constructor(props: any) {
     super(props)
@@ -501,12 +524,12 @@ class IndicatorsListComponent extends React.Component<IndicatorsListComponentPro
 
   componentDidMount() {
     // Get names and basic of forms
-    const query = {}
+    const query: any = {}
     query.fields = JSON.stringify({ "design.name": 1, "design.desc": 1, "design.recommended": 1, deprecated: 1 })
     query.client = this.props.client
 
     // Get list of all indicator names
-    return $.getJSON(this.props.apiUrl + "indicators?" + querystring.stringify(query), (indicators) => {
+    return $.getJSON(this.props.apiUrl + "indicators?" + querystring.stringify(query), (indicators: any[]) => {
       // Remove deprecated
       indicators = _.filter(indicators, (indicator) => !indicator.deprecated)
 
@@ -559,7 +582,7 @@ class IndicatorsListComponent extends React.Component<IndicatorsListComponentPro
       this.props.onExtraTableAdd(tableId)
     }
 
-    return this.addIndicatorConfirmPopup.show(tableId)
+    this.addIndicatorConfirmPopup!.show(tableId)
   }
 
   render() {
@@ -574,13 +597,13 @@ class IndicatorsListComponent extends React.Component<IndicatorsListComponentPro
 
       const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i")
 
-      indicators = _.filter(this.state.indicators, (indicator) => indicator.name.match(searchStringRegExp))
+      indicators = _.filter(this.state.indicators || [], (indicator) => indicator.name.match(searchStringRegExp))
     } else {
       ;({ indicators } = this.state)
     }
 
     // Remove if already included
-    indicators = _.filter(indicators, (f) => !(this.props.extraTables || []).includes(`indicator_values:${f.id}`))
+    indicators = _.filter(indicators || [], (f) => !(this.props.extraTables || []).includes(`indicator_values:${f.id}`))
 
     let tables = _.filter(
       this.props.schema.getTables(),
@@ -595,8 +618,8 @@ class IndicatorsListComponent extends React.Component<IndicatorsListComponentPro
         schema: this.props.schema,
         onChange: this.props.onChange,
         onExtraTableAdd: this.props.onExtraTableAdd,
-        ref: (c: any) => {
-          return (this.addIndicatorConfirmPopup = c)
+        ref: (c: AddIndicatorConfirmPopupComponent | null) => {
+          this.addIndicatorConfirmPopup = c
         }
       }),
 
@@ -711,7 +734,7 @@ are certain that you want to use the raw indicator table`
           desc: ExprUtils.localizeString(entityColumn.desc, this.context.locale),
           onClick: () => {
             // Select table
-            this.props.onChange(entityColumn.join.toTable)
+            this.props.onChange(entityColumn.join!.toTable)
             return this.setState({ visible: false })
           }
         }))
@@ -764,9 +787,9 @@ interface IssuesListComponentProps {
 }
 
 interface IssuesListComponentState {
-  error: any
+  error?: any
   search: any
-  issueTypes: any
+  issueTypes: any[] | null
 }
 
 // Searchable list of issue types
@@ -783,12 +806,12 @@ class IssuesListComponent extends React.Component<IssuesListComponentProps, Issu
 
   componentDidMount() {
     // Get names and basic of issueTypes
-    const query = {}
+    const query: any = {}
     query.fields = JSON.stringify({ name: 1, desc: 1, roles: 1, created: 1, modified: 1 })
     query.client = this.props.client
 
     // Get list of all issueType names
-    return $.getJSON(this.props.apiUrl + "issue_types?" + querystring.stringify(query), (issueTypes) => {
+    return $.getJSON(this.props.apiUrl + "issue_types?" + querystring.stringify(query), (issueTypes: any[]) => {
       // Sort by modified.on desc but first by user
       issueTypes = _.sortByOrder(
         issueTypes,
@@ -844,13 +867,13 @@ class IssuesListComponent extends React.Component<IssuesListComponentProps, Issu
 
       const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i")
 
-      issueTypes = _.filter(this.state.issueTypes, (issueType) => issueType.name.match(searchStringRegExp))
+      issueTypes = _.filter(this.state.issueTypes || [], (issueType) => issueType.name.match(searchStringRegExp))
     } else {
       ;({ issueTypes } = this.state)
     }
 
     // Remove if already included
-    issueTypes = _.filter(issueTypes, (f) => !(this.props.extraTables || []).includes(`issues:${f.id}`))
+    issueTypes = _.filter(issueTypes || [], (f) => !(this.props.extraTables || []).includes(`issues:${f.id}`))
 
     let tables = _.filter(
       this.props.schema.getTables(),

@@ -26,6 +26,7 @@ export default class MWaterTableSelectComponent extends React.Component<MWaterTa
         locale: PropTypes.Requireable<string>;
         activeTables: PropTypes.Requireable<string[]>;
     };
+    toggleEdit: any;
     constructor(props: any);
     componentWillReceiveProps(nextProps: any): any;
     handleChange: (tableId: any) => any;

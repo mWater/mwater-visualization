@@ -5,8 +5,8 @@ import React from "react"
 import { OptionListComponent } from "./UIComponents"
 import { TextInput } from "react-library/lib/bootstrap"
 
-/** Searchable list of metric tables */
-export const MWaterMetricsTableListComponent = (props: {
+/** Searchable list of asset system tables */
+export const MWaterAssetSystemsListComponent = (props: {
   apiUrl: string
   schema: Schema
   client?: string
@@ -23,20 +23,20 @@ export const MWaterMetricsTableListComponent = (props: {
   /** e.g. "en" */
   locale?: string
 }) => {
-  const [metrics, setMetrics] = useState<Metric[]>()
+  const [systems, setSystems] = useState<AssetSystem[]>()
   const [search, setSearch] = useState<string | null>("")
   const [extraTableNeeded, setExtraTableNeeded] = useState<string>()
 
-  // Get list of all metrics
+  // Get list of all systems
   useEffect(() => {
-    fetch(`${props.apiUrl}metrics?client=${props.client || ""}`)
+    fetch(`${props.apiUrl}asset_systems?client=${props.client || ""}`)
       .then((response) => response.json())
       .then((body) => {
         // Put included ones first
-        setMetrics(
+        setSystems(
           _.sortByAll(body, [
-            (m) => (props.extraTables.some((t) => (t = `metrics:${m._id}`)) ? 0 : 1),
-            (m) => ExprUtils.localizeString(m.design.name, props.locale)
+            (m) => (props.extraTables.some(t => t == `assets:${s.sid}`)) ? 0 : 1,
+            (m) => ExprUtils.localizeString(m.name, props.locale)
           ])
         )
       })
@@ -48,8 +48,8 @@ export const MWaterMetricsTableListComponent = (props: {
     }
   })
 
-  const selectTable = (metric: Metric) => {
-    const qualifiedTableId = `metrics:${metric._id}`
+  const selectTable = (system: AssetSystem) => {
+    const qualifiedTableId = `assets:${system.sid}`
 
     // If already included, select it
     if (props.schema.getTable(qualifiedTableId)) {
@@ -62,9 +62,9 @@ export const MWaterMetricsTableListComponent = (props: {
     props.onExtraTableAdd(qualifiedTableId)
   }
 
-  const handleRemove = (metric: Metric) => {
+  const handleRemove = (system: AssetSystem) => {
     // Remove from extra tables
-    const match = props.extraTables.find((t) => t == `metrics:${metric._id}`)
+    const match = props.extraTables.find((t) => t == `assets:${system.sid}`)
     if (match) {
       if (confirm("Remove this table? Some widgets may not work correctly.")) {
         props.onChange(null)
@@ -73,7 +73,7 @@ export const MWaterMetricsTableListComponent = (props: {
     }
   }
 
-  if (!metrics || extraTableNeeded) {
+  if (!systems || extraTableNeeded) {
     return (
       <div>
         <i className="fa fa-spin fa-spinner" /> Loading...
@@ -81,13 +81,12 @@ export const MWaterMetricsTableListComponent = (props: {
     )
   }
 
-  const renderMetrics = () => {
-    const items = metrics
-      .filter((m) => !m.design.deprecated)
+  const renderAssetSystems = () => {
+    const items = systems
       .map((m) => {
-        const alreadyIncluded = props.extraTables.some((t) => t == `metrics:${m._id}`)
+        const alreadyIncluded = props.extraTables.some((t) => t == `systems:${m._id}`)
         return {
-          name: ExprUtils.localizeString(m.design.name, props.locale) || "",
+          name: ExprUtils.localizeString(m.name, props.locale) || "",
           onClick: () => selectTable(m),
           onRemove: alreadyIncluded ? handleRemove.bind(null, m) : undefined
         }
@@ -100,21 +99,17 @@ export const MWaterMetricsTableListComponent = (props: {
   return (
     <div>
       <TextInput value={search} onChange={setSearch} placeholder="Search..." />
-      {renderMetrics()}
+      <div className="alert alert-info">
+        <i className="fa fa-info-circle" /> This is a beta feature.
+      </div>
+      {renderAssetSystems()}
     </div>
   )
 }
 
 /** Partial definition for use here only */
-interface Metric {
-  _id: string
-  design: {
-    /** localized name of tableset */
-    name: LocalizedString
-
-    /** Localized description */
-    desc: LocalizedString
-
-    deprecated?: boolean
-  }
+interface AssetSystem {
+  sid: number
+  name: LocalizedString
+  description: LocalizedString
 }
