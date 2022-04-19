@@ -431,7 +431,7 @@ export function NewMapViewComponent(props: {
     })
   }
 
-  // Autozoom if filters or autozoom changed
+  // Autozoom if autozoom changed
   useEffect(() => {
     if (!map) {
       return
@@ -441,7 +441,7 @@ export function NewMapViewComponent(props: {
     if (props.design.autoBounds) {
       performAutoZoom()
     }
-  }, [map, props.design.filters, props.design.globalFilters, props.extraFilters, props.design.autoBounds])
+  }, [map, props.design.autoBounds])
 
   // Set initial bounds
   useEffect(() => {
