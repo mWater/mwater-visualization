@@ -66,6 +66,9 @@ export function NewMapViewComponent(props: {
 
   /** Locale to use */
   locale: string
+
+  /** Increment to force refresh */
+  refreshTrigger?: number
 }) {
   const [mapDiv, setMapDiv] = useState<HTMLDivElement | null>(null)
 
@@ -332,7 +335,7 @@ export function NewMapViewComponent(props: {
   // Update user layers
   useEffect(() => {
     updateUserStyle()
-  }, [props.design.layerViews, props.scope, layersCreatedAfter, props.extraFilters, props.design.filters, props.design.globalFilters])
+  }, [props.design.layerViews, props.scope, layersCreatedAfter, props.extraFilters, props.design.filters, props.design.globalFilters, props.refreshTrigger])
 
   // Style map
   useStyleMap({

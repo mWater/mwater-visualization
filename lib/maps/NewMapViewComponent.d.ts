@@ -35,4 +35,6 @@ export declare function NewMapViewComponent(props: {
     zoomLocked?: boolean;
     /** Locale to use */
     locale: string;
+    /** Increment to force refresh */
+    refreshTrigger?: number;
 }): JSX.Element;
