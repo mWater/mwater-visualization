@@ -8,7 +8,18 @@ import { JsonQLFilter } from "../../.."
 import { LayeredChartDesign } from "./LayeredChartDesign"
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 import { Axis } from "../../../axes/Axis"
-import * as c3 from "billboard.js"
+import { bar, line, spline, scatter, area, pie, donut } from "billboard.js"
+
+/** Chart types */
+const chartTypes = {
+  bar,
+  line,
+  spline,
+  scatter,
+  area,
+  pie,
+  donut,
+}
 
 const commaFormatter = d3Format.format(",")
 const compactFormatter = d3Format.format(".4")
@@ -966,7 +977,13 @@ export default class LayeredChartCompiler {
 
   // Get layer type, defaulting to overall type
   getLayerType(design: any, layerIndex: any) { 
-    return c3[design.layers[layerIndex].type || design.type]()
+    // Special handling for mocha tests where chartTypes has all undefined values
+    // See https://github.com/mWater/mwater-visualization/issues/453#issuecomment-1103671467
+    const chartTypeString = design.layers[layerIndex].type || design.type
+    if (chartTypes[chartTypeString]) {
+      return chartTypes[chartTypeString]()
+    } 
+    return chartTypeString
   }
 
   getLayerTypeString(design: any, layerIndex: any) {

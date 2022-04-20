@@ -39,7 +39,7 @@ $(function () {
       // R(RichTextPane)
       // R(TestPane, apiUrl: "https://api.mwater.co/v3/")
       // R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-      R(MWaterDashboardPane, {apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "ae60838fa66847a5927f3ca62cdd0b9d"})
+      R(MWaterDashboardPane, {apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "ae60838fa66847a5927f3ca62cdd0b9d", share: "380f5db0e6c24a1fa63c3c814adcc431"})
       // R(MWaterDirectDashboardPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
       //R(MWaterDatagridPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
     )
