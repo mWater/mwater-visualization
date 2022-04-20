@@ -8,6 +8,7 @@ import { JsonQLFilter } from "../../.."
 import { LayeredChartDesign } from "./LayeredChartDesign"
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 import { Axis } from "../../../axes/Axis"
+import * as c3 from "billboard.js"
 
 const commaFormatter = d3Format.format(",")
 const compactFormatter = d3Format.format(".4")
@@ -951,32 +952,36 @@ export default class LayeredChartCompiler {
   }
 
   // Get layer type, defaulting to overall type
-  getLayerType(design: any, layerIndex: any) {
+  getLayerType(design: any, layerIndex: any) {    
+    return c3[design.layers[layerIndex].type || design.type]()
+  }
+
+  getLayerTypeString(design: any, layerIndex: any) {
     return design.layers[layerIndex].type || design.type
   }
 
   // Determine if layer required grouping by x (and color)
   doesLayerNeedGrouping(design: any, layerIndex: any) {
-    return this.getLayerType(design, layerIndex) !== "scatter"
+    return this.getLayerTypeString(design, layerIndex) !== "scatter"
   }
 
   // Determine if layer can use x axis
   canLayerUseXExpr(design: any, layerIndex: any) {
     let needle
-    return (needle = this.getLayerType(design, layerIndex)), !["pie", "donut"].includes(needle)
+    return (needle = this.getLayerTypeString(design, layerIndex)), !["pie", "donut"].includes(needle)
   }
 
   isXAxisRequired(design: any, layerIndex: any) {
     let needle
     return _.any(
       design.layers,
-      (layer, i) => ((needle = this.getLayerType(design, i)), !["pie", "donut"].includes(needle))
+      (layer, i) => ((needle = this.getLayerTypeString(design, i)), !["pie", "donut"].includes(needle))
     )
   }
 
   isColorAxisRequired(design: any, layerIndex: any) {
     let needle
-    return (needle = this.getLayerType(design, layerIndex)), ["pie", "donut"].includes(needle)
+    return (needle = this.getLayerTypeString(design, layerIndex)), ["pie", "donut"].includes(needle)
   }
 
   compileDefaultTitleText(design: any, locale: any) {

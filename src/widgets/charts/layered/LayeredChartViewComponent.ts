@@ -9,6 +9,7 @@ import LayeredChartCompiler from "./LayeredChartCompiler"
 import TextComponent from "../../text/TextComponent"
 import * as d3 from "d3"
 import { LayeredChartDesign } from "./LayeredChartDesign"
+import c3 from 'billboard.js'
 
 export interface LayeredChartViewComponentProps {
   schema: Schema
@@ -201,7 +202,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     // Update scope after rendering. Needs a delay to make it happen
     chartOptions.onrendered = () => _.defer(this.updateScope)
 
-    const c3 = require("c3")
+    // const c3 = require("c3")
     this.chart = c3.generate(chartOptions)
 
     // Remove listener for window focus (https://github.com/c3js/c3/issues/2742)
@@ -267,7 +268,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
 
     // Handle line and bar charts
     d3.select(el)
-      .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
+      .selectAll(".bb-chart-bar .bb-bar, .bb-chart-line .bb-circle")
       // Highlight only scoped
       .style("opacity", (d: any, i: any) => {
         let scope

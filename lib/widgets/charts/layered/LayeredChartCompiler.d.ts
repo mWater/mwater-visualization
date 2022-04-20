@@ -154,6 +154,7 @@ export default class LayeredChartCompiler {
     };
     compileExpr(expr: any): import("jsonql").JsonQLExpr;
     getLayerType(design: any, layerIndex: any): any;
+    getLayerTypeString(design: any, layerIndex: any): any;
     doesLayerNeedGrouping(design: any, layerIndex: any): boolean;
     canLayerUseXExpr(design: any, layerIndex: any): boolean;
     isXAxisRequired(design: any, layerIndex: any): boolean;
