@@ -203,7 +203,14 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     chartOptions.onrendered = () => _.defer(this.updateScope)
 
     // const c3 = require("c3")
-    this.chart = c3.generate(chartOptions)
+    console.log(chartOptions)
+    try {
+      this.chart = c3.generate(chartOptions)  
+    } catch (error) {
+      
+      throw(error)
+    }
+    
 
     // Remove listener for window focus (https://github.com/c3js/c3/issues/2742)
     window.removeEventListener("focus", this.chart.internal.windowFocusHandler)

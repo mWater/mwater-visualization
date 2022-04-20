@@ -212,7 +212,6 @@ export default class LayeredChartCompiler {
         types: c3Data.types,
         columns: c3Data.columns,
         names: c3Data.names,
-        types: c3Data.types,
         groups: c3Data.groups,
         xs: c3Data.xs,
         colors: c3Data.colors,
@@ -279,6 +278,20 @@ export default class LayeredChartCompiler {
       transition: { duration: 0 } // Transitions interfere with scoping
     }
 
+    if(options.design.labels && (options.design.type === "pie" || options.design.type === "donut")) {
+      // same color values gets hidden!! https://github.com/naver/billboard.js/issues/871
+      chartDesign.data.labels = {
+        colors: chartDesign.data.columns.reduce((a, c) => {
+          a[c[0]] = '#000'
+          return a
+        }, {})
+      }
+    }
+
+    if(_.isEmpty(chartDesign.data.types)) {
+      chartDesign.data.type = this.getLayerType(options.design, 0)
+    }
+
     if (options.design.labels) {
       if (options.design.type === "pie" || options.design.type === "donut") {
         chartDesign.tooltip = {
@@ -300,7 +313,7 @@ export default class LayeredChartCompiler {
     if (options.design.labels && !_.isEmpty(c3Data.format)) {
       // format = _.map options.design.layers, (layer, layerIndex) =>
       //   return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
-      chartDesign.data.labels = { format: c3Data.format }
+      chartDesign.data.labels = { ...chartDesign.data.labels, format: c3Data.format }
     }
 
     if (options.design.yThresholds) {
@@ -952,7 +965,7 @@ export default class LayeredChartCompiler {
   }
 
   // Get layer type, defaulting to overall type
-  getLayerType(design: any, layerIndex: any) {    
+  getLayerType(design: any, layerIndex: any) { 
     return c3[design.layers[layerIndex].type || design.type]()
   }
 
