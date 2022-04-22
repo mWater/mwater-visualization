@@ -1,7 +1,8 @@
 import _ from "lodash"
-import React from "react"
+import React, { useState } from "react"
 const R = React.createElement
-import { DataSource, EnumValue, ExprUtils, Schema } from "mwater-expressions"
+import { DataSource, EnumValue, Expr, ExprUtils, Schema } from "mwater-expressions"
+import moment from "moment"
 
 export interface EditExprCellComponentProps {
   /** schema to use */
@@ -10,13 +11,19 @@ export interface EditExprCellComponentProps {
   dataSource: DataSource
   /** Locale to use */
   locale?: string
+
+  /** Size of control */
   width: number
   height: number
+
+  /** Expression being edited */
+  expr: Expr
+  /** Value of expression */
   value?: any
-  expr: any
   /** Called when save is requested (e.g. enter in text box) */
-  onSave: any
-  onCancel: any
+  onSave: () => void
+  /** Called when cancel is requested (e.g. esc in text box) */
+  onCancel: () => void
 }
 
 interface EditExprCellComponentState {
@@ -77,19 +84,30 @@ export default class EditExprCellComponent extends React.Component<
           onCancel: this.props.onCancel,
           locale: this.props.locale
         })
-    }
+      case "date":
+      case "datetime":
+        return R(DateEditComponent, {
+          value: this.state.value,
+          onChange: this.handleChange,
+          onSave: this.props.onSave,
+          onCancel: this.props.onCancel,
+          datetime: exprType === "datetime"
+        })
+      }
 
     throw new Error(`Unsupported type ${exprType} for editing`)
   }
 }
 
 interface TextEditComponentProps {
+  /** Current value */
   value?: any
   /** Called with new value */
-  onChange: any
-  /** Called when enter is pressed */
-  onSave: any
-  onCancel: any
+  onChange: (value: any) => void
+  /** Called when save is requested (e.g. enter in text box) */
+  onSave: () => void
+  /** Called when cancel is requested (e.g. esc in text box) */
+  onCancel: () => void
 }
 
 // Simple text box
@@ -127,12 +145,14 @@ class TextEditComponent extends React.Component<TextEditComponentProps> {
 }
 
 interface NumberEditComponentProps {
+  /** Current value */
   value?: any
   /** Called with new value */
-  onChange: any
-  /** Called when enter is pressed */
-  onSave: any
-  onCancel: any
+  onChange: (value: any) => void
+  /** Called when save is requested (e.g. enter in text box) */
+  onSave: () => void
+  /** Called when cancel is requested (e.g. esc in text box) */
+  onCancel: () => void
 }
 
 // Simple number box
@@ -179,15 +199,17 @@ class NumberEditComponent extends React.Component<NumberEditComponentProps> {
 }
 
 interface EnumEditComponentProps {
+  /** Current value */
   value?: any
+  /** Called with new value */
+  onChange: (value: any) => void
   enumValues: EnumValue[]
   /** Locale to use */
   locale?: string
-  /** Called with new value */
-  onChange: any
-  /** Called when enter is pressed */
-  onSave: any
-  onCancel: any
+  /** Called when save is requested (e.g. enter in text box) */
+  onSave: () => void
+  /** Called when cancel is requested (e.g. esc in text box) */
+  onCancel: () => void
 }
 
 // Simple enum box
@@ -210,4 +232,74 @@ class EnumEditComponent extends React.Component<EnumEditComponentProps> {
       )
     )
   }
+}
+
+/** Simple date editor */
+function DateEditComponent(props: {
+  /** Current value */
+  value?: any
+  /** Called with new value */
+  onChange: (value: any) => void
+  /** Called when save is requested (e.g. enter in text box) */
+  onSave: () => void
+  /** Called when cancel is requested (e.g. esc in text box) */
+  onCancel: () => void
+  /** True if datetime, not date */
+  datetime: boolean
+}) {
+    // // Focus when created
+    // return this.input?.focus()
+  
+  // Format date
+  const [valueStr, setValueStr] = useState(props.datetime ?
+    (props.value ? moment(props.value, moment.ISO_8601).format("YYYY-MM-DD HH:mm") : "")
+    : props.value || ""
+    )
+
+  const [isValid, setIsValid] = useState(true)
+
+  // Parse date
+  function parseDate(value: string) {
+    if (!value) {
+      setIsValid(true)
+      return null
+    }
+    const m = moment(value, props.datetime ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD")
+    if (!m.isValid()) {
+      setIsValid(false)
+      return null
+    }
+    setIsValid(true)
+    if (props.datetime) {
+      return m.toISOString()
+    } else {
+      return m.format("YYYY-MM-DD")
+    }
+  }
+
+  return <div style={{ paddingTop: 3 }}>
+    <input 
+      type="text" 
+      className="form-control" 
+      value={valueStr} 
+      style={{ backgroundColor: isValid ? "white" : "pink" }}
+      onChange={ev => {
+        setValueStr(ev.target.value)
+        props.onChange(parseDate(ev.target.value))
+      }}
+      ref={c => {
+        if (c) {
+          c.focus()
+        }
+      }}
+      onKeyUp={(ev) => {
+        if (ev.keyCode === 27) {
+          props.onCancel()
+        }
+        if (ev.keyCode === 13) {
+          return props.onSave()
+        }
+      }}
+    />
+  </div>
 }

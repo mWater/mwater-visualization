@@ -223,7 +223,7 @@ export default class DatagridViewComponent extends React.Component<
     const exprType = new ExprUtils(this.props.schema).getExprType(column.expr)!
 
     // If cannot edit type, return
-    if (!["text", "number", "enum"].includes(exprType)) {
+    if (!["text", "number", "enum", "date", "datetime"].includes(exprType)) {
       return
     }
 

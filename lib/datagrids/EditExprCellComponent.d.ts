@@ -1,5 +1,5 @@
 import React from "react";
-import { DataSource, EnumValue, Schema } from "mwater-expressions";
+import { DataSource, EnumValue, Expr, Schema } from "mwater-expressions";
 export interface EditExprCellComponentProps {
     /** schema to use */
     schema: Schema;
@@ -7,13 +7,17 @@ export interface EditExprCellComponentProps {
     dataSource: DataSource;
     /** Locale to use */
     locale?: string;
+    /** Size of control */
     width: number;
     height: number;
+    /** Expression being edited */
+    expr: Expr;
+    /** Value of expression */
     value?: any;
-    expr: any;
     /** Called when save is requested (e.g. enter in text box) */
-    onSave: any;
-    onCancel: any;
+    onSave: () => void;
+    /** Called when cancel is requested (e.g. esc in text box) */
+    onCancel: () => void;
 }
 interface EditExprCellComponentState {
     value: any;
@@ -23,15 +27,28 @@ export default class EditExprCellComponent extends React.Component<EditExprCellC
     getValue(): any;
     hasChanged(): boolean;
     handleChange: (value: any) => void;
-    render(): React.CElement<TextEditComponentProps, TextEditComponent> | React.CElement<EnumEditComponentProps, EnumEditComponent>;
+    render(): React.CElement<TextEditComponentProps, TextEditComponent> | React.CElement<EnumEditComponentProps, EnumEditComponent> | React.FunctionComponentElement<{
+        /** Current value */
+        value?: any;
+        /** Called with new value */
+        onChange: (value: any) => void;
+        /** Called when save is requested (e.g. enter in text box) */
+        onSave: () => void;
+        /** Called when cancel is requested (e.g. esc in text box) */
+        onCancel: () => void;
+        /** True if datetime, not date */
+        datetime: boolean;
+    }>;
 }
 interface TextEditComponentProps {
+    /** Current value */
     value?: any;
     /** Called with new value */
-    onChange: any;
-    /** Called when enter is pressed */
-    onSave: any;
-    onCancel: any;
+    onChange: (value: any) => void;
+    /** Called when save is requested (e.g. enter in text box) */
+    onSave: () => void;
+    /** Called when cancel is requested (e.g. esc in text box) */
+    onCancel: () => void;
 }
 declare class TextEditComponent extends React.Component<TextEditComponentProps> {
     input: HTMLInputElement | null;
@@ -43,15 +60,17 @@ declare class TextEditComponent extends React.Component<TextEditComponentProps> 
     }, HTMLElement>;
 }
 interface EnumEditComponentProps {
+    /** Current value */
     value?: any;
+    /** Called with new value */
+    onChange: (value: any) => void;
     enumValues: EnumValue[];
     /** Locale to use */
     locale?: string;
-    /** Called with new value */
-    onChange: any;
-    /** Called when enter is pressed */
-    onSave: any;
-    onCancel: any;
+    /** Called when save is requested (e.g. enter in text box) */
+    onSave: () => void;
+    /** Called when cancel is requested (e.g. esc in text box) */
+    onCancel: () => void;
 }
 declare class EnumEditComponent extends React.Component<EnumEditComponentProps> {
     render(): React.DetailedReactHTMLElement<{
