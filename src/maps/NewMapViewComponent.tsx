@@ -69,6 +69,11 @@ export function NewMapViewComponent(props: {
 
   /** Increment to force refresh */
   refreshTrigger?: number
+
+  /** Optional callback that gets updated MapLibre map each render. Used to allow
+   * external zooming/panning.
+   */
+  onMapUpdate?: (map: maplibregl.Map) => void
 }) {
   const [mapDiv, setMapDiv] = useState<HTMLDivElement | null>(null)
 
@@ -114,6 +119,11 @@ export function NewMapViewComponent(props: {
       dragPan: props.dragging,
       touchZoomRotate: props.touchZoom,
   })
+
+  // Pass map upwards
+  if (map && props.onMapUpdate) {
+    props.onMapUpdate(map)
+  }
 
   useThrottledMapResize(map, props.width, props.height)
 

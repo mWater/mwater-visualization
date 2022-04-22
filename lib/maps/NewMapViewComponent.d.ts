@@ -37,4 +37,8 @@ export declare function NewMapViewComponent(props: {
     locale: string;
     /** Increment to force refresh */
     refreshTrigger?: number;
+    /** Optional callback that gets updated MapLibre map each render. Used to allow
+     * external zooming/panning.
+     */
+    onMapUpdate?: (map: maplibregl.Map) => void;
 }): JSX.Element;
