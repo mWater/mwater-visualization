@@ -227,7 +227,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
       }
 
       // Remove metrics
-      if (table.id.match(/^metric:/)) {
+      if (table.id.match(/^metrics:/)) {
         return false
       }
 

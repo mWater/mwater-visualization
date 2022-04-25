@@ -274,7 +274,7 @@ class EditModeTableSelectComponent extends React.Component<
               header: "Select Data Source",
               onClose: () => this.setState({ completeMode: false }),
               showCloseX: true,
-              size: "large"
+              size: "x-large"
             },
             R(MWaterCompleteTableSelectComponent, {
               apiUrl: this.props.apiUrl,
