@@ -35,7 +35,7 @@ export const MWaterAssetSystemsListComponent = (props: {
         // Put included ones first
         setSystems(
           _.sortByAll(body, [
-            (m) => (props.extraTables.some(t => t == `assets:${s.sid}`)) ? 0 : 1,
+            (m) => (props.extraTables.some(t => t == `assets:${m.sid}`)) ? 0 : 1,
             (m) => ExprUtils.localizeString(m.name, props.locale)
           ])
         )
@@ -84,7 +84,7 @@ export const MWaterAssetSystemsListComponent = (props: {
   const renderAssetSystems = () => {
     const items = systems
       .map((m) => {
-        const alreadyIncluded = props.extraTables.some((t) => t == `systems:${m._id}`)
+        const alreadyIncluded = props.extraTables.some((t) => t == `systems:${m.sid}`)
         return {
           name: ExprUtils.localizeString(m.name, props.locale) || "",
           onClick: () => selectTable(m),
