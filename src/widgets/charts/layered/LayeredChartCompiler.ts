@@ -294,6 +294,9 @@ export default class LayeredChartCompiler {
       // same color values gets hidden!! https://github.com/naver/billboard.js/issues/871
       chartDesign.data.labels = {
         // centered: true,
+        position: {
+          y: 15
+        },
         colors: chartDesign.data.columns.reduce((a, c) => {
           a[c[0]] = '#000'
           return a
