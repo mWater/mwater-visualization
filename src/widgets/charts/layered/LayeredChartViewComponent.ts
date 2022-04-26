@@ -212,6 +212,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     }
     
 
+    console.log(this.chartDiv)
     // Remove listener for window focus (https://github.com/c3js/c3/issues/2742)
     window.removeEventListener("focus", this.chart.internal.windowFocusHandler)
     this.chart.internal.windowFocusHandler = () => {}
@@ -273,6 +274,72 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     const compiler = new LayeredChartCompiler({ schema: this.props.schema })
     const el = this.chartDiv
 
+    const smalls: any[] = []
+    d3.select(el)
+      .selectAll(".bb-chart-bar .bb-bar")
+      .each(function (p: any, i){
+        const box = (d3.select(this).nodes()[0]! as SVGAElement).getBBox()
+        console.log(p)
+
+        if(box.height < 25) {
+          
+          d3.select(el)
+          .selectAll(".bb-chart-text .bb-text")
+          .filter(function(p, j){ return i === j })
+          .each(function(){
+            smalls.push({
+              origin_x: box.x + box.width,
+              origin_y: box.y,
+              series: Number(p.id),
+              textY:  box.y - (10 * Number(p.id)) - 5
+              // origin_x: d3.select(this).attr('x'),
+              // origin_y: d3.select(this).attr('y'),
+            })
+          })
+          .attr('y', function(){
+            return box.y - (10 * Number(p.id)) - 5
+            return Number(d3.select(this).attr('y')) - 7
+          })
+          .attr('x', function(){
+            return box.x + 15
+            // return Number(d3.select(this).attr('x')) + 2
+          })
+          .attr('text-anchor', 'left')
+        }
+      })
+    
+    if(smalls.length > 0) {
+      const hackGroup = d3.select(el)
+      .selectAll(".bb-chart")
+      .selectAll(".hack")
+      .data(["1"])
+      .enter()
+      .append('g')
+      .attr('class', 'hack')
+
+      hackGroup
+        .data(smalls)
+        .enter()
+        .append('line')
+          .attr('x1', function(d) {return d.origin_x - (d.series * 3) - 20})
+          .attr('y1', function(d) {return d.origin_y})
+          .attr('x2', function(d) {return d.origin_x - (d.series * 3) - 20})
+          .attr('y2', function(d) {return d.textY + 5})
+          .style("stroke", "black")
+          .style("stroke-width", 0.5)
+        .exit()
+        .data(smalls)
+        .enter()
+        .append('line')
+          .attr('x1', function(d) {return d.origin_x - (d.series * 3) - 20} )
+          .attr('y1', function(d) {return d.textY + 5} )
+          .attr('x2', function(d) {return d.origin_x - (d.series * 3) - 15} )
+          .attr('y2', function(d) {return d.textY} )
+          .style("stroke", "black")
+          .style("stroke-width", 0.5)
+        .exit()
+    }
+
     // Handle line and bar charts
     d3.select(el)
       .selectAll(".bb-chart-bar .bb-bar, .bb-chart-line .bb-circle")
@@ -304,7 +371,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     // Handle pie charts
     return d3
       .select(el)
-      .selectAll(".c3-chart-arcs .c3-chart-arc")
+      .selectAll(".bb-chart-arcs .bb-chart-arc")
       .style("opacity", (d: any, i: any) => {
         let scope
         const dataPoint = this.lookupDataPoint(dataMap, d)

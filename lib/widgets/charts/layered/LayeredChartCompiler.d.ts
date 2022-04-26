@@ -131,7 +131,7 @@ export default class LayeredChartCompiler {
         order: null;
         format: {};
     };
-    fixStringYValues(rows: any): any;
+    fixStringYValues(rows?: any): any;
     flattenRowData(rows: any): any[];
     compileDataCategorical(design: any, data: any, locale: any): {
         columns: string[][];

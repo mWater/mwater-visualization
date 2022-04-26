@@ -289,9 +289,11 @@ export default class LayeredChartCompiler {
       transition: { duration: 0 } // Transitions interfere with scoping
     }
 
-    if(options.design.labels && (options.design.type === "pie" || options.design.type === "donut")) {
+    // && (options.design.type === "pie" || options.design.type === "donut")
+    if(options.design.labels) {
       // same color values gets hidden!! https://github.com/naver/billboard.js/issues/871
       chartDesign.data.labels = {
+        // centered: true,
         colors: chartDesign.data.columns.reduce((a, c) => {
           a[c[0]] = '#000'
           return a
@@ -324,7 +326,10 @@ export default class LayeredChartCompiler {
     if (options.design.labels && !_.isEmpty(c3Data.format)) {
       // format = _.map options.design.layers, (layer, layerIndex) =>
       //   return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
-      chartDesign.data.labels = { ...chartDesign.data.labels, format: c3Data.format }
+      chartDesign.data.labels = { 
+        ...chartDesign.data.labels, 
+        format: c3Data.format
+      }
     }
 
     if (options.design.yThresholds) {
@@ -613,7 +618,7 @@ export default class LayeredChartCompiler {
   }
 
   // Numbers sometimes arrive as strings from database. Fix by parsing
-  fixStringYValues(rows: any) {
+  fixStringYValues(rows: any = []) {
     for (let row of rows) {
       if (_.isString(row.y)) {
         row.y = parseFloat(row.y)
