@@ -274,47 +274,60 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     const compiler = new LayeredChartCompiler({ schema: this.props.schema })
     const el = this.chartDiv
 
-    if(!this.props.design.transpose && this.props.design.layers.length > 1) {
+    if(!this.props.design.transpose) {
       const stacked = this.props.design.stacked
       
       let barWidth = 20
       const smalls: any[] = []
+      const map = new Map()
+      let _id = 0
       d3.select(el)
       .selectAll(".bb-chart-bar .bb-bar")
       .each(function (p: any, i){
+        if(!map.has(p.id)) {
+          map.set(p.id, _id++)
+        }
+        
         const box = (d3.select(this).nodes()[0]! as SVGAElement).getBBox()
         barWidth = box.width
 
-        if(box.height < 25) {
+        if(box.height < 12) {
           
           d3.select(el)
           .selectAll(".bb-chart-text .bb-text")
           .filter(function(p, j){ return i === j })
-          .each(function(){
+          .each(function(_p: any){
             smalls.push({
               origin_x: box.x,// + box.width,
               origin_y: box.y,
-              series: Number(p.id),
-              textY:  box.y - (10 * Number(p.id)) - 10,
-              textX: box.x + 15
+              series: map.get(p.id),
+              textY:  box.y - (12 * map.get(p.id)) - 10,
+              textX: box.x + 25,
             })
+            ;(d3.select(this).node()as SVGAElement).classList.add("needs_adjustment")
           })
+          .attr('data-boxX', box.x)
           .attr('y', function(){
-            return box.y - (10 * Number(p.id)) - 10
+            return box.y - (12 * map.get(p.id)) - 10
             // return Number(d3.select(this).attr('y')) - 7
           })
-          .attr('x', function(){
-            return box.x + 15
-            // return Number(d3.select(this).attr('x')) + 2
-          })
-          .attr('text-anchor', 'left')
         }
       })
     
       if(smalls.length > 0) {
         const sliceWidth = 4
 
-        const seriesToBeDrawn = _.uniq(smalls.map((s) => s.series)).length -1
+        const seriesToBeDrawn = _.uniq(smalls.map((s) => s.series)).length
+        console.log(seriesToBeDrawn * sliceWidth)
+
+        d3.select(el)
+          .selectAll(".needs_adjustment")
+          .attr('x', function() {
+            const self = d3.select(this)
+            return Number(self.attr('data-boxX')) + ((seriesToBeDrawn) * sliceWidth) + 10
+          })
+          .attr('text-anchor', 'left')
+
         const hackGroup = d3.select(el)
         .selectAll(".bb-chart")
         .selectAll(".hack")
@@ -324,6 +337,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
         .attr('class', 'hack')
 
         hackGroup
+          .selectAll('line')
           .data(smalls)
           .enter()
           .append('line')
@@ -339,7 +353,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
           .append('line')
             .attr('x1', function(d) {return stacked ? d.origin_x + (sliceWidth*(seriesToBeDrawn - d.series)) : d.origin_x+5})
             .attr('y1', function(d) {return d.textY + 3} )
-            .attr('x2', function(d) {return d.textX - 2})
+            .attr('x2', function(d) {return d.origin_x + ((seriesToBeDrawn) * sliceWidth) + 8})
             .attr('y2', function(d) {return d.textY} )
             .style("stroke", "black")
             .style("stroke-width", 0.5)
