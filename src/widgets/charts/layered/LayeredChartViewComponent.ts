@@ -274,10 +274,9 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     const compiler = new LayeredChartCompiler({ schema: this.props.schema })
     const el = this.chartDiv
 
-    if(!this.props.design.transpose) {
+    if(!this.props.design.transpose && this.props.design.layers.length > 1) {
       const stacked = this.props.design.stacked
-      const numSeries = this.props.design.layers.length + 1
-
+      
       let barWidth = 20
       const smalls: any[] = []
       d3.select(el)
