@@ -36,7 +36,7 @@ export const MWaterAssetSystemsListComponent = (props: {
         setSystems(
           _.sortByAll(body, [
             (m) => (props.extraTables.some(t => t == `assets:${m.sid}`)) ? 0 : 1,
-            (m) => ExprUtils.localizeString(m.name, props.locale)
+            (m) => ExprUtils.localizeString(m.design.name, props.locale)
           ])
         )
       })
@@ -86,7 +86,7 @@ export const MWaterAssetSystemsListComponent = (props: {
       .map((m) => {
         const alreadyIncluded = props.extraTables.some((t) => t == `systems:${m.sid}`)
         return {
-          name: ExprUtils.localizeString(m.name, props.locale) || "",
+          name: ExprUtils.localizeString(m.design.name, props.locale) || "",
           onClick: () => selectTable(m),
           onRemove: alreadyIncluded ? handleRemove.bind(null, m) : undefined
         }
@@ -110,6 +110,8 @@ export const MWaterAssetSystemsListComponent = (props: {
 /** Partial definition for use here only */
 interface AssetSystem {
   sid: number
-  name: LocalizedString
-  description: LocalizedString
+  design: {
+    name: LocalizedString
+    description: LocalizedString
+  }
 }
