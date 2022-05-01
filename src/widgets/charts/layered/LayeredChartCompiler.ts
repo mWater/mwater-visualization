@@ -22,7 +22,7 @@ const chartTypes = {
 }
 
 const commaFormatter = d3Format.format(",")
-const compactFormatter = d3Format.format(".4")
+const compactFormatter = (d: any) => d3Format.format("~s")(d).replace('G', 'B')
 
 function pieLabelValueFormatter(format: any, hidePercent = false) {
   function percent(ratio: any) {
