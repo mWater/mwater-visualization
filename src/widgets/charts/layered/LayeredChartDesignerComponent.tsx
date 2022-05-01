@@ -50,6 +50,9 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
   handleLabelsChange = (value: any) => {
     return this.updateDesign({ labels: value })
   }
+  handleLabelsPopoutChange = (value: any) => {
+    return this.updateDesign({ popoutSmallValues: value })
+  }
   handlePercentageVisibilityChange = (value: any) => {
     return this.updateDesign({ hidePercentage: value })
   }
@@ -308,7 +311,12 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
               Descending Order
             </Checkbox>
           ]
-        : undefined
+        : undefined,
+      design.labels ? R('div', null, 
+        <Checkbox inline key="labels" value={design.popoutSmallValues || false} onChange={this.handleLabelsPopoutChange}>
+          Show Popout labels for small values
+        </Checkbox>
+      ):undefined
     )
   }
 

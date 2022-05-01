@@ -19,6 +19,7 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
     handleStackedChange: (value: any) => void;
     handleProportionalChange: (value: any) => void;
     handleLabelsChange: (value: any) => void;
+    handleLabelsPopoutChange: (value: any) => void;
     handlePercentageVisibilityChange: (value: any) => void;
     handlePolarOrderChange: (value: any) => void;
     handleYThresholdsChange: (yThresholds: any) => void;

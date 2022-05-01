@@ -203,7 +203,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     chartOptions.onrendered = () => _.defer(this.updateScope)
 
     // const c3 = require("c3")
-    console.log(chartOptions)
+    // console.log(chartOptions)
     try {
       this.chart = c3.generate(chartOptions)  
     } catch (error) {
@@ -274,7 +274,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     const compiler = new LayeredChartCompiler({ schema: this.props.schema })
     const el = this.chartDiv
 
-    if(!this.props.design.transpose) {
+    if(!this.props.design.transpose && this.props.design.popoutSmallValues) {
       const stacked = this.props.design.stacked
       
       let barWidth = 20
@@ -318,7 +318,6 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
         const sliceWidth = 4
 
         const seriesToBeDrawn = _.uniq(smalls.map((s) => s.series)).length
-        console.log(seriesToBeDrawn * sliceWidth)
 
         d3.select(el)
           .selectAll(".needs_adjustment")
@@ -330,11 +329,11 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
 
         const hackGroup = d3.select(el)
         .selectAll(".bb-chart")
-        .selectAll(".hack")
+        .selectAll(".popout_labels")
         .data(["1"])
         .enter()
         .append('g')
-        .attr('class', 'hack')
+        .attr('class', 'popout_labels')
 
         hackGroup
           .selectAll('line')
@@ -345,6 +344,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
             .attr('y1', function(d) {return d.origin_y})
             .attr('x2', function(d) {return stacked ? d.origin_x + (sliceWidth*(seriesToBeDrawn - d.series)) : d.origin_x+5})
             .attr('y2', function(d) {return d.textY + 3})
+            .attr('shape-rendering', 'crispEdges')
             .style("stroke", "black")
             .style("stroke-width", 0.5)
           .exit()
@@ -355,6 +355,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
             .attr('y1', function(d) {return d.textY + 3} )
             .attr('x2', function(d) {return d.origin_x + ((seriesToBeDrawn) * sliceWidth) + 8})
             .attr('y2', function(d) {return d.textY} )
+            .attr('shape-rendering', 'crispEdges')
             .style("stroke", "black")
             .style("stroke-width", 0.5)
           .exit()
