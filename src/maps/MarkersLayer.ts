@@ -254,6 +254,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Create outer query which takes where r <= 3 to limit # of points in a cluster
+    // Wrap geometry in ST_Force2D to avoid https://trac.osgeo.org/postgis/ticket/4690 (https://github.com/mWater/mwater-server/issues/495)
     const outerquery: JsonQLQuery = {
       type: "query",
       selects: [
@@ -267,7 +268,12 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           expr: {
             type: "op",
             op: "ST_AsMVTGeom",
-            exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, envelopeExpr]
+            exprs: [
+              { type: "op", op: "ST_Force2D", exprs: [
+                { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }
+              ]}, 
+              envelopeExpr
+            ]
           },
           alias: "the_geom_webmercator"
         }, // innerquery.the_geom_webmercator as the_geom_webmercator
