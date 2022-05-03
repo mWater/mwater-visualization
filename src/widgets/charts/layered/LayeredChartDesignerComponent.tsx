@@ -312,7 +312,7 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
             </Checkbox>
           ]
         : undefined,
-      design.labels ? R('div', null, 
+      (design.labels && design.type === "bar" && !design.transpose) ? R('div', null, 
         <Checkbox inline key="labels" value={design.popoutSmallValues || false} onChange={this.handleLabelsPopoutChange}>
           Show Popout labels for small values
         </Checkbox>
