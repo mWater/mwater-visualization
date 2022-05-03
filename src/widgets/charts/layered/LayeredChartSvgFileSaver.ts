@@ -12,7 +12,7 @@ function getC3Css() {
       const rules = sheet?.cssRules || sheet.rules
       if (rules) {
         for (let rule of rules) {
-          if (rule.cssText && rule.cssText.startsWith(".c3")) {
+          if (rule.cssText && rule.cssText.startsWith(".bb")) {
             css.push(rule.cssText)
           }
         }
@@ -76,7 +76,10 @@ export default {
     }
     const chartOptions = compiler.createChartOptions(props)
     const containerDiv = document.createElement("div")
-    containerDiv.className += "c3"
+    containerDiv.className += "bb"
+    // BillboardJS legend calculations dont work properly when element is not visible
+    // https://github.com/naver/billboard.js/issues/1015
+    document.body.appendChild(containerDiv)
     chartOptions.bindto = containerDiv
     const title = design.titleText
     let chart: any = null
@@ -112,10 +115,10 @@ line, path {fill: none;stroke: rgb(0, 0, 0);}
 
           saveSvgAsPng.saveSvgAsPng(el, `${title || "untitled"}.png`, {
             selectorRemap(selector: any) {
-              if ([".c3 path, .c3 line", ".c3 line, .c3 path"].includes(selector)) {
+              if ([".bb path, .bb line", ".bb line, .bb path"].includes(selector)) {
                 return "path, line"
               }
-              if (selector.indexOf(".c3 ") === 0) {
+              if (selector.indexOf(".bb ") === 0) {
                 return selector.substr(4)
               } else {
                 return selector
@@ -128,7 +131,7 @@ line, path {fill: none;stroke: rgb(0, 0, 0);}
       })
     }
     chartOptions.onrendered = _.debounce(_.once(onRender), 1000)
-    const c3 = require("c3")
+    // const c3 = require("c3")
     chart = c3.generate(chartOptions)
 
     // Remove listener for window focus (https://github.com/c3js/c3/issues/2742)

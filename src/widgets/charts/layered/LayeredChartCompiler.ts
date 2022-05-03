@@ -8,9 +8,21 @@ import { JsonQLFilter } from "../../.."
 import { LayeredChartDesign } from "./LayeredChartDesign"
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 import { Axis } from "../../../axes/Axis"
+import { bar, line, spline, scatter, area, pie, donut } from "billboard.js"
+
+/** Chart types */
+const chartTypes = {
+  bar,
+  line,
+  spline,
+  scatter,
+  area,
+  pie,
+  donut,
+}
 
 const commaFormatter = d3Format.format(",")
-const compactFormatter = d3Format.format(".4")
+const compactFormatter = (d: any) => d3Format.format("~s")(d).replace('G', 'B')
 
 function pieLabelValueFormatter(format: any, hidePercent = false) {
   function percent(ratio: any) {
@@ -211,7 +223,6 @@ export default class LayeredChartCompiler {
         types: c3Data.types,
         columns: c3Data.columns,
         names: c3Data.names,
-        types: c3Data.types,
         groups: c3Data.groups,
         xs: c3Data.xs,
         colors: c3Data.colors,
@@ -278,6 +289,29 @@ export default class LayeredChartCompiler {
       transition: { duration: 0 } // Transitions interfere with scoping
     }
 
+    // && (options.design.type === "pie" || options.design.type === "donut")
+    if(options.design.labels) {
+      // same color values gets hidden!! https://github.com/naver/billboard.js/issues/871
+      chartDesign.data.labels = {
+        colors: chartDesign.data.columns.reduce((a, c) => {
+          a[c[0]] = '#000'
+          return a
+        }, {})
+      }
+      if(!options.design.transpose) {
+        chartDesign.data.labels = {
+          ...chartDesign.data.labels,
+          position: {
+            y: 15
+          },
+        }
+      }
+    }
+
+    if(_.isEmpty(chartDesign.data.types)) {
+      chartDesign.data.type = this.getLayerType(options.design, 0)
+    }
+
     if (options.design.labels) {
       if (options.design.type === "pie" || options.design.type === "donut") {
         chartDesign.tooltip = {
@@ -299,7 +333,10 @@ export default class LayeredChartCompiler {
     if (options.design.labels && !_.isEmpty(c3Data.format)) {
       // format = _.map options.design.layers, (layer, layerIndex) =>
       //   return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
-      chartDesign.data.labels = { format: c3Data.format }
+      chartDesign.data.labels = { 
+        ...chartDesign.data.labels, 
+        format: c3Data.format
+      }
     }
 
     if (options.design.yThresholds) {
@@ -588,7 +625,7 @@ export default class LayeredChartCompiler {
   }
 
   // Numbers sometimes arrive as strings from database. Fix by parsing
-  fixStringYValues(rows: any) {
+  fixStringYValues(rows: any = []) {
     for (let row of rows) {
       if (_.isString(row.y)) {
         row.y = parseFloat(row.y)
@@ -951,32 +988,42 @@ export default class LayeredChartCompiler {
   }
 
   // Get layer type, defaulting to overall type
-  getLayerType(design: any, layerIndex: any) {
+  getLayerType(design: any, layerIndex: any) { 
+    // Special handling for mocha tests where chartTypes has all undefined values
+    // See https://github.com/mWater/mwater-visualization/issues/453#issuecomment-1103671467
+    const chartTypeString = design.layers[layerIndex].type || design.type
+    if (chartTypes[chartTypeString]) {
+      return chartTypes[chartTypeString]()
+    } 
+    return chartTypeString
+  }
+
+  getLayerTypeString(design: any, layerIndex: any) {
     return design.layers[layerIndex].type || design.type
   }
 
   // Determine if layer required grouping by x (and color)
   doesLayerNeedGrouping(design: any, layerIndex: any) {
-    return this.getLayerType(design, layerIndex) !== "scatter"
+    return this.getLayerTypeString(design, layerIndex) !== "scatter"
   }
 
   // Determine if layer can use x axis
   canLayerUseXExpr(design: any, layerIndex: any) {
     let needle
-    return (needle = this.getLayerType(design, layerIndex)), !["pie", "donut"].includes(needle)
+    return (needle = this.getLayerTypeString(design, layerIndex)), !["pie", "donut"].includes(needle)
   }
 
   isXAxisRequired(design: any, layerIndex: any) {
     let needle
     return _.any(
       design.layers,
-      (layer, i) => ((needle = this.getLayerType(design, i)), !["pie", "donut"].includes(needle))
+      (layer, i) => ((needle = this.getLayerTypeString(design, i)), !["pie", "donut"].includes(needle))
     )
   }
 
   isColorAxisRequired(design: any, layerIndex: any) {
     let needle
-    return (needle = this.getLayerType(design, layerIndex)), ["pie", "donut"].includes(needle)
+    return (needle = this.getLayerTypeString(design, layerIndex)), ["pie", "donut"].includes(needle)
   }
 
   compileDefaultTitleText(design: any, locale: any) {

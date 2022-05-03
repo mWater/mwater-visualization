@@ -40,6 +40,8 @@ export interface LayeredChartDesign {
     yMax?: number;
     /** optional minimum for y axis */
     yMin?: number;
+    /** true to show popout lines for small values */
+    popoutSmallValues?: boolean;
 }
 export interface LayeredChartDesignLayer {
     /** bar/line/spline/scatter/area/pie/donut (overrides main one) */

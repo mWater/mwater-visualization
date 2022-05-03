@@ -9,6 +9,7 @@ import LayeredChartCompiler from "./LayeredChartCompiler"
 import TextComponent from "../../text/TextComponent"
 import * as d3 from "d3"
 import { LayeredChartDesign } from "./LayeredChartDesign"
+import c3 from 'billboard.js'
 
 export interface LayeredChartViewComponentProps {
   schema: Schema
@@ -201,9 +202,17 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     // Update scope after rendering. Needs a delay to make it happen
     chartOptions.onrendered = () => _.defer(this.updateScope)
 
-    const c3 = require("c3")
-    this.chart = c3.generate(chartOptions)
+    // const c3 = require("c3")
+    // console.log(chartOptions)
+    try {
+      this.chart = c3.generate(chartOptions)  
+    } catch (error) {
+      
+      throw(error)
+    }
+    
 
+    console.log(this.chartDiv)
     // Remove listener for window focus (https://github.com/c3js/c3/issues/2742)
     window.removeEventListener("focus", this.chart.internal.windowFocusHandler)
     this.chart.internal.windowFocusHandler = () => {}
@@ -265,9 +274,97 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     const compiler = new LayeredChartCompiler({ schema: this.props.schema })
     const el = this.chartDiv
 
+    if(!this.props.design.transpose && this.props.design.popoutSmallValues) {
+      const stacked = this.props.design.stacked
+      
+      let barWidth = 20
+      const smalls: any[] = []
+      const map = new Map()
+      let _id = 0
+      d3.select(el)
+      .selectAll(".bb-chart-bar .bb-bar")
+      .each(function (p: any, i){
+        if(!map.has(p.id)) {
+          map.set(p.id, _id++)
+        }
+        
+        const box = (d3.select(this).nodes()[0]! as SVGAElement).getBBox()
+        barWidth = box.width
+
+        if(box.height < 12) {
+          
+          d3.select(el)
+          .selectAll(".bb-chart-text .bb-text")
+          .filter(function(p, j){ return i === j })
+          .each(function(_p: any){
+            smalls.push({
+              origin_x: box.x,// + box.width,
+              origin_y: box.y,
+              series: map.get(p.id),
+              textY:  box.y - (12 * map.get(p.id)) - 10,
+              textX: box.x + 25,
+            })
+            ;(d3.select(this).node()as SVGAElement).classList.add("needs_adjustment")
+          })
+          .attr('data-boxX', box.x)
+          .attr('y', function(){
+            return box.y - (12 * map.get(p.id)) - 10
+            // return Number(d3.select(this).attr('y')) - 7
+          })
+        }
+      })
+    
+      if(smalls.length > 0) {
+        const sliceWidth = 4
+
+        const seriesToBeDrawn = _.uniq(smalls.map((s) => s.series)).length
+
+        d3.select(el)
+          .selectAll(".needs_adjustment")
+          .attr('x', function() {
+            const self = d3.select(this)
+            return Number(self.attr('data-boxX')) + ((seriesToBeDrawn) * sliceWidth) + 10
+          })
+          .attr('text-anchor', 'left')
+
+        const hackGroup = d3.select(el)
+        .selectAll(".bb-chart")
+        .selectAll(".popout_labels")
+        .data(["1"])
+        .enter()
+        .append('g')
+        .attr('class', 'popout_labels')
+
+        hackGroup
+          .selectAll('line')
+          .data(smalls)
+          .enter()
+          .append('line')
+            .attr('x1', function(d) {return stacked ? d.origin_x + (sliceWidth*(seriesToBeDrawn - d.series)) : d.origin_x+5})
+            .attr('y1', function(d) {return d.origin_y})
+            .attr('x2', function(d) {return stacked ? d.origin_x + (sliceWidth*(seriesToBeDrawn - d.series)) : d.origin_x+5})
+            .attr('y2', function(d) {return d.textY + 3})
+            .attr('shape-rendering', 'crispEdges')
+            .style("stroke", "black")
+            .style("stroke-width", 0.5)
+          .exit()
+          .data(smalls)
+          .enter()
+          .append('line')
+            .attr('x1', function(d) {return stacked ? d.origin_x + (sliceWidth*(seriesToBeDrawn - d.series)) : d.origin_x+5})
+            .attr('y1', function(d) {return d.textY + 3} )
+            .attr('x2', function(d) {return d.origin_x + ((seriesToBeDrawn) * sliceWidth) + 8})
+            .attr('y2', function(d) {return d.textY} )
+            .attr('shape-rendering', 'crispEdges')
+            .style("stroke", "black")
+            .style("stroke-width", 0.5)
+          .exit()
+      }
+    }
+
     // Handle line and bar charts
     d3.select(el)
-      .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
+      .selectAll(".bb-chart-bar .bb-bar, .bb-chart-line .bb-circle")
       // Highlight only scoped
       .style("opacity", (d: any, i: any) => {
         let scope
@@ -296,7 +393,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     // Handle pie charts
     return d3
       .select(el)
-      .selectAll(".c3-chart-arcs .c3-chart-arc")
+      .selectAll(".bb-chart-arcs .bb-chart-arc")
       .style("opacity", (d: any, i: any) => {
         let scope
         const dataPoint = this.lookupDataPoint(dataMap, d)

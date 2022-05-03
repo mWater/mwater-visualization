@@ -51,35 +51,35 @@
 }
 
 /* Dashed thresholds */
-.c3-grid line {
+.bb-grid line {
   stroke-dasharray: 3;
 }
 
 /* Dark text on donut/pie */
-.c3-chart-arc text {
+.bb-chart-arc text {
   fill: #444;
 }
 
 /* Less dark charts */
-.c3 text {
+.bb text {
   fill: #444;
   font-family: "Helvetica Neue", sans-serif;
 }
 
-.c3 path,
-.c3 line {
+.bb path,
+.bb line {
   fill: none;
   stroke: #ccc;
 }
 
 /* Hide trendline dots and text */
-.c3-target-trendline .c3-circles,
-.c3-target-trendline .c3-texts {
+.bb-target-trendline .bb-circles,
+.bb-target-trendline .bb-texts {
   opacity: 0;
 }
 
 /* Trandlines are dashed */
-.c3-target-trendline .c3-lines {
+.bb-target-trendline .bb-lines {
   stroke-dasharray: 3;
 }
 
@@ -128,12 +128,12 @@
   visibility: visible;
 }
 
-.c3-title {
+.bb-title {
   font: 14px sans-serif;
   font-weight: bold;
 }
 
-.c3-chart-arc text {
+.bb-chart-arc text {
   fill: black;
 }
 

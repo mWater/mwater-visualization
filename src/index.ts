@@ -48,7 +48,7 @@ import "fixed-data-table-2/dist/fixed-data-table.min.css"
 import "rc-slider/assets/index.css"
 import "./layouts/decorated-block.css"
 import "react-datepicker/dist/react-datepicker.css"
-import "c3/c3.css"
+import "billboard.js/dist/billboard.css"
 import "./index.css"
 import "./layout-styles.css"
 
