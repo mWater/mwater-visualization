@@ -50,9 +50,9 @@ export function MapViewComponent(props: {
   /** Locale to use */
   locale: string
 }) {
-  if (window.localStorage.getItem("maptech") == "maplibre") {
-    return <NewMapViewComponent {...props} />
-  } else {
+  if (window.localStorage.getItem("maptech") == "mapnik") {
     return <OldMapViewComponent {...props} />
+  } else {
+    return <NewMapViewComponent {...props} />
   }
 }
