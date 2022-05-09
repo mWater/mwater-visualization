@@ -1,21 +1,16 @@
 import _ from "lodash"
-import React from "react"
+import React, { ReactElement, Component } from "react"
 import ReactDOM from "react-dom"
 import LeafletLoading from "./LeafletLoading"
-import { ReactNode, Component } from "react"
 import L, { PathOptions, CircleMarkerOptions } from "leaflet"
 let BingLayer = require("./BingLayer")
 let UtfGridLayer = require("./UtfGridLayer")
 
 const R = React.createElement
 
-// See https://github.com/PaulLeCam/react-leaflet/issues/255#issuecomment-261904061 for issue with CSS + webpack
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png").default,
-  iconUrl: require("leaflet/dist/images/marker-icon.png").default,
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png").default
-})
+import iconRetinaUrl from "./marker-icon-2x.png"
+import iconUrl from "./marker-icon.png"
+import shadowUrl from "./marker-shadow.png"
 
 // import { GeoJsonObject } from "geojson";
 type GeoJsonObject = any
@@ -90,7 +85,7 @@ export interface Props {
   layers: MapLayer[]
 
   /** Legend. Will have zoom injected */
-  legend?: ReactNode
+  legend?: ReactElement
 
   /** Whether the map be draggable with mouse/touch or not. Default true */
   dragging?: boolean
@@ -120,7 +115,7 @@ export interface Props {
   popup?: {
     lat: number
     lng: number
-    contents: ReactNode
+    contents: ReactElement
   }
 }
 
@@ -130,9 +125,20 @@ export default class LeafletMapComponent extends Component<Props> {
   hasBounds: boolean
   map: L.Map
   loaded: boolean
-  popupDiv: HTMLElement
+  popupDiv: HTMLElement | null
   popupLayer: L.Popup | null
   mapElem: HTMLDivElement | null
+  tileLayers: any[] | null
+  utfGridLayers: any[] | null
+  geoJsonLayers: any[] | null  
+
+  static defaultProps = {
+    dragging: true,
+    touchZoom: true,
+    scrollWheelZoom: true,
+    scaleControl: true,
+    keyboard: true
+  }
   
   constructor(props: Props) {
     super(props)
@@ -141,7 +147,9 @@ export default class LeafletMapComponent extends Component<Props> {
   /** Reloads all layers */
   reload(): void {
     // TODO reload JSON tiles
-    this.tileLayers.map((tileLayer: any) => tileLayer.redraw())
+    if (this.tileLayers) {
+      this.tileLayers.map((tileLayer: any) => tileLayer.redraw())
+    }
   }
 
   /** Gets the underlying Leaflet map */
@@ -229,7 +237,7 @@ export default class LeafletMapComponent extends Component<Props> {
       mapOptions.minZoom = this.props.minZoom
     }
 
-    this.map = L.map(this.mapElem, mapOptions)
+    this.map = L.map(this.mapElem!, mapOptions)
 
     if (this.props.scaleControl) {
       L.control.scale().addTo(this.map)
@@ -262,7 +270,7 @@ export default class LeafletMapComponent extends Component<Props> {
     if (this.props.loadingSpinner) {
       const loadingControl = new LeafletLoading({
         separate: true
-      })
+      } as any)
       this.map.addControl(loadingControl)
     }
 
@@ -303,7 +311,7 @@ export default class LeafletMapComponent extends Component<Props> {
     // Update maxZoom
     if (prevProps && prevProps.maxZoom !== this.props.maxZoom) {
       this.map.options.maxZoom = this.props.maxZoom
-      if (this.map.getZoom() > this.props.maxZoom) {
+      if (this.props.maxZoom && this.map.getZoom() > this.props.maxZoom) {
         this.map.setZoom(this.props.maxZoom)
       }
     }
@@ -311,7 +319,9 @@ export default class LeafletMapComponent extends Component<Props> {
     // Update attribution
     if (!prevProps || this.props.extraAttribution !== prevProps.extraAttribution) {
       if (this.baseLayer) {
-        this.baseLayer._map.attributionControl.removeAttribution(prevProps.extraAttribution)
+        if (prevProps) {
+          this.baseLayer._map.attributionControl.removeAttribution(prevProps.extraAttribution)
+        }
         this.baseLayer._map.attributionControl.addAttribution(this.props.extraAttribution)
       }
     }
@@ -325,12 +335,12 @@ export default class LeafletMapComponent extends Component<Props> {
       }
 
       // Close popup
-      this.map.removeLayer(this.popupLayer)
+      this.map.removeLayer(this.popupLayer!)
       this.popupLayer = null
     } else if (prevProps && prevProps.popup && this.props.popup) {
       // Move location
       if (prevProps.popup.lat !== this.props.popup.lat || prevProps.popup.lng !== this.props.popup.lng) {
-        this.popupLayer.setLatLng(L.latLng(this.props.popup.lat, this.props.popup.lng))
+        this.popupLayer!.setLatLng(L.latLng(this.props.popup.lat, this.props.popup.lng))
       }
 
       // Re-render contents
@@ -453,7 +463,7 @@ export default class LeafletMapComponent extends Component<Props> {
               continue
             }
 
-            const options = { opacity: layer.opacity }
+            const options: any = { opacity: layer.opacity }
 
             // Putting null seems to make layer vanish
             if (layer.minZoom) {
@@ -467,10 +477,10 @@ export default class LeafletMapComponent extends Component<Props> {
             this.tileLayers.push(tileLayer)
 
             // TODO Hack for animated zooming
-            this.map._zoomAnimated = false
+            ;(this.map as any)._zoomAnimated = false
             this.map.addLayer(tileLayer)
-            this.map._zoomAnimated = true
-            tileLayer._container.className += " leaflet-zoom-hide"
+            ;(this.map as any)._zoomAnimated = true
+            ;(tileLayer as any)._container.className += " leaflet-zoom-hide"
           } else if (layer.geometry) {
             geoJsonLayer = L.geoJSON(layer.geometry, {
               // Put in front
@@ -484,7 +494,19 @@ export default class LeafletMapComponent extends Component<Props> {
                     _.extend({}, layer.pointStyle, { interactive: layer.nonInteractive ? false : true })
                   )
                 } else {
-                  return L.marker(latlng, { interactive: layer.nonInteractive ? false : true })
+                  return L.marker(latlng, { 
+                    icon: L.icon({
+                      iconUrl,
+                      shadowUrl,
+                      iconRetinaUrl,
+                      iconSize: [25, 41],
+                      iconAnchor: [13, 41],
+                      popupAnchor: [1, -34],
+                      shadowSize: [41, 41],
+                      shadowAnchor: [13, 41]
+                    }),
+                    interactive: layer.nonInteractive ? false : true 
+                  })
                 }
               }
             })
@@ -498,54 +520,42 @@ export default class LeafletMapComponent extends Component<Props> {
 
         this.utfGridLayers = []
         // Add grid layers in reverse order
-        return (() => {
-          const result = []
-          for (layer of this.props.layers.slice().reverse()) {
-            if (!layer.visible) {
-              continue
+        for (layer of this.props.layers.slice().reverse()) {
+          if (!layer.visible) {
+            continue
+          }
+
+          if (layer.utfGridUrl) {
+            utfGridLayer = new UtfGridLayer(layer.utfGridUrl, {
+              useJsonP: false,
+              minZoom: layer.minZoom || undefined,
+              maxZoom: layer.maxZoom || undefined
+            })
+
+            this.map.addLayer(utfGridLayer)
+            this.utfGridLayers.push(utfGridLayer)
+
+            if (layer.onGridClick) {
+              ;((layer) => {
+                return utfGridLayer.on("click", (ev: any) => {
+                  return layer.onGridClick(ev)
+                })
+              })(layer)
             }
 
-            if (layer.utfGridUrl) {
-              utfGridLayer = new UtfGridLayer(layer.utfGridUrl, {
-                useJsonP: false,
-                minZoom: layer.minZoom || undefined,
-                maxZoom: layer.maxZoom || undefined
+            if (layer.onGridHover) {
+              utfGridLayer.on("mouseout", (ev: any) => {
+                return layer.onGridHover(_.omit(ev, "data"))
               })
-
-              this.map.addLayer(utfGridLayer)
-              this.utfGridLayers.push(utfGridLayer)
-
-              if (layer.onGridClick) {
-                ;((layer) => {
-                  return utfGridLayer.on("click", (ev: any) => {
-                    return layer.onGridClick(ev)
-                  })
-                })(layer)
-              }
-
-              if (layer.onGridHover) {
-                result.push(
-                  ((layer) => {
-                    utfGridLayer.on("mouseout", (ev: any) => {
-                      return layer.onGridHover(_.omit(ev, "data"))
-                    })
-                    utfGridLayer.on("mouseover", (ev: any) => {
-                      return layer.onGridHover(ev)
-                    })
-                    return utfGridLayer.on("mousemove", (ev: any) => {
-                      return layer.onGridHover(ev)
-                    })
-                  })(layer)
-                )
-              } else {
-                result.push(undefined)
-              }
-            } else {
-              result.push(undefined)
+              utfGridLayer.on("mouseover", (ev: any) => {
+                return layer.onGridHover(ev)
+              })
+              return utfGridLayer.on("mousemove", (ev: any) => {
+                return layer.onGridHover(ev)
+              })
             }
           }
-          return result
-        })()
+        }
       }
     }
   }
@@ -568,10 +578,3 @@ export default class LeafletMapComponent extends Component<Props> {
   }
 }
 
-LeafletMapComponent.defaultProps = {
-  dragging: true,
-  touchZoom: true,
-  scrollWheelZoom: true,
-  scaleControl: true,
-  keyboard: true
-}

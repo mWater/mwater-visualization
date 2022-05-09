@@ -1,5 +1,4 @@
-import React from "react";
-import { ReactNode, Component } from "react";
+import React, { ReactElement, Component } from "react";
 import L, { PathOptions, CircleMarkerOptions } from "leaflet";
 declare type GeoJsonObject = any;
 export interface MapBounds {
@@ -67,7 +66,7 @@ export interface Props {
     /** List of layers */
     layers: MapLayer[];
     /** Legend. Will have zoom injected */
-    legend?: ReactNode;
+    legend?: ReactElement;
     /** Whether the map be draggable with mouse/touch or not. Default true */
     dragging?: boolean;
     /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
@@ -90,7 +89,7 @@ export interface Props {
     popup?: {
         lat: number;
         lng: number;
-        contents: ReactNode;
+        contents: ReactElement;
     };
 }
 /** Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer */
@@ -99,9 +98,19 @@ export default class LeafletMapComponent extends Component<Props> {
     hasBounds: boolean;
     map: L.Map;
     loaded: boolean;
-    popupDiv: HTMLElement;
+    popupDiv: HTMLElement | null;
     popupLayer: L.Popup | null;
     mapElem: HTMLDivElement | null;
+    tileLayers: any[] | null;
+    utfGridLayers: any[] | null;
+    geoJsonLayers: any[] | null;
+    static defaultProps: {
+        dragging: boolean;
+        touchZoom: boolean;
+        scrollWheelZoom: boolean;
+        scaleControl: boolean;
+        keyboard: boolean;
+    };
     constructor(props: Props);
     /** Reloads all layers */
     reload(): void;
@@ -115,11 +124,11 @@ export default class LeafletMapComponent extends Component<Props> {
     };
     /** Set bounds. Padding is optional fractional pad */
     setBounds(bounds: MapBounds | null, pad?: number): void;
-    componentDidMount(): any[] | undefined;
-    componentDidUpdate(prevProps: any): any[] | undefined;
+    componentDidMount(): any;
+    componentDidUpdate(prevProps: any): any;
     componentWillUnmount(): L.Map;
     openPopup(options: any): Element;
-    updateMap(prevProps?: Props): any[] | undefined;
+    updateMap(prevProps?: Props): any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};
