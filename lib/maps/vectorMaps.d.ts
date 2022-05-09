@@ -2,6 +2,8 @@
 import { LngLatBoundsLike } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./NewMapViewComponent.css";
+/** This must be called to set the appropriate key before use */
+export declare function setMapTilerApiKey(key: string): void;
 export declare type BaseLayer = "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "blank";
 /** Loads a vector map, refreshing the WebGL context as needed */
 export declare function useVectorMap(options: {

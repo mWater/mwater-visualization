@@ -29,6 +29,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "billboard.js/dist/billboard.css";
 import "./index.css";
 import "./layout-styles.css";
+export { setMapTilerApiKey } from "./maps/vectorMaps";
 export { default as CachingDataSource } from "./CachingDataSource";
 export { default as UndoStack } from "./UndoStack";
 export { default as DashboardViewComponent } from "./dashboards/DashboardViewComponent";

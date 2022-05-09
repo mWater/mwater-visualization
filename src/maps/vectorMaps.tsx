@@ -9,6 +9,13 @@ import React from "react"
 
 /* Hooks and functions related to displaying a vector map */
 
+let mapTilerApiKey = ""
+
+/** This must be called to set the appropriate key before use */
+export function setMapTilerApiKey(key: string) {
+  mapTilerApiKey = key
+}
+
 export type BaseLayer = "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "blank"
 
 /** Loads a vector map, refreshing the WebGL context as needed */
@@ -197,13 +204,13 @@ export function useBaseStyle(baseLayer: BaseLayer) {
     }
 
     if (baseLayer == "cartodb_positron") {
-      loadStyle("https://api.maptiler.com/maps/positron/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+      loadStyle(`https://api.maptiler.com/maps/positron/style.json?key=${mapTilerApiKey}`)
     } else if (baseLayer == "cartodb_dark_matter") {
-      loadStyle("https://api.maptiler.com/maps/darkmatter/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+      loadStyle(`https://api.maptiler.com/maps/darkmatter/style.json?key=${mapTilerApiKey}`)
     } else if (baseLayer == "bing_road") {
-      loadStyle("https://api.maptiler.com/maps/streets/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+      loadStyle(`https://api.maptiler.com/maps/streets/style.json?key=${mapTilerApiKey}`)
     } else if (baseLayer == "bing_aerial") {
-      loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=wXgjrSOKxcDdRfpMMNYl")
+      loadStyle(`https://api.maptiler.com/maps/hybrid/style.json?key=${mapTilerApiKey}`)
     } else if (baseLayer == "blank") {
       setBaseStyle({
         version: 8,
@@ -252,7 +259,7 @@ export function mergeBaseAndUserStyle(
       ...baseStyle.sources,
       ...userStyle.sources
     },
-    glyphs: baseStyle.glyphs || "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=wXgjrSOKxcDdRfpMMNYl",
+    glyphs: baseStyle.glyphs || `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${mapTilerApiKey}`,
     layers
   }
   return style
