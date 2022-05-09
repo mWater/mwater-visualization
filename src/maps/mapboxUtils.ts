@@ -38,8 +38,9 @@ export function compileColorToMapbox(color: string, excludedValues?: any[]): Dat
     compiled = ["case"]
     for (let value of excludedValues) {
       // If value is numeric, cast to number as ST_AsMVT makes numeric types into strings
+      // However, to-number makes null into 0, so check for that first
       if (typeof value == "number") {
-        compiled.push(["==", ["to-number", ["get", "color"]], value])
+        compiled.push(["all", ["has", "color"], ["==", ["to-number", ["get", "color"]], value]])
       } else {
         compiled.push(["==", ["get", "color"], value])
       }
