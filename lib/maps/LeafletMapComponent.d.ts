@@ -1,5 +1,6 @@
 import React, { ReactElement, Component } from "react";
 import L, { PathOptions, CircleMarkerOptions } from "leaflet";
+export declare const standardLeafletIcon: L.Icon<L.IconOptions>;
 declare type GeoJsonObject = any;
 export interface MapBounds {
     w: number;

@@ -12,6 +12,17 @@ import iconRetinaUrl from "./marker-icon-2x.png"
 import iconUrl from "./marker-icon.png"
 import shadowUrl from "./marker-shadow.png"
 
+export const standardLeafletIcon = L.icon({
+  iconUrl,
+  shadowUrl,
+  iconRetinaUrl,
+  iconSize: [25, 41],
+  iconAnchor: [13, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+  shadowAnchor: [13, 41]
+})
+
 // import { GeoJsonObject } from "geojson";
 type GeoJsonObject = any
 
@@ -495,16 +506,7 @@ export default class LeafletMapComponent extends Component<Props> {
                   )
                 } else {
                   return L.marker(latlng, { 
-                    icon: L.icon({
-                      iconUrl,
-                      shadowUrl,
-                      iconRetinaUrl,
-                      iconSize: [25, 41],
-                      iconAnchor: [13, 41],
-                      popupAnchor: [1, -34],
-                      shadowSize: [41, 41],
-                      shadowAnchor: [13, 41]
-                    }),
+                    icon: standardLeafletIcon,
                     interactive: layer.nonInteractive ? false : true 
                   })
                 }
