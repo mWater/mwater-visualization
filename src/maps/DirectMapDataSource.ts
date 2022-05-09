@@ -77,6 +77,31 @@ interface DirectLayerDataSourceOptions {
   client?: string
 }
 
+/** Interface for a request made to get a token for vector tiles.
+ * The response is a token that can be used to get the actual tiles.
+ * The token is a string that is passed to the server as a query parameter.
+ * This type of request 
+ */
+export interface VectorTileDirectTokenRequest {
+  /** Layers to include in the resulting tiles */
+  layers: VectorTileSourceLayer[]
+
+  /** Common table expressions of the tiles */
+  ctes: VectorTileCTE[]
+
+  /** Requests that the created tiles not be based on data older than */
+  createdAfter?: string
+
+  /** Earliest expiry of the token (ISO 8601 datetime) */
+  expiresAfter: string
+
+  /** Enforced minimum zoom level */
+  minZoom?: number
+
+  /** Enforced maximum zoom level */
+  maxZoom?: number
+}
+
 class DirectLayerDataSource implements MapLayerDataSource {
   options: DirectLayerDataSourceOptions
 
@@ -105,18 +130,7 @@ class DirectLayerDataSource implements MapLayerDataSource {
     // Put in opacity of 1 as it doesn't affect source data
     const vectorTile = layer.getVectorTile(layerDesign, this.options.layerView.id, this.options.schema, filters, 1)
 
-    const request: {
-      layers: VectorTileSourceLayer[]
-      /** Common table expressions of the tiles */
-      ctes: VectorTileCTE[]
-      createdAfter?: string
-      expiresAfter: string
-      /** Enforced minimum zoom level */
-      minZoom?: number
-
-      /** Enforced maximum zoom level */
-      maxZoom?: number
-    } = {
+    const request: VectorTileDirectTokenRequest = {
       layers: vectorTile.sourceLayers,
       ctes: vectorTile.ctes,
       minZoom: vectorTile.minZoom,
