@@ -3,6 +3,7 @@ import $ from "jquery"
 import saveSvgAsPng from "save-svg-as-png"
 import LayeredChartCompiler from "./LayeredChartCompiler"
 import { Schema } from "mwater-expressions"
+import c3 from 'billboard.js'
 
 // Get the css rules corresponding to .c3 directly out of the document object
 function getC3Css() {
