@@ -12,6 +12,7 @@ import { ExprCompiler } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import { DatagridDesign, JsonQLFilter } from ".."
 import { JsonQLSelectQuery } from "jsonql"
+import produce from "immer"
 
 export interface FindReplaceModalComponentProps {
   schema: Schema
@@ -166,31 +167,42 @@ export default class FindReplaceModalComponent extends React.Component<
     const exprUtils = new ExprUtils(this.props.schema)
 
     // Replace "replace" column with fake case statement to simulate change
-    const design = _.clone(this.props.design)
-    design.columns = _.map(design.columns, (column) => {
-      // Unchanged if not replace column
-      if (column.id !== this.state.replaceColumn) {
-        return column
+    const design = produce(this.props.design, draft => {
+      const replaceColumn = draft.columns.find(column => column.id == this.state.replaceColumn)
+      if (replaceColumn) {
+        replaceColumn.expr = {
+          type: "case",
+          table: this.props.design.table!,
+          cases: [
+            {
+              when: this.state.conditionExpr || { type: "literal", valueType: "boolean", value: true },
+              then: this.state.withExpr
+            }
+          ],
+          // Unchanged
+          else: replaceColumn.expr
+        }
+
+        replaceColumn.label = replaceColumn.label || exprUtils.summarizeExpr(replaceColumn.expr, this.props.design.locale)
       }
 
-      const expr = {
-        type: "case",
-        table: this.props.design.table,
-        cases: [
-          {
-            when: this.state.conditionExpr || { type: "literal", valueType: "boolean", value: true },
-            then: this.state.withExpr
+      // Add filter
+      if (this.state.conditionExpr) {
+        if (draft.filter) {
+          draft.filter = {
+            type: "op",
+            op: "and",
+            table: this.props.design.table!,
+            exprs: [
+              draft.filter,
+              this.state.conditionExpr
+            ]
           }
-        ],
-        // Unchanged
-        else: column.expr
+        }
+        else {
+          draft.filter = this.state.conditionExpr
+        }
       }
-
-      // Specify label to prevent strange titles
-      return _.extend({}, column, {
-        expr,
-        label: column.label || exprUtils.summarizeExpr(column.expr, this.props.design.locale)
-      })
     })
 
     return R(AutoSizeComponent, { injectWidth: true } as any, (size: any) => {
