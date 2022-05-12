@@ -287,7 +287,8 @@ export default class FindReplaceModalComponent extends React.Component<
               enumValues: exprUtils.getExprEnumValues(replaceExpr) || undefined,
               idTable: exprUtils.getExprIdTable(replaceExpr) || undefined,
               preferLiteral: true,
-              placeholder: "(Blank)"
+              placeholder: "(Blank)",
+              refExpr: replaceExpr
             })
           )
         }
