@@ -194,7 +194,7 @@ export default class DatagridComponent extends React.Component<
 
   // Toggle to allow cell editing
   renderCellEdit() {
-    if (!this.props.canEditExpr || this.props.onDesignChange == null) {
+    if (!this.props.canEditExpr) {
       return null
     }
 
