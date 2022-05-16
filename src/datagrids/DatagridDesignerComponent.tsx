@@ -1,7 +1,9 @@
 import PropTypes from "prop-types"
 import _ from "lodash"
-import React from "react"
+import React, { useMemo } from "react"
 const R = React.createElement
+import { default as ReactSelect } from "react-select"
+import languages from "languages"
 
 import { DataSource, ExprUtils, LiteralType, Schema } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
@@ -172,28 +174,40 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
 
 interface DatagridOptionsComponentProps {
   /** Datagrid design. See README.md */
-  design: any
-  onDesignChange: any
+  design: DatagridDesign
+  onDesignChange: (design: DatagridDesign) => void
 }
 
 // Datagrid Options
-class DatagridOptionsComponent extends React.Component<DatagridOptionsComponentProps> {
-  render() {
-    return R(
-      ui.FormGroup,
-      { label: T("Display Options") },
-      R(
-        ui.Checkbox,
-        {
-          value: this.props.design.showRowNumbers,
-          onChange: (showRowNumbers) =>
-            this.props.onDesignChange(update(this.props.design, { showRowNumbers: { $set: showRowNumbers } }))
-        },
-        T("Show row numbers")
-      )
-    )
-  }
+function DatagridOptionsComponent(props: DatagridOptionsComponentProps) {
+  const localeOptions = useMemo<{ value: string, label: string }[]>(() => {
+    return _.sortBy(languages.getAllLanguageCode().map((code: string) => ({
+      value: code,
+      label: languages.getLanguageInfo(code).name + " (" + languages.getLanguageInfo(code).nativeName + ")"
+    })), "label")
+  }, [])
+
+  return <div>
+    <ui.Checkbox 
+      value={props.design.showRowNumbers}
+      onChange={(showRowNumbers) =>
+          props.onDesignChange({ ...props.design, showRowNumbers })
+      }
+    >
+      {T("Show row numbers")}
+    </ui.Checkbox>
+    <ui.FormGroup label={T("Language")} hint={T("Preferred language of the datagrid")}>
+      <ReactSelect
+        value={localeOptions.find(opt => opt.value == (props.design.locale || "en")) || null}
+        options={localeOptions}
+        onChange={(locale: any) =>
+          props.onDesignChange({ ...props.design, locale: locale.value })
+        }
+      />
+    </ui.FormGroup>
+  </div>
 }
+
 interface ColumnsDesignerComponentProps {
   /** schema to use */
   schema: Schema

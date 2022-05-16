@@ -26,6 +26,10 @@ import RichTextComponent from "./richtext/RichTextComponent"
 import ItemsHtmlConverter from "./richtext/ItemsHtmlConverter"
 import { DragDropContextProvider } from "react-dnd"
 import { default as HTML5Backend } from "react-dnd-html5-backend"
+import { defaultT } from 'ez-localize'
+
+// Setup localizer
+global.T = defaultT
 
 $(function () {
   const sample = R(
