@@ -68,18 +68,18 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
       tabs: [
         {
           id: "columns",
-          label: "Columns",
+          label: T("Columns"),
           elem: R(ColumnsDesignerComponent, {
             schema: this.props.schema,
             dataSource: this.props.dataSource,
-            table: this.props.design.table,
+            table: this.props.design.table!,
             columns: this.props.design.columns,
             onColumnsChange: this.handleColumnsChange
           })
         },
         {
           id: "filter",
-          label: "Filter",
+          label: T("Filter"),
           // Here because of modal scroll issue
           elem: R(
             "div",
@@ -87,7 +87,7 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
             R(FilterExprComponent, {
               schema: this.props.schema,
               dataSource: this.props.dataSource,
-              table: this.props.design.table,
+              table: this.props.design.table!,
               value: this.props.design.filter,
               onChange: this.handleFilterChange
             }),
@@ -109,14 +109,14 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
         },
         {
           id: "order",
-          label: "Sorting",
+          label: T("Sorting"),
           elem: R(
             "div",
             { style: { marginBottom: 200 } },
             R(OrderBysDesignerComponent, {
               schema: this.props.schema,
               dataSource: this.props.dataSource,
-              table: this.props.design.table,
+              table: this.props.design.table!,
               orderBys: this.props.design.orderBys,
               onChange: this.handleOrderBysChange
             })
@@ -124,7 +124,7 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
         },
         {
           id: "quickfilters",
-          label: "Quickfilters",
+          label: T("Quickfilters"),
           elem: R(
             "div",
             { style: { marginBottom: 200 } },
@@ -140,7 +140,7 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
         },
         {
           id: "options",
-          label: "Options",
+          label: T("Options"),
           elem: R(
             "div",
             { style: { marginBottom: 200 } },
@@ -158,7 +158,7 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
     return R(
       "div",
       null,
-      R("label", null, "Data Source:"),
+      R("label", null, T("Data Source:")),
       R(TableSelectComponent, {
         schema: this.props.schema,
         value: this.props.design.table,
@@ -181,7 +181,7 @@ class DatagridOptionsComponent extends React.Component<DatagridOptionsComponentP
   render() {
     return R(
       ui.FormGroup,
-      { label: "Display Options" },
+      { label: T("Display Options") },
       R(
         ui.Checkbox,
         {
@@ -189,7 +189,7 @@ class DatagridOptionsComponent extends React.Component<DatagridOptionsComponentP
           onChange: (showRowNumbers) =>
             this.props.onDesignChange(update(this.props.design, { showRowNumbers: { $set: showRowNumbers } }))
         },
-        "Show row numbers"
+        T("Show row numbers")
       )
     )
   }
@@ -237,7 +237,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
       type: "expr",
       width: 150,
       expr: { type: "id", table: this.props.table },
-      label: "Unique Id"
+      label: T("Unique Id")
     })
     return this.props.onColumnsChange(columns)
   }
@@ -303,7 +303,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
             onClick: this.handleAddDefaultColumns
           },
           R("span", { className: "fas fa-plus" }),
-          " Add Default Columns"
+          " " + T("Add Default Columns")
         ),
         R(
           "button",
@@ -314,7 +314,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
             onClick: this.handleRemoveAllColumns
           },
           R("span", { className: "fas fa-times" }),
-          " Remove All Columns"
+          " " + T("Remove All Columns")
         )
       ),
 
@@ -335,7 +335,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
             onClick: this.handleAddColumn
           },
           R("span", { className: "fas fa-plus" }),
-          " Add Column"
+          " " + T("Add Column")
         ),
 
         R(
@@ -347,7 +347,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
             onClick: this.handleAddIdColumn
           },
           R("span", { className: "fas fa-plus" }),
-          " Add Unique Id (advanced)"
+          " " + T("Add Unique Id (advanced)")
         )
       )
     )
@@ -444,7 +444,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
           "a",
           { className: "btn btn-sm btn-link", onClick: this.handleSplitEnumset },
           R("i", { className: "fa fa-chain-broken" }),
-          " Split by options"
+          " " + T("Split by options")
         )
         break
       case "geometry":
@@ -452,7 +452,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
           "a",
           { className: "btn btn-sm btn-link", onClick: this.handleSplitGeometry },
           R("i", { className: "fa fa-chain-broken" }),
-          " Split by lat/lng"
+          " " + T("Split by lat/lng")
         )
         break
     }
@@ -475,7 +475,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
     return R(
       "div",
       { className: "mb-3" },
-      R("label", { className: "text-muted" }, "Format"),
+      R("label", { className: "text-muted" }, T("Format")),
       ": ",
       R(
         "select",

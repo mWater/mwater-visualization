@@ -66,7 +66,7 @@ export default class OrderBysDesignerComponent extends React.Component<OrderBysD
           onClick: this.handleAdd
         },
         R("span", { className: "fas fa-plus" }),
-        " Add Ordering"
+        " " + T("Add Ordering")
       )
     )
   }
@@ -111,7 +111,7 @@ class OrderByDesignerComponent extends React.Component<OrderByDesignerComponentP
         "div",
         { className: "col-3" },
         <Checkbox inline value={this.props.orderBy.direction === "desc"} onChange={this.handleDirectionChange}>
-          Reverse
+          {T("Reverse")}
         </Checkbox>
       ),
       R(

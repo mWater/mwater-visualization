@@ -142,7 +142,7 @@ export default class FindReplaceModalComponent extends React.Component<
       const rows = await this.props.dataSource.performQuery(query)
 
       // Confirm
-      if (!confirm(`Replace ${rows.length} values? This cannot be undone.`)) {
+      if (!confirm(T("Replace {0} values? This cannot be undone.", rows.length))) {
         return
       }
 
@@ -153,7 +153,7 @@ export default class FindReplaceModalComponent extends React.Component<
         value: row.withValue
       })))
       
-      alert("Success")
+      alert(T("Successfully replaced {0} values", rows.length))
       this.setState({ open: false })
       this.props.onUpdate()
     } catch(error) {
@@ -240,7 +240,7 @@ export default class FindReplaceModalComponent extends React.Component<
       return R(
         "div",
         null,
-        R("h3", null, "Working..."),
+        R("h3", null, T("Working...")),
         R(
           "div",
           { className: "progress" },
@@ -255,12 +255,12 @@ export default class FindReplaceModalComponent extends React.Component<
       R(
         "div",
         { key: "replace", className: "mb-3" },
-        R("label", null, "Column with data to replace: "),
+        R("label", null, T("Column with data to replace") + ": "),
         R(ReactSelect, {
           options: replaceColumnOptions,
           value: _.findWhere(replaceColumnOptions, { value: this.state.replaceColumn }) || null,
           onChange: (opt: any) => this.setState({ replaceColumn: opt.value }),
-          placeholder: "Select Column...",
+          placeholder: T("Select Column..."),
           styles: {
             // Keep menu above fixed data table headers
             menu: (style) => _.extend({}, style, { zIndex: 2 })
@@ -276,7 +276,7 @@ export default class FindReplaceModalComponent extends React.Component<
           return R(
             "div",
             { key: "with", className: "mb-3" },
-            R("label", null, "Value to replace data with: "),
+            R("label", null, T("Value to replace data with") + ": "),
             R(ExprComponent, {
               schema: this.props.schema,
               dataSource: this.props.dataSource,
@@ -287,7 +287,7 @@ export default class FindReplaceModalComponent extends React.Component<
               enumValues: exprUtils.getExprEnumValues(replaceExpr) || undefined,
               idTable: exprUtils.getExprIdTable(replaceExpr) || undefined,
               preferLiteral: true,
-              placeholder: "(Blank)",
+              placeholder: T("(Blank)"),
               refExpr: replaceExpr
             })
           )
@@ -298,7 +298,7 @@ export default class FindReplaceModalComponent extends React.Component<
       R(
         "div",
         { key: "condition", className: "mb-3" },
-        R("label", null, "Only in rows that (optional):"),
+        R("label", null, T("Only in rows that (optional)") + ":"),
         R(ExprComponent, {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
@@ -306,11 +306,11 @@ export default class FindReplaceModalComponent extends React.Component<
           value: this.state.conditionExpr,
           onChange: (value) => this.setState({ conditionExpr: value }),
           types: ["boolean"],
-          placeholder: "All Rows"
+          placeholder: T("All Rows")
         })
       ),
 
-      R("div", { key: "preview" }, R("h4", null, "Preview"), this.renderPreview())
+      R("div", { key: "preview" }, R("h4", null, T("Preview")), this.renderPreview())
     )
   }
 
@@ -323,7 +323,7 @@ export default class FindReplaceModalComponent extends React.Component<
       ModalPopupComponent,
       {
         size: "large",
-        header: "Find/Replace",
+        header: T("Find/Replace"),
         footer: [
           R(
             "button",
@@ -333,7 +333,7 @@ export default class FindReplaceModalComponent extends React.Component<
               onClick: () => this.setState({ open: false }),
               className: "btn btn-secondary"
             },
-            "Cancel"
+            T("Cancel")
           ),
           R(
             "button",
@@ -344,7 +344,7 @@ export default class FindReplaceModalComponent extends React.Component<
               onClick: () => this.performReplace(),
               className: "btn btn-primary"
             },
-            "Apply"
+            T("Apply")
           )
         ]
       },

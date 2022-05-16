@@ -127,7 +127,7 @@ export default class DatagridComponent extends React.Component<
     if (this.state.cellEditingEnabled) {
       return this.setState({ cellEditingEnabled: false })
     } else {
-      if (confirm("Turn on cell editing? This will allow you to edit the live data and is an advanced feature.")) {
+      if (confirm(T("Turn on cell editing? This will allow you to edit the live data and is an advanced feature."))) {
         return this.setState({ cellEditingEnabled: true })
       }
     }
@@ -201,7 +201,7 @@ export default class DatagridComponent extends React.Component<
     const label = [
       R("i", { className: this.state.cellEditingEnabled ? "fa fa-fw fa-check-square" : "fa fa-fw fa-square-o" }),
       " ",
-      "Cell Editing"
+      T("Cell Editing")
     ]
 
     return R(
@@ -229,7 +229,7 @@ export default class DatagridComponent extends React.Component<
       },
       R("span", { className: "fas fa-cog" }),
       " ",
-      "Settings"
+      T("Settings")
     )
   }
 
@@ -245,7 +245,7 @@ export default class DatagridComponent extends React.Component<
         className: "btn btn-link btn-sm",
         onClick: () => this.findReplaceModal!.show()
       },
-      "Find/Replace"
+      T("Find/Replace")
     )
   }
 
@@ -380,7 +380,7 @@ export default class DatagridComponent extends React.Component<
           return R(
             "div",
             { style: { textAlign: "center", marginTop: size.height / 2 } },
-            R("a", { className: "btn btn-link", onClick: this.handleEdit }, "Click Here to Configure")
+            R("a", { className: "btn btn-link", onClick: this.handleEdit }, T("Click Here to Configure"))
           )
         } else {
           return null

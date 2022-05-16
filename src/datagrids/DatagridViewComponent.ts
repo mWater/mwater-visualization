@@ -121,7 +121,7 @@ export default class DatagridViewComponent extends React.Component<
       (error: any, newRows: any) => {
         if (error) {
           console.error(error)
-          alert("Error loading data")
+          alert(T("Error loading data"))
           return
         }
 
@@ -160,7 +160,7 @@ export default class DatagridViewComponent extends React.Component<
       (error: any, rows: any) => {
         if (error || !rows[0]) {
           console.error(error)
-          alert("Error loading data")
+          alert(T("Error loading data"))
           callback()
           return
         }
@@ -258,7 +258,7 @@ export default class DatagridViewComponent extends React.Component<
             this.setState({ editingCell: null, savingCell: false })
           })
         }).catch(error => {
-          alert("Error saving data")
+          alert(T("Error saving data"))
           console.error(error)
         })
     })
