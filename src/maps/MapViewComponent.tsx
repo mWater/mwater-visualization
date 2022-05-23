@@ -7,6 +7,7 @@ import { MapDataSource } from "./MapDataSource"
 import { NewMapViewComponent } from "./NewMapViewComponent"
 import { MapScope } from "./MapUtils"
 import OldMapViewComponent from "./OldMapViewComponent"
+import { areVectorMapsEnabled } from "./vectorMaps"
 
 /** Component that displays just the map */
 export function MapViewComponent(props: {
@@ -50,7 +51,7 @@ export function MapViewComponent(props: {
   /** Locale to use */
   locale: string
 }) {
-  if (window.localStorage.getItem("maptech") == "mapnik") {
+  if (window.localStorage.getItem("maptech") == "mapnik" || !areVectorMapsEnabled()) {
     return <OldMapViewComponent {...props} />
   } else {
     return <NewMapViewComponent {...props} />

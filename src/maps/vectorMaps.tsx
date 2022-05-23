@@ -11,9 +11,16 @@ import React from "react"
 
 let mapTilerApiKey = ""
 
-/** This must be called to set the appropriate key before use */
+/** This must be called to set the appropriate key before use. If it is not set, vector maps will not function.
+ * Maps will fall back to leaflet if the key is not set or if set to ""
+ */
 export function setMapTilerApiKey(key: string) {
   mapTilerApiKey = key
+}
+
+/** Check if vector maps are enabled by setting API key */
+export function areVectorMapsEnabled() {
+  return mapTilerApiKey !== ""
 }
 
 export type BaseLayer = "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "blank"
