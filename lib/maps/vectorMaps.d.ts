@@ -33,6 +33,9 @@ export declare function mergeBaseAndUserStyle(baseStyle: maplibregl.StyleSpecifi
 /** Resizes map to width and height, throttling to avoid flicker and possibly bugs in maplibre when resizing too quickly */
 export declare function useThrottledMapResize(map: maplibregl.Map | undefined, width: number, height: number): void;
 export declare function AttributionControl(props: {
+    baseLayer: BaseLayer;
     extraText?: string;
 }): JSX.Element;
-export declare function MapTilerLogo(props: {}): JSX.Element;
+export declare function VectorMapLogo(props: {
+    baseLayer: BaseLayer;
+}): JSX.Element | null;

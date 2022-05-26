@@ -27,9 +27,13 @@ import ItemsHtmlConverter from "./richtext/ItemsHtmlConverter"
 import { DragDropContextProvider } from "react-dnd"
 import { default as HTML5Backend } from "react-dnd-html5-backend"
 import { defaultT } from 'ez-localize'
+import { setMapTilerApiKey } from "./maps/vectorMaps"
 
 // Setup localizer
 global.T = defaultT
+
+// Set demo key
+setMapTilerApiKey("cNNyJl2nwIIKEUYSeXYc")
 
 $(function () {
   const sample = R(
@@ -47,7 +51,8 @@ $(function () {
       R(MWaterDashboardPane, {apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "609dcf6eccbc41ebb7a410d71c5457a6", share: "e5c7ebc47fb14300b94642c82cf61ed1"})
       // R(MWaterDirectDashboardPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
       //R(MWaterDatagridPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
-    )
+      //R(MWaterDirectMapPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
+  )
   )
   // R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
   // R(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))

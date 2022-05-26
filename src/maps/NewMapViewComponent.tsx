@@ -19,7 +19,7 @@ import "maplibre-gl/dist/maplibre-gl.css"
 import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
-import { AttributionControl, MapTilerLogo, mergeBaseAndUserStyle, useBaseStyle, useHoverCursor, useStyleMap, useThrottledMapResize, useVectorMap } from "./vectorMaps"
+import { AttributionControl, VectorMapLogo, mergeBaseAndUserStyle, useBaseStyle, useHoverCursor, useStyleMap, useThrottledMapResize, useVectorMap } from "./vectorMaps"
 
 type LayerClickHandlerEvent = maplibregl.MapMouseEvent & {
   features?: maplibregl.GeoJSONFeature[] | undefined
@@ -551,8 +551,12 @@ export function NewMapViewComponent(props: {
       <div style={{ width: props.width, height: props.height }} ref={setMapDiv} />
       {renderLegend()}
       {renderBusy()}
-      <AttributionControl extraText={props.design.attribution} />
-      <MapTilerLogo />
+      <AttributionControl 
+        baseLayer={props.design.baseLayer}
+        extraText={props.design.attribution} />
+      <VectorMapLogo 
+        baseLayer={props.design.baseLayer}
+      />
     </div>
   )
 }

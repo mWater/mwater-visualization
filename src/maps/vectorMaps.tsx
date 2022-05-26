@@ -217,7 +217,9 @@ export function useBaseStyle(baseLayer: BaseLayer) {
     } else if (baseLayer == "bing_road") {
       loadStyle(`https://api.maptiler.com/maps/streets/style.json?key=${mapTilerApiKey}`)
     } else if (baseLayer == "bing_aerial") {
-      loadStyle(`https://api.maptiler.com/maps/hybrid/style.json?key=${mapTilerApiKey}`)
+      // Switched to Bing for superior aerial imagery
+      loadBingBasemap("AerialWithLabels", 1).then(setBaseStyle)
+      // loadStyle(`https://api.maptiler.com/maps/hybrid/style.json?key=${mapTilerApiKey}`)
     } else if (baseLayer == "blank") {
       setBaseStyle({
         version: 8,
@@ -288,7 +290,25 @@ export function useThrottledMapResize(map: maplibregl.Map | undefined, width: nu
   }, [width, height, map])
 }
 
-export function AttributionControl(props: { extraText?: string }) {
+export function AttributionControl(props: { 
+  baseLayer: BaseLayer
+  extraText?: string 
+}) {
+  if (props.baseLayer == "blank") {
+    return <div className="newmap-attribution-control">
+      {props.extraText ? " " + props.extraText : null}
+    </div>
+  }
+
+  if (props.baseLayer == "bing_aerial") {
+    return (
+      <div className="newmap-attribution-control">
+        Copyright © 2022 Microsoft and its suppliers.
+        {props.extraText ? " " + props.extraText : null}
+      </div>
+    )
+  }
+
   return (
     <div className="newmap-attribution-control">
       <a href="https://www.maptiler.com/copyright/" target="_blank">
@@ -303,9 +323,52 @@ export function AttributionControl(props: { extraText?: string }) {
   )
 }
 
-export function MapTilerLogo(props: {}) {
+export function VectorMapLogo(props: {
+  baseLayer: BaseLayer
+}) {
+  if (props.baseLayer == "blank") {
+    return null
+  }
+
+  if (props.baseLayer == "bing_aerial") {
+    return <img 
+      src="https://dev.virtualearth.net/Branding/logo_powered_by.png" 
+      style={{ position: "absolute", bottom: 38, left: 11, height: 22, zIndex: 1000, pointerEvents: "none" }} 
+    />
+  }
+
   return <img 
     src={require("./Maptiler-logo.png").default} 
     style={{ position: "absolute", bottom: 38, left: 11, height: 22, zIndex: 1000, pointerEvents: "none" }} 
   />
+}
+
+async function loadBingBasemap(basemapType: "AerialWithLabels", opacity: number): Promise<maplibregl.StyleSpecification> {
+  // Load metadata
+  const bingApiKey = "Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU"
+
+  const metadata = await fetch(`https://dev.virtualearth.net/REST/v1/Imagery/Metadata/${basemapType}?key=${bingApiKey}`).then((response) => response.json())
+  const resource = metadata.resourceSets[0].resources[0]
+  
+  return {
+    sources: {
+      "bing_raster": {
+        type: "raster",
+        tiles: resource.imageUrlSubdomains.map((subdomain: string) => 
+          resource.imageUrl.replace("{subdomain}", subdomain).replace("{culture}", "")),
+        tileSize: resource.imageHeight,
+      }
+    },
+    layers: [
+      {
+        id: "bing_raster",
+        type: "raster",
+        source: "bing_raster",
+        paint: {
+          "raster-opacity": opacity
+        }
+      }
+    ],
+    version: 8
+  }
 }
