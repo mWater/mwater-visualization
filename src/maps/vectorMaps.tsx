@@ -355,7 +355,7 @@ async function loadBingBasemap(basemapType: "AerialWithLabels", opacity: number)
       "bing_raster": {
         type: "raster",
         tiles: resource.imageUrlSubdomains.map((subdomain: string) => 
-          resource.imageUrl.replace("{subdomain}", subdomain).replace("{culture}", "")).replace("http:", "https:"),
+          resource.imageUrl.replace("{subdomain}", subdomain).replace("{culture}", "").replace("http:", "https:")),
         tileSize: resource.imageHeight,
       }
     },
