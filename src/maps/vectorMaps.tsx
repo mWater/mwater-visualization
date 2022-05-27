@@ -315,7 +315,7 @@ export function AttributionControl(props: {
         &copy; MapTiler
       </a> 
       {" "}
-      <a href="http://www.openstreetmap.org/about/" target="_blank">
+      <a href="https://www.openstreetmap.org/about/" target="_blank">
         © OpenStreetMap
       </a>
       {props.extraText ? " " + props.extraText : null}
@@ -355,7 +355,7 @@ async function loadBingBasemap(basemapType: "AerialWithLabels", opacity: number)
       "bing_raster": {
         type: "raster",
         tiles: resource.imageUrlSubdomains.map((subdomain: string) => 
-          resource.imageUrl.replace("{subdomain}", subdomain).replace("{culture}", "")),
+          resource.imageUrl.replace("{subdomain}", subdomain).replace("{culture}", "")).replace("http:", "https:"),
         tileSize: resource.imageHeight,
       }
     },
