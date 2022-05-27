@@ -24,6 +24,7 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
     handleAutoBoundsChange: (value: any) => any;
     handleShowLayerSwitcherChange: (value: any) => any;
     handleConvertToClusterMap: () => any;
+    handleConvertToMarkersMap: () => any;
     handleInitialLegendDisplayChange: (value: any) => any;
     renderOptionsTab(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     render(): React.DetailedReactHTMLElement<{

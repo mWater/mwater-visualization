@@ -56,6 +56,10 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
   handleConvertToClusterMap = () => {
     return this.props.onDesignChange(MapUtils.convertToClusterMap(this.props.design))
   }
+  
+  handleConvertToMarkersMap = () => {
+    return this.props.onDesignChange(MapUtils.convertToMarkersMap(this.props.design))
+  }
 
   handleInitialLegendDisplayChange = (value: any) => {
     const design = _.extend({}, this.props.design, { initialLegendDisplay: value })
@@ -126,6 +130,18 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
               "a",
               { onClick: this.handleConvertToClusterMap, className: "btn btn-link btn-sm" },
               "Convert to cluster map"
+            )
+          )
+        : undefined,
+      
+      MapUtils.convertToMarkersMap(this.props.design)
+        ? R(
+            "div",
+            { key: "toMarker" },
+            R(
+              "a",
+              { onClick: this.handleConvertToMarkersMap, className: "btn btn-link btn-sm" },
+              "Convert to markers map"
             )
           )
         : undefined,

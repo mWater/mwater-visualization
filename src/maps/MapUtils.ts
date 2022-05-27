@@ -18,6 +18,12 @@ export function canConvertToClusterMap(design: MapDesign) {
   return _.any(design.layerViews, (lv) => lv.type === "Markers")
 }
 
+
+// Check if can convert to a markers map. Only maps containing cluster views can be
+export function canConvertToMarkersMap(design: MapDesign) {
+  return _.any(design.layerViews, (lv) => lv.type === "Cluster")
+}
+
 // Convert to a cluster map
 export function convertToClusterMap(design: MapDesign) {
   const layerViews = _.map(design.layerViews, (lv) => {
@@ -34,6 +40,32 @@ export function convertToClusterMap(design: MapDesign) {
       axes: { geometry: lv.design.axes != null ? lv.design.axes.geometry : undefined },
       filter: lv.design.filter,
       fillColor: lv.design.color,
+      minZoom: lv.design.minZoom,
+      maxZoom: lv.design.maxZoom
+    }
+
+    return lv
+  })
+
+  return _.extend({}, design, { layerViews })
+}
+
+// Convert to a markers map
+export function convertToMarkersMap(design: MapDesign) {
+  const layerViews = _.map(design.layerViews, (lv) => {
+    if (lv.type !== "Cluster") {
+      return lv
+    }
+
+    lv = _.cloneDeep(lv)
+
+    // Set type and design
+    lv.type = "Markers"
+    lv.design = {
+      table: lv.design.table,
+      axes: { geometry: lv.design.axes != null ? lv.design.axes.geometry : undefined },
+      filter: lv.design.filter,
+      color: lv.design.fillColor,
       minZoom: lv.design.minZoom,
       maxZoom: lv.design.maxZoom
     }
