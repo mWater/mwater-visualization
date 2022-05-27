@@ -134,7 +134,7 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
           )
         : undefined,
       
-      MapUtils.convertToMarkersMap(this.props.design)
+      MapUtils.canConvertToMarkersMap(this.props.design)
         ? R(
             "div",
             { key: "toMarker" },
