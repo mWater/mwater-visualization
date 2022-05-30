@@ -14,6 +14,7 @@ import WidgetScopesViewComponent from "../widgets/WidgetScopesViewComponent"
 import { getLayoutOptions } from "./layoutOptions"
 import { WidgetComponent } from "./WidgetComponent"
 import { DashboardDataSource, DashboardDesign, JsonQLFilter } from ".."
+import { getMapTilerApiKey, setMapTilerApiKey } from "../maps/vectorMaps"
 
 export interface DashboardViewComponentProps {
   /** schema to use */
@@ -145,16 +146,24 @@ export default class DashboardViewComponent extends React.Component<
   }
 
   // Call to print the dashboard
-  print = () => {
-    // Create element at 1080 wide (use as standard printing width)
-    const elem = R(
-      "div",
-      { style: { width: 1080 } },
-      R(DashboardViewComponent, _.extend({}, this.props, { onDesignChange: null, printMode: true }))
-    )
+  print = async () => {
+    // Temporarily disable vector maps as WebGL is not supported in print mode
+    const mapTilerAPIKey = getMapTilerApiKey()
+    try {
+      setMapTilerApiKey("")
 
-    const printer = new ReactElementPrinter()
-    return printer.print(elem, { delay: 5000 })
+      // Create element at 1080 wide (use as standard printing width)
+      const elem = R(
+        "div",
+        { style: { width: 1080 } },
+        R(DashboardViewComponent, _.extend({}, this.props, { onDesignChange: null, printMode: true }))
+      )
+    
+      const printer = new ReactElementPrinter()
+      await printer.print(elem, { delay: 5000 })
+    } finally {
+      setMapTilerApiKey(mapTilerAPIKey)
+    }
   }
 
   // Get filters from props filters combined with dashboard filters

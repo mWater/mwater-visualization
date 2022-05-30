@@ -59,7 +59,7 @@ export default class DashboardViewComponent extends React.Component<DashboardVie
     handleItemsChange: (items: any) => void;
     handleClipboardChange: (block: any) => void;
     getClipboardContents(): any;
-    print: () => void;
+    print: () => Promise<void>;
     getCompiledFilters(): JsonQLFilter[];
     getTOCEntries(layoutManager: any): any[];
     handleScrollToTOCEntry: (widgetId: any, entryId: any) => any;

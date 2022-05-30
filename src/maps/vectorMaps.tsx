@@ -18,6 +18,10 @@ export function setMapTilerApiKey(key: string) {
   mapTilerApiKey = key
 }
 
+export function getMapTilerApiKey(): string {
+  return mapTilerApiKey
+}
+
 /** Check if vector maps are enabled by setting API key */
 export function areVectorMapsEnabled() {
   return mapTilerApiKey !== ""

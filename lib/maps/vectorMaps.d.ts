@@ -6,6 +6,7 @@ import "./NewMapViewComponent.css";
  * Maps will fall back to leaflet if the key is not set or if set to ""
  */
 export declare function setMapTilerApiKey(key: string): void;
+export declare function getMapTilerApiKey(): string;
 /** Check if vector maps are enabled by setting API key */
 export declare function areVectorMapsEnabled(): boolean;
 export declare type BaseLayer = "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "blank";
