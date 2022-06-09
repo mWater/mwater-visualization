@@ -182,6 +182,11 @@ export function NewMapViewComponent(props: {
     }
   })
 
+  // Debounced version of handleLayerClick to prevent multiple popups
+  const handleLayerClickDebounced = useMemo(() => {
+    return _.debounce(handleLayerClick, 250, { leading: true, trailing: false })
+  }, [handleLayerClick])
+  
   /** Get filters from extraFilters combined with map filters */
   function getCompiledFilters() {
     return (props.extraFilters || []).concat(
@@ -366,7 +371,7 @@ export function NewMapViewComponent(props: {
     for (const clickHandler of layerClickHandlers) {
       const onClick = (ev: MapLayerMouseEvent) => {
         if (ev.features && ev.features[0]) {
-          handleLayerClick(clickHandler.layerViewId, {
+          handleLayerClickDebounced(clickHandler.layerViewId, {
             data: ev.features![0].properties,
             event: ev
           })
