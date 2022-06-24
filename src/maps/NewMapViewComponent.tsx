@@ -232,6 +232,7 @@ export function NewMapViewComponent(props: {
       }
 
       const defType = layer.getLayerDefinitionType()
+      console.log(defType, layerView.type)
       const layerDataSource = props.mapDataSource.getLayerDataSource(layerView.id)
 
       if (defType == "VectorTile") {
@@ -254,12 +255,12 @@ export function NewMapViewComponent(props: {
         for (const mapLayer of vectorTileDef.mapLayers) {
           newLayers.push({ layerViewId: layerView.id, layer: mapLayer })
         }
-        newClickHandlers = newClickHandlers.concat(
+        newClickHandlers = 
           vectorTileDef.mapLayersHandleClicks.map((mlid: any) => ({
             layerViewId: layerView.id,
             mapLayerId: mlid
-          }))
-        )
+          })).concat(newClickHandlers)
+        
       } else {
         const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(design, [])
         if (tileUrl) {
