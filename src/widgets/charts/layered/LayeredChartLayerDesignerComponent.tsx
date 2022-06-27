@@ -14,6 +14,7 @@ import * as uiComponents from "../../../UIComponents"
 import TableSelectComponent from "../../../TableSelectComponent"
 import * as ui from "react-library/lib/bootstrap"
 import { Checkbox } from "react-library/lib/bootstrap"
+import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 
 export interface LayeredChartLayerDesignerComponentProps {
   design: any
@@ -184,6 +185,10 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     )
   }
 
+  handleValueAxisOnlyValuesPresentChange = (valueAxisOnlyValuesPresent: boolean) => {
+    this.updateLayer({valueAxisOnlyValuesPresent})
+  }
+
   renderXAxis() {
     const layer = this.props.design.layers[this.props.index]
     if (!layer.table) {
@@ -208,26 +213,36 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
 
     const categoricalX = new LayeredChartCompiler({ schema: this.props.schema }).isCategoricalX(this.props.design)
 
-    return R(
-      uiComponents.SectionComponent,
-      { label: title },
-      R(AxisComponent, {
-        schema: this.props.schema,
-        dataSource: this.props.dataSource,
-        table: layer.table,
-        types: this.getAxisTypes(layer, "x"),
-        aggrNeed: "none",
-        required: true,
-        value: layer.axes.x,
-        onChange: this.handleXAxisChange,
-        filters,
-        // Only show x color map if no color axis and is categorical and enabled
-        showColorMap: layer.xColorMap && categoricalX && !layer.axes.color,
-        autosetColors: false,
-        // Categorical X can exclude values
-        allowExcludedValues: categoricalX
-      })
-    )
+    return [
+      R(
+        uiComponents.SectionComponent,
+        { label: title },
+        R(AxisComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          table: layer.table,
+          types: this.getAxisTypes(layer, "x"),
+          aggrNeed: "none",
+          required: true,
+          value: layer.axes.x,
+          onChange: this.handleXAxisChange,
+          filters,
+          // Only show x color map if no color axis and is categorical and enabled
+          showColorMap: layer.xColorMap && categoricalX && !layer.axes.color,
+          autosetColors: false,
+          // Categorical X can exclude values
+          allowExcludedValues: categoricalX
+        })
+      ),
+      categoricalX ? R(ui.Checkbox, {
+        value: layer.valueAxisOnlyValuesPresent,
+        onChange: this.handleValueAxisOnlyValuesPresentChange
+      }, 
+        "Only show values actually present", 
+        R(PopoverHelpComponent, {placement: 'bottom'}, "Limits values to those that are present in the data, as opposed to all choices or all dates within range")
+      ):undefined
+
+    ]
   }
 
   renderColorAxis() {
