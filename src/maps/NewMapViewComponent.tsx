@@ -505,6 +505,19 @@ export function NewMapViewComponent(props: {
     )
   }
 
+  const [zoom, setZoom] = useState(map?.getZoom())
+
+  useEffect(() =>  {
+    const handleZoom = () => setZoom(map?.getZoom())
+    if(map) {
+      map.on('zoomend', handleZoom)
+    }
+
+    return () => {
+      map?.off('zoomend', handleZoom)
+    }
+  }, [map])
+
   function renderLegend() {
     if (legendHidden) {
       return <HiddenLegend onShow={() => setLegendHidden(false)} />

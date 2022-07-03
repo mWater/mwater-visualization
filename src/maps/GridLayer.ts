@@ -608,7 +608,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   getMinZoom(design: GridLayerDesign) {
     // Determine if too zoomed out to safely display (zoom 6 at 20000 is limit)
     if (design.sizeUnits === "meters") {
-      const minSafeZoom = Math.log2(1280000.0 / (design.size || 1000))
+      const minSafeZoom = Math.log2(1280000.0 / (design.size || 20000))
       if (design.minZoom) {
         return Math.max(design.minZoom, minSafeZoom)
       } else {
