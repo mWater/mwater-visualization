@@ -68,7 +68,8 @@ export default class GridLayerDesigner extends React.Component<{
     } else {
       this.update((d) => {
         d.sizeUnits = sizeUnits
-        d.size = 1000
+        d.size = 20000
+        d.minZoom = 6
       })
     }
   }
