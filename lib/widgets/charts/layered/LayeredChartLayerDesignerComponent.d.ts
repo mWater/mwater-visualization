@@ -1,6 +1,7 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import * as uiComponents from "../../../UIComponents";
+import * as ui from "react-library/lib/bootstrap";
 export interface LayeredChartLayerDesignerComponentProps {
     design: any;
     schema: Schema;
@@ -45,7 +46,8 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
         onClick: any;
     }, HTMLElement> | undefined;
     renderTable(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent>;
-    renderXAxis(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | undefined;
+    handlexAxisOnlyValuesPresentChange: (xAxisOnlyValuesPresent: boolean) => void;
+    renderXAxis(): (React.CElement<ui.CheckboxProps, ui.Checkbox> | React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | undefined)[] | undefined;
     renderColorAxis(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | undefined;
