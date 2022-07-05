@@ -185,8 +185,8 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     )
   }
 
-  handleValueAxisOnlyValuesPresentChange = (valueAxisOnlyValuesPresent: boolean) => {
-    this.updateLayer({valueAxisOnlyValuesPresent})
+  handlexAxisOnlyValuesPresentChange = (xAxisOnlyValuesPresent: boolean) => {
+    this.updateLayer({xAxisOnlyValuesPresent})
   }
 
   renderXAxis() {
@@ -235,8 +235,8 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
         })
       ),
       categoricalX ? R(ui.Checkbox, {
-        value: layer.valueAxisOnlyValuesPresent,
-        onChange: this.handleValueAxisOnlyValuesPresentChange
+        value: layer.xAxisOnlyValuesPresent,
+        onChange: this.handlexAxisOnlyValuesPresentChange
       }, 
         "Only show values actually present", 
         R(PopoverHelpComponent, {placement: 'bottom'}, "Limits values to those that are present in the data, as opposed to all choices or all dates within range")

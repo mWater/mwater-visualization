@@ -700,7 +700,7 @@ export default class LayeredChartCompiler {
     })
 
     // Categories will be in form [{ value, label }]
-    let categories = this.axisBuilder.getCategories(xAxis, xValues, { locale, onlyValuesPresent: design.layers[0].valueAxisOnlyValuesPresent })
+    let categories = this.axisBuilder.getCategories(xAxis, xValues, { locale, onlyValuesPresent: design.layers[0].xAxisOnlyValuesPresent })
 
     // Get indexed ordering of categories (lookup from value to index) without removing excluded values
     const categoryOrder = _.zipObject(_.map(categories, (c, i) => [c.value, i]))
