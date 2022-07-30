@@ -460,7 +460,7 @@ export function NewMapViewComponent(props: {
     if (props.design.autoBounds) {
       performAutoZoom()
     }
-  }, [map, props.design.autoBounds])
+  }, [map,props.extraFilters, props.design.autoBounds])
 
   // Set initial bounds
   useEffect(() => {
