@@ -99,9 +99,6 @@ export const MWaterAssetSystemsListComponent = (props: {
   return (
     <div>
       <TextInput value={search} onChange={setSearch} placeholder="Search..." />
-      <div className="alert alert-info">
-        <i className="fa fa-info-circle" /> This is a beta feature.
-      </div>
       {renderAssetSystems()}
     </div>
   )
