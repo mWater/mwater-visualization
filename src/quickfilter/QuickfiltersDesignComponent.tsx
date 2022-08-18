@@ -1,28 +1,26 @@
 import _ from "lodash"
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import update from "update-object"
-import TableSelectComponent from "../TableSelectComponent"
 import { ExprComponent } from "mwater-expressions-ui"
 import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
+import { ListEditorComponent } from "react-library/lib/ListEditorComponent"
+import { Quickfilter } from "./Quickfilter"
 
 export interface QuickfiltersDesignComponentProps {
   /** Design of quickfilters. See README.md */
-  design: any
+  design: Quickfilter[]
   /** Called when design changes */
-  onDesignChange: any
+  onDesignChange: (design: Quickfilter[]) => void
   schema: Schema
   dataSource: DataSource
   /** List of possible table ids to use */
-  tables: any
+  tables: string[]
 }
 
 // Displays quick filters and allows their value to be modified
 export default class QuickfiltersDesignComponent extends React.Component<QuickfiltersDesignComponentProps> {
-  static defaultProps = { design: [] }
-
   handleDesignChange = (design: any) => {
     design = design.slice()
 
@@ -68,14 +66,14 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
       return false
     }
 
-    if (enumValues && !_.isEqual(_.pluck(enumValues, "id"), _.pluck(prevEnumValues, "id"))) {
+    if (enumValues && !_.isEqual(_.pluck(enumValues, "id"), _.pluck(prevEnumValues || [], "id"))) {
       return false
     }
 
     return true
   }
 
-  renderQuickfilter(item: any, index: any) {
+  renderQuickfilter = (item: any, index: any) => {
     return R(QuickfilterDesignComponent, {
       key: index,
       design: item,
@@ -95,7 +93,7 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
 
   handleAdd = () => {
     // Add blank to end
-    const design = this.props.design.concat([{}])
+    const design = this.props.design.concat([{ expr: null }])
     return this.props.onDesignChange(design)
   }
 
@@ -109,8 +107,12 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
     return R(
       "div",
       null,
-      _.map(this.props.design, (item, index) => this.renderQuickfilter(item, index)),
-
+      <ListEditorComponent
+        items={this.props.design}
+        onItemsChange={this.handleDesignChange}
+        renderItem={this.renderQuickfilter}
+        getReorderableKey={(item: any) => JSON.stringify(item)}
+      />,
       this.props.tables.length > 0
         ? R(
             "button",
@@ -125,20 +127,21 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
 
 interface QuickfilterDesignComponentProps {
   /** Design of a single quickfilters. See README.md */
-  design: any
-  onChange: any
-  onRemove: any
+  design: Quickfilter
+  onChange: (design: Quickfilter) => void
+  onRemove: () => void
   /** True if can be merged */
   mergeable?: boolean
   schema: Schema
   dataSource: DataSource
-  tables: any
+  tables: string[]
 }
 
 interface QuickfilterDesignComponentState {
   table: any
 }
 
+/** Single quickfilter design component */
 class QuickfilterDesignComponent extends React.Component<
   QuickfilterDesignComponentProps,
   QuickfilterDesignComponentState
@@ -155,8 +158,7 @@ class QuickfilterDesignComponent extends React.Component<
   handleTableChange = (table: any) => {
     this.setState({ table })
     const design = {
-      expr: null,
-      label: null
+      expr: null
     }
     return this.props.onChange(design)
   }
@@ -179,110 +181,77 @@ class QuickfilterDesignComponent extends React.Component<
     const exprType = new ExprUtils(this.props.schema).getExprType(this.props.design.expr)
 
     return R(
-      RemovableComponent,
-      { onRemove: this.props.onRemove },
+      "div", {},
       R(
         "div",
-        { className: "card mb-3" },
+        { className: "mb-3 mt-1", key: "table" },
+        R("label", { className: "text-muted" }, "Data Source"),
+        R(ui.Select, {
+          value: this.state.table,
+          options: _.map(this.props.tables, (table) => ({
+            value: table,
+            label: ExprUtils.localizeString(this.props.schema.getTable(table)!.name)
+          })),
+          onChange: this.handleTableChange,
+          nullLabel: "Select..."
+        })
+      ),
+
+      R(
+        "div",
+        { className: "mb-3", key: "expr" },
+        R("label", { className: "text-muted" }, "Filter By"),
         R(
           "div",
-          { className: "card-body" },
-          R(
+          null,
+          R(ExprComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.state.table,
+            value: this.props.design.expr,
+            onChange: this.handleExprChange,
+            types: ["enum", "text", "enumset", "date", "datetime", "id[]", "text[]"]
+          })
+        )
+      ),
+
+      this.props.design.expr
+        ? R(
             "div",
-            { className: "mb-3", key: "table" },
-            R("label", { className: "text-muted" }, "Data Source"),
-            R(ui.Select, {
-              value: this.state.table,
-              options: _.map(this.props.tables, (table) => ({
-                value: table,
-                label: ExprUtils.localizeString(this.props.schema.getTable(table).name)
-              })),
-              onChange: this.handleTableChange,
-              nullLabel: "Select..."
+            { className: "mb-3", key: "label" },
+            R("label", { className: "text-muted" }, "Label"),
+            R("input", {
+              type: "text",
+              className: "form-control form-control-sm",
+              value: this.props.design.label || "",
+              onChange: this.handleLabelChange,
+              placeholder: "Optional Label"
             })
-          ),
+          )
+        : undefined,
 
-          R(
-            "div",
-            { className: "mb-3", key: "expr" },
-            R("label", { className: "text-muted" }, "Filter By"),
-            R(
-              "div",
-              null,
-              R(ExprComponent, {
-                schema: this.props.schema,
-                dataSource: this.props.dataSource,
-                table: this.state.table,
-                value: this.props.design.expr,
-                onChange: this.handleExprChange,
-                types: ["enum", "text", "enumset", "date", "datetime", "id[]", "text[]"]
-              })
-            )
-          ),
+      this.props.mergeable
+        ? R(
+            ui.Checkbox,
+            {
+              value: this.props.design.merged,
+              onChange: this.handleMergedChange
+            },
+            "Merge with previous quickfilter ",
+            R("span", { className: "text-muted" }, "- displays as one single control that filters both")
+          )
+        : undefined,
 
-          this.props.design.expr
-            ? R(
-                "div",
-                { className: "mb-3", key: "label" },
-                R("label", { className: "text-muted" }, "Label"),
-                R("input", {
-                  type: "text",
-                  className: "form-control form-control-sm",
-                  value: this.props.design.label || "",
-                  onChange: this.handleLabelChange,
-                  placeholder: "Optional Label"
-                })
-              )
-            : undefined,
-
-          this.props.mergeable
-            ? R(
-                ui.Checkbox,
-                {
-                  value: this.props.design.merged,
-                  onChange: this.handleMergedChange
-                },
-                "Merge with previous quickfilter ",
-                R("span", { className: "text-muted" }, "- displays as one single control that filters both")
-              )
-            : undefined,
-
-          ["enum", "text", "enumset", "id[]", "text[]"].includes(exprType)
-            ? R(
-                ui.Checkbox,
-                {
-                  value: this.props.design.multi,
-                  onChange: this.handleMultiChange
-                },
-                "Allow multiple selections"
-              )
-            : undefined
-        )
-      )
-    )
-  }
-}
-
-interface RemovableComponentProps {
-  onRemove: any
-}
-
-// Floats an x to the right on hover
-class RemovableComponent extends React.Component<RemovableComponentProps> {
-  render() {
-    return R(
-      "div",
-      { style: { display: "flex" }, className: "hover-display-parent" },
-      R("div", { style: { flex: "1 1 auto" }, key: "main" }, this.props.children),
-      R(
-        "div",
-        { style: { flex: "0 0 auto", alignSelf: "center" }, className: "hover-display-child", key: "remove" },
-        R(
-          "a",
-          { className: "link-plain", onClick: this.props.onRemove, style: { fontSize: "80%", marginLeft: 5 } },
-          R("span", { className: "fas fa-times" })
-        )
-      )
+      ["enum", "text", "enumset", "id[]", "text[]"].includes(exprType!)
+        ? R(
+            ui.Checkbox,
+            {
+              value: this.props.design.multi,
+              onChange: this.handleMultiChange
+            },
+            "Allow multiple selections"
+          )
+        : undefined
     )
   }
 }

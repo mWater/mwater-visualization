@@ -97,7 +97,7 @@ export default class SettingsModalComponent extends React.Component<
 
         filterableTables.length > 0
           ? R(QuickfiltersDesignComponent, {
-              design: this.state.design.quickfilters,
+              design: this.state.design.quickfilters || [],
               onDesignChange: (design: any) =>
                 this.handleDesignChange(update(this.state.design, { quickfilters: { $set: design } })),
               schema: this.props.schema,

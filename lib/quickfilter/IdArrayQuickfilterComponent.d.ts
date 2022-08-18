@@ -9,7 +9,7 @@ export interface IdArrayQuickfilterComponentProps {
     index: number;
     /** Current value of quickfilter (state of filter selected) */
     value: any;
-    onValueChange: (value: any) => void;
+    onValueChange?: (value: any) => void;
     /** true to display multiple values */
     multi?: boolean;
     filters?: JsonQLFilter[];

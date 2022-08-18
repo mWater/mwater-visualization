@@ -131,12 +131,12 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
             "div",
             { style: { marginBottom: 200 } },
             R(QuickfiltersDesignComponent, {
-              design: this.props.design.quickfilters,
+              design: this.props.design.quickfilters || [],
               onDesignChange: (design: any) =>
                 this.props.onDesignChange(update(this.props.design, { quickfilters: { $set: design } })),
               schema: this.props.schema,
               dataSource: this.props.dataSource,
-              tables: [this.props.design.table]
+              tables: [this.props.design.table!]
             })
           )
         },

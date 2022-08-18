@@ -72,7 +72,7 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
     if (lock) {
       // Overrides item value
       itemValue = lock.value
-      onValueChange = null
+      onValueChange = undefined
     } else {
       // Can change value if not locked
       onValueChange = (v: any) => {
@@ -112,9 +112,8 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
       return R(EnumQuickfilterComponent, {
         key: JSON.stringify(item),
         label: item.label,
-        expr,
         schema: this.props.schema,
-        options: new ExprUtils(this.props.schema).getExprEnumValues(expr),
+        options: new ExprUtils(this.props.schema).getExprEnumValues(expr)!,
         value: itemValue,
         onValueChange,
         multi: item.multi
@@ -243,13 +242,13 @@ class EnumQuickfilterComponent extends React.Component<EnumQuickfilterComponentP
     }
   }
 
-  renderSingleSelect(options: any) {
+  renderSingleSelect(options: any[]) {
     return R(ReactSelect, {
       placeholder: "All",
       value: _.findWhere(options, { value: this.props.value }) || null,
       options,
       isClearable: true,
-      onChange: (value) => {
+      onChange: (value: any) => {
         if (this.props.onValueChange) {
           return this.handleSingleChange(value?.value)
         }
@@ -262,7 +261,7 @@ class EnumQuickfilterComponent extends React.Component<EnumQuickfilterComponentP
     })
   }
 
-  renderMultiSelect(options: any) {
+  renderMultiSelect(options: any[]) {
     return R(ReactSelect, {
       placeholder: "All",
       value: _.map(this.props.value, (v) => _.find(options, (o) => o.value === v)),

@@ -17,7 +17,7 @@ export interface IdArrayQuickfilterComponentProps {
 
   /** Current value of quickfilter (state of filter selected) */
   value: any
-  onValueChange: (value: any) => void
+  onValueChange?: (value: any) => void
 
   /** true to display multiple values */
   multi?: boolean 
@@ -43,7 +43,7 @@ export default class IdArrayQuickfilterComponent extends React.Component<IdArray
         // TODO should use quickfilter data source, but is complicated
         R(IdLiteralComponent, {
           value: this.props.value,
-          onChange: this.props.onValueChange,
+          onChange: this.props.onValueChange || (() => {}),
           idTable,
           schema: this.props.schema,
           dataSource: this.props.dataSource,
