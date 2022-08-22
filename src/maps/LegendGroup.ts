@@ -3,7 +3,7 @@ const R = React.createElement
 import _ from "lodash"
 
 export interface LegendGroupProps {
-  items?: any
+  items?: { color: string, name: string }[]
   radiusLayer?: boolean
   defaultColor?: string
   name?: string
@@ -23,18 +23,18 @@ export default class LegendGroup extends React.Component<LegendGroupProps> {
       "div",
       { style: { marginBottom: 5 } },
       React.createElement(LegendItem, {
-        hasChildren: this.props.items.length > 0,
-        symbol: this.props.symbol,
+        hasChildren: (this.props.items || []).length > 0,
+        symbol: this.props.symbol ?? undefined,
         markerSize: this.props.markerSize,
         color: this.props.defaultColor,
         name: this.props.name,
         key: this.props.name,
         radiusLayer: this.props.radiusLayer
       }),
-      _.map(this.props.items, (item) => {
+      _.map((this.props.items || []), (item) => {
         return React.createElement(LegendItem, {
           isChild: true,
-          symbol: this.props.symbol,
+          symbol: this.props.symbol ?? undefined,
           markerSize: this.props.markerSize,
           color: item.color,
           name: item.name,
@@ -71,7 +71,7 @@ class LegendItem extends React.Component<LegendItemProps> {
       fontSize: this.props.markerSize
     }
 
-    const className = this.props.symbol.replace("font-awesome/", "fa fa-")
+    const className = this.props.symbol!.replace("font-awesome/", "fa fa-")
     return R("span", { className, style: symbolStyle }, "")
   }
 

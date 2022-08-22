@@ -19,8 +19,9 @@ export interface ImageMosaicChartViewComponentProps {
   onRowClick?: any
 }
 
-// creates a d3 calendar visualization
+/** creates a d3 calendar visualization */
 export default class ImageMosaicChartViewComponent extends React.Component<ImageMosaicChartViewComponentProps> {
+  imagePopup: ImagePopupComponent | null
   shouldComponentUpdate(prevProps: any) {
     return !_.isEqual(prevProps, this.props)
   }
@@ -105,8 +106,8 @@ export default class ImageMosaicChartViewComponent extends React.Component<Image
       title ? R("p", { style: titleStyle }, title) : undefined,
 
       R(ImagePopupComponent, {
-        ref: (c: any) => {
-          return (this.imagePopup = c)
+        ref: (c: ImagePopupComponent | null) => {
+          this.imagePopup = c
         },
         imageManager
       }),

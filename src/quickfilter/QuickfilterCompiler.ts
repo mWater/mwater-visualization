@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { ExprCompiler, Schema } from "mwater-expressions"
+import { ExprCompiler, OpExpr, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
@@ -24,7 +24,7 @@ export default class QuickfilterCompiler {
       return []
     }
 
-    const filters = []
+    const filters: JsonQLFilter[] = []
 
     for (let index = 0; index < design.length; index++) {
       // Determine if locked
@@ -45,7 +45,7 @@ export default class QuickfilterCompiler {
       }
 
       // Clean expression first
-      const expr = new ExprCleaner(this.schema).cleanExpr(item.expr)
+      const expr = new ExprCleaner(this.schema).cleanExpr(item.expr) as OpExpr | null
 
       // Do not render if nothing
       if (!expr) {
@@ -73,7 +73,7 @@ export default class QuickfilterCompiler {
       }
 
       filters.push({
-        table: expr.table,
+        table: expr.table!,
         jsonql
       })
     }
@@ -81,7 +81,7 @@ export default class QuickfilterCompiler {
     return filters
   }
 
-  compileToFilterExpr(expr: any, value: any, multi: any) {
+  compileToFilterExpr(expr: any, value: any, multi: any): OpExpr | null {
     // Get type of expr
     const type = new ExprUtils(this.schema).getExprType(expr)
     const idTable = new ExprUtils(this.schema).getExprIdTable(expr)
@@ -120,7 +120,7 @@ export default class QuickfilterCompiler {
           exprs: [expr, { type: "literal", valueType: "enum", value }]
         }
       }
-    } else if (["enumset", "text[]"].includes(type)) {
+    } else if (type && ["enumset", "text[]"].includes(type)) {
       // Create contains expression
       if (multi) {
         return {
@@ -137,7 +137,7 @@ export default class QuickfilterCompiler {
           exprs: [expr, { type: "literal", valueType: type, value: [value] }]
         }
       }
-    } else if (["id[]"].includes(type)) {
+    } else if (type && ["id[]"].includes(type)) {
       if (multi) {
         return {
           type: "op",
@@ -153,7 +153,7 @@ export default class QuickfilterCompiler {
           exprs: [expr, { type: "literal", valueType: "id[]", idTable, value: [value] }]
         }
       }
-    } else if (["date", "datetime"].includes(type) && value.op) {
+    } else if (type && ["date", "datetime"].includes(type) && value.op) {
       return {
         type: "op",
         op: value.op,

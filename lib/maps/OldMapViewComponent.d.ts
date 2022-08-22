@@ -24,7 +24,7 @@ export interface OldMapViewComponentProps {
     /** scope of the map (when a layer self-selects a particular scope) */
     scope?: MapScope;
     /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-    onScopeChange: (scope: MapScope | null) => void;
+    onScopeChange?: (scope: MapScope | null) => void;
     /** Whether the map be draggable with mouse/touch or not. Default true */
     dragging?: boolean;
     /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
@@ -41,7 +41,7 @@ export default class OldMapViewComponent extends React.Component<OldMapViewCompo
     static contextTypes: {
         locale: PropTypes.Requireable<string>;
     };
-    leafletMap?: LeafletMapComponent;
+    leafletMap?: LeafletMapComponent | null;
     constructor(props: any);
     componentDidMount(): void;
     componentDidUpdate(prevProps: any): void;
@@ -49,7 +49,17 @@ export default class OldMapViewComponent extends React.Component<OldMapViewCompo
     handleBoundsChange: (bounds: any) => void;
     handleGridClick: (layerViewId: any, ev: any) => void;
     getCompiledFilters(): JsonQLFilter[];
-    renderLegend(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    renderLegend(): React.CElement<{
+        onShow: () => void;
+    }, HiddenLegend> | React.FunctionComponentElement<{
+        schema: Schema;
+        dataSource: DataSource;
+        layerViews: import("./MapDesign").MapLayerView[];
+        zoom: number | null;
+        filters: JsonQLFilter[];
+        locale: string;
+        onHide: () => void;
+    }>;
     renderPopup(): React.CElement<import("react-library/lib/ModalPopupComponent").ModalPopupComponentProps, ModalPopupComponent> | null;
     render(): React.DetailedReactHTMLElement<{
         style: {
@@ -59,3 +69,28 @@ export default class OldMapViewComponent extends React.Component<OldMapViewCompo
         };
     }, HTMLElement>;
 }
+declare class HiddenLegend extends React.Component<{
+    onShow: () => void;
+}> {
+    render(): React.DOMElement<{
+        style: {
+            zIndex: number;
+            backgroundColor: string;
+            position: string;
+            bottom: number;
+            right: number;
+            fontSize: number;
+            color: string;
+            cursor: string;
+            paddingTop: number;
+            paddingBottom: number;
+            paddingLeft: number;
+            paddingRight: number;
+            borderRadius: string;
+            border: string;
+            borderRight: string;
+        };
+        onClick: () => void;
+    }, Element>;
+}
+export {};

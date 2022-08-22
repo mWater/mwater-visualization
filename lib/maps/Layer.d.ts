@@ -131,7 +131,7 @@ export default class Layer<LayerDesign> {
         schema: Schema;
         dataSource: DataSource;
         onDesignChange: (design: LayerDesign) => void;
-    }): void;
+    }): ReactNode;
     /** Returns a cleaned design */
     cleanDesign(design: LayerDesign, schema: Schema): LayerDesign;
     /** Validates design. Null if ok, message otherwise */

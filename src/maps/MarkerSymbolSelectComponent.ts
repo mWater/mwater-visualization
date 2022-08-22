@@ -34,7 +34,7 @@ export default class MarkerSymbolSelectComponent extends React.Component<MarkerS
         options,
         formatOptionLabel: optionRenderer,
         isClearable: true,
-        onChange: (opt) => this.props.onChange(opt?.value || null)
+        onChange: (opt: any) => this.props.onChange(opt?.value || null)
       })
     )
   }

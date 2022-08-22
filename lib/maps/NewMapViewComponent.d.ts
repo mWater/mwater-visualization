@@ -24,7 +24,7 @@ export declare function NewMapViewComponent(props: {
     /** scope of the map (when a layer self-selects a particular scope) */
     scope?: MapScope;
     /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-    onScopeChange: (scope: MapScope | null) => void;
+    onScopeChange?: (scope: MapScope | null) => void;
     /** Whether the map be draggable with mouse/touch or not. Default true */
     dragging?: boolean;
     /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */

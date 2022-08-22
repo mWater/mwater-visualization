@@ -1,10 +1,10 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
 import { default as ReactSelect } from "react-select"
 import { DataSource, Schema } from "mwater-expressions"
+import { JsonQLSelectQuery } from "jsonql"
 
 export interface DetailLevelSelectComponentProps {
   /** Schema to use */
@@ -20,7 +20,7 @@ export interface DetailLevelSelectComponentProps {
 }
 
 interface DetailLevelSelectComponentState {
-  options: any
+  options: { label: string, value: any }[] | null
 }
 
 // Select detail level within an admin region
@@ -45,7 +45,7 @@ export default class DetailLevelSelectComponent extends React.Component<
 
   loadLevels(props: any) {
     // Get country id of scope
-    let query = {
+    let query: JsonQLSelectQuery = {
       type: "query",
       selects: [{ type: "select", expr: { type: "field", tableAlias: "main", column: "level0" }, alias: "level0" }],
       from: { type: "table", table: "admin_regions", alias: "main" },
@@ -82,7 +82,7 @@ export default class DetailLevelSelectComponent extends React.Component<
       }
 
       // Execute query
-      return props.dataSource.performQuery(query, (err: any, rows: any) => {
+      return props.dataSource.performQuery(query, (err: any, rows: any[]) => {
         if (err) {
           alert("Error loading detail levels")
           return
@@ -92,7 +92,7 @@ export default class DetailLevelSelectComponent extends React.Component<
         rows = _.filter(rows, (r) => r.level > props.scopeLevel)
 
         // If detail level set (defaults to zero), and has an option, auto-select
-        if (this.props.detailLevel <= this.props.scopeLevel && rows.length > 0) {
+        if (this.props.detailLevel && this.props.detailLevel <= this.props.scopeLevel && rows.length > 0) {
           this.props.onChange(rows[0].level)
         }
 
@@ -100,7 +100,7 @@ export default class DetailLevelSelectComponent extends React.Component<
           value: r.level,
           label: r.name
         }))
-        return this.setState({ options })
+        this.setState({ options })
       })
     })
   }
@@ -110,7 +110,7 @@ export default class DetailLevelSelectComponent extends React.Component<
       return R(ReactSelect, {
         value: _.findWhere(this.state.options, { value: this.props.detailLevel }) || null,
         options: this.state.options,
-        onChange: (opt) => this.props.onChange(opt.value)
+        onChange: (opt: any) => this.props.onChange(opt.value)
       })
     } else {
       return R("div", { className: "text-muted" }, R("i", { className: "fa fa-spinner fa-spin" }), " Loading...")

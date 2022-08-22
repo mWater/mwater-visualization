@@ -205,7 +205,7 @@ export default class Layer<LayerDesign> {
     schema: Schema
     dataSource: DataSource
     onDesignChange: (design: LayerDesign) => void
-  }) {
+  }): ReactNode {
     throw new Error("Not implemented")
   }
 

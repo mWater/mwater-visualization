@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import _ from "lodash"
 import React, { ReactNode } from "react"
 const R = React.createElement
-import LeafletMapComponent from "./LeafletMapComponent"
+import LeafletMapComponent, { TileLayer } from "./LeafletMapComponent"
 import { ExprUtils, Schema, DataSource } from "mwater-expressions"
 import LayerFactory from "./LayerFactory"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
@@ -38,7 +38,7 @@ export interface OldMapViewComponentProps {
   scope?: MapScope
 
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange: (scope: MapScope | null) => void
+  onScopeChange?: (scope: MapScope | null) => void
 
   /** Whether the map be draggable with mouse/touch or not. Default true */
   dragging?: boolean
@@ -63,7 +63,7 @@ export default class OldMapViewComponent extends React.Component<
 > {
   static contextTypes = { locale: PropTypes.string }
 
-  leafletMap?: LeafletMapComponent
+  leafletMap?: LeafletMapComponent | null
 
   constructor(props: any) {
     super(props)
@@ -210,7 +210,8 @@ export default class OldMapViewComponent extends React.Component<
         filters: this.getCompiledFilters(),
         dataSource: this.props.dataSource,
         locale: this.context.locale,
-        onHide: () => this.setState({ legendHidden: true })
+        onHide: () => this.setState({ legendHidden: true }),
+        zoom: null
       })
     }
   }
@@ -270,13 +271,13 @@ export default class OldMapViewComponent extends React.Component<
       const isScoping = this.props.scope && this.props.scope.data.layerViewId === layerView.id
 
       // Create leafletLayer
-      let leafletLayer = {
-        tileUrl: layerDataSource.getTileUrl(design, isScoping ? compiledFilters : scopedCompiledFilters),
-        utfGridUrl: layerDataSource.getUtfGridUrl(design, isScoping ? compiledFilters : scopedCompiledFilters),
+      let leafletLayer: TileLayer = {
+        tileUrl: layerDataSource.getTileUrl(design, isScoping ? compiledFilters : scopedCompiledFilters)!,
+        utfGridUrl: layerDataSource.getUtfGridUrl(design, isScoping ? compiledFilters : scopedCompiledFilters) ?? undefined,
         visible: layerView.visible,
         opacity: isScoping ? layerView.opacity * 0.3 : layerView.opacity,
-        minZoom: layer.getMinZoom(design),
-        maxZoom: layer.getMaxZoom(design),
+        minZoom: layer.getMinZoom(design) ?? undefined,
+        maxZoom: layer.getMaxZoom(design) ?? undefined,
         onGridClick: this.handleGridClick.bind(null, layerView.id)
       }
 
@@ -285,12 +286,12 @@ export default class OldMapViewComponent extends React.Component<
       // Add scoped layer if scoping
       if (isScoping) {
         leafletLayer = {
-          tileUrl: layerDataSource.getTileUrl(design, scopedCompiledFilters),
-          utfGridUrl: layerDataSource.getUtfGridUrl(design, scopedCompiledFilters),
+          tileUrl: layerDataSource.getTileUrl(design, scopedCompiledFilters)!,
+          utfGridUrl: layerDataSource.getUtfGridUrl(design, scopedCompiledFilters) ?? undefined,
           visible: layerView.visible,
           opacity: layerView.opacity,
-          minZoom: layer.getMinZoom(design),
-          maxZoom: layer.getMaxZoom(design),
+          minZoom: layer.getMinZoom(design) ?? undefined,
+          maxZoom: layer.getMaxZoom(design) ?? undefined,
           onGridClick: this.handleGridClick.bind(null, layerView.id)
         }
 
@@ -309,12 +310,12 @@ export default class OldMapViewComponent extends React.Component<
           })
         : undefined,
       R(LeafletMapComponent, {
-        ref: (c) => {
-          return (this.leafletMap = c)
+        ref: (c: LeafletMapComponent | null) => {
+          this.leafletMap = c
         },
         initialBounds: this.props.design.bounds,
         baseLayerId: this.props.design.baseLayer,
-        baseLayerOpacity: this.props.design.baseLayerOpacity,
+        baseLayerOpacity: this.props.design.baseLayerOpacity ?? undefined,
         layers: leafletLayers,
         width: this.props.width,
         height: this.props.height,
@@ -325,14 +326,14 @@ export default class OldMapViewComponent extends React.Component<
         onBoundsChange: this.handleBoundsChange,
         extraAttribution: this.props.design.attribution,
         loadingSpinner: true,
-        maxZoom: this.props.design.maxZoom
+        maxZoom: this.props.design.maxZoom ?? undefined
       })
     )
   }
 }
 
 // Legend display tab at bottom right
-class HiddenLegend extends React.Component {
+class HiddenLegend extends React.Component<{ onShow: () => void }> {
   render() {
     const style = {
       zIndex: 1000,

@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -107,7 +106,7 @@ export default class EditPopupComponent extends React.Component<EditPopupCompone
                   design: options.design,
                   scope: null,
                   filters: [],
-                  onScopeChange: null,
+                  onScopeChange: () => {},
                   onDesignChange: options.onDesignChange,
                   width: options.width,
                   height: options.height,

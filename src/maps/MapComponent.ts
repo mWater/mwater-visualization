@@ -1,6 +1,6 @@
 import PropTypes from "prop-types"
 import _ from "lodash"
-import React from "react"
+import React, { ReactNode } from "react"
 const R = React.createElement
 
 import { MapViewComponent } from "./MapViewComponent"
@@ -9,38 +9,66 @@ import MapControlComponent from "./MapControlComponent"
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 import UndoStack from "../UndoStack"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
+import { DataSource, Schema } from "mwater-expressions"
+import { MapDataSource } from "./MapDataSource"
+import { MapDesign } from "./MapDesign"
+import { JsonQLFilter } from "../JsonQLFilter"
 
-// Map with designer on right
-export default class MapComponent extends React.Component {
-  static propTypes = {
-    schema: PropTypes.object.isRequired,
-    dataSource: PropTypes.object.isRequired, // Data source to use
+export interface MapComponentProps {
+  schema: Schema
+  dataSource: DataSource
+  mapDataSource: MapDataSource
 
-    // Data source for the map
-    mapDataSource: PropTypes.shape({
-      // Gets the data source for a layer
-      getLayerDataSource: PropTypes.func.isRequired
-    }).isRequired,
+  design: MapDesign
+  onDesignChange?: (design: MapDesign) => void
 
-    design: PropTypes.object.isRequired,
-    onDesignChange: PropTypes.func, // Null/undefined for readonly
+  /** Called with (tableId, rowId) when item is clicked */
+  onRowClick?: (tableId: string, rowId: any) => void
 
-    onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
+  /** Extra filters to apply to view */
+  extraFilters?: JsonQLFilter[]
 
-    extraFilters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired,
-        jsonql: PropTypes.object.isRequired
-      })
-    ), // Extra filters to apply to view
+  /** Extra element to include in title at left */
+  titleElem?: ReactNode 
 
-    titleElem: PropTypes.node, // Extra element to include in title at left
-    extraTitleButtonsElem: PropTypes.node // Extra elements to add to right
-  }
+  /** Extra elements to add to right */
+  extraTitleButtonsElem?: ReactNode 
 
+
+  // /** scope of the map (when a layer self-selects a particular scope) */
+  // scope?: MapScope
+
+  // /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+  // onScopeChange: (scope: MapScope | null) => void
+
+  // /** Whether the map be draggable with mouse/touch or not. Default true */
+  // dragging?: boolean
+
+  // /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
+  // touchZoom?: boolean
+
+  // /** Whether the map can be zoomed by using the mouse wheel. Default true */
+  // scrollWheelZoom?: boolean
+
+  // /** Whether changes to zoom level should be persisted. Default false  */
+  // zoomLocked?: boolean
+
+  // /** Locale to use */
+  // locale: string
+
+}
+
+interface MapComponentState {
+  undoStack: UndoStack
+  transientDesign: MapDesign
+  zoomLocked: boolean
+}
+
+/** Map with designer on right */
+export default class MapComponent extends React.Component<MapComponentProps, MapComponentState> {
   static contextTypes = { locale: PropTypes.string }
 
-  constructor(props: any) {
+  constructor(props: MapComponentProps) {
     super(props)
     this.state = {
       undoStack: new UndoStack().push(props.design),
@@ -62,19 +90,14 @@ export default class MapComponent extends React.Component {
     const undoStack = this.state.undoStack.undo()
 
     // We need to use callback as state is applied later
-    return this.setState({ undoStack }, () => this.props.onDesignChange(undoStack.getValue()))
+    return this.setState({ undoStack }, () => this.props.onDesignChange!(undoStack.getValue()))
   }
 
   handleRedo = () => {
     const undoStack = this.state.undoStack.redo()
 
     // We need to use callback as state is applied later
-    return this.setState({ undoStack }, () => this.props.onDesignChange(undoStack.getValue()))
-  }
-
-  // Gets the current design, whether prop or transient
-  getDesign() {
-    return this.state.transientDesign || this.props.design
+    return this.setState({ undoStack }, () => this.props.onDesignChange!(undoStack.getValue()))
   }
 
   handleZoomLockClick = () => {
@@ -154,7 +177,7 @@ export default class MapComponent extends React.Component {
     if (this.props.onDesignChange) {
       return this.props.design
     } else {
-      return this.state.transientDesign
+      return this.state.transientDesign || this.props.design
     }
   }
 
@@ -162,17 +185,24 @@ export default class MapComponent extends React.Component {
     return React.createElement(
       AutoSizeComponent,
       { injectWidth: true, injectHeight: true },
-      React.createElement(MapViewComponent, {
-        mapDataSource: this.props.mapDataSource,
-        schema: this.props.schema,
-        dataSource: this.props.dataSource,
-        design: this.getDesign(),
-        onDesignChange: this.handleDesignChange,
-        zoomLocked: this.state.zoomLocked,
-        onRowClick: this.props.onRowClick,
-        extraFilters: this.props.extraFilters,
-        locale: this.context.locale
-      })
+      (size: {
+          width?: number;
+          height?: number;
+      }) => {
+        return React.createElement(MapViewComponent, {
+          mapDataSource: this.props.mapDataSource,
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.getDesign(),
+          onDesignChange: this.handleDesignChange,
+          zoomLocked: this.state.zoomLocked,
+          onRowClick: this.props.onRowClick,
+          extraFilters: this.props.extraFilters,
+          locale: this.context.locale,
+          width: size.width!,
+          height: size.height!
+        })
+      }
     )
   }
 

@@ -12,7 +12,7 @@ export default class DirectWidgetDataSource implements WidgetDataSource {
         /** general data source */
         dataSource: DataSource;
         /** API url to use for talking to mWater server. Not needed if no map widgets */
-        apiUrl: string;
+        apiUrl?: string;
         /** client id to use for talking to mWater server. Not needed if no map widgets */
         client?: string | undefined;
     };
@@ -24,7 +24,7 @@ export default class DirectWidgetDataSource implements WidgetDataSource {
         /** general data source */
         dataSource: DataSource;
         /** API url to use for talking to mWater server. Not needed if no map widgets */
-        apiUrl: string;
+        apiUrl?: string;
         /** client id to use for talking to mWater server. Not needed if no map widgets */
         client?: string;
     });

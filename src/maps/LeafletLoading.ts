@@ -1,3 +1,4 @@
+// @ts-nocheck
 import "./LeafletLoading.css"
 import L from "leaflet"
 

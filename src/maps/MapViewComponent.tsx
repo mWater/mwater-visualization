@@ -34,7 +34,7 @@ export function MapViewComponent(props: {
   scope?: MapScope
 
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange: (scope: MapScope | null) => void
+  onScopeChange?: (scope: MapScope | null) => void
 
   /** Whether the map be draggable with mouse/touch or not. Default true */
   dragging?: boolean

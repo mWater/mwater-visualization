@@ -1,6 +1,6 @@
 import _ from "lodash"
 import PropTypes from "prop-types"
-import React from "react"
+import React, { ReactElement } from "react"
 const R = React.createElement
 
 import TabbedComponent from "react-library/lib/TabbedComponent"
@@ -250,7 +250,7 @@ class AttributionComponent extends React.Component<AttributionComponentProps, At
   }
 
   render() {
-    let elem = R(
+    let elem: ReactElement = R(
       "div",
       { style: { marginLeft: 5 } },
       this.state.editing

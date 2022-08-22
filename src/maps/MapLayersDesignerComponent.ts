@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -7,17 +6,18 @@ import LayerFactory from "./LayerFactory"
 import AddLayerComponent from "./AddLayerComponent"
 import MapLayerViewDesignerComponent from "./MapLayerViewDesignerComponent"
 import ReorderableListComponent from "react-library/lib/reorderable/ReorderableListComponent"
-import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
+import { DataSource, ExprCompiler, OpExpr, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
+import { MapDesign, MapLayerView } from "./MapDesign"
 
 export interface MapLayersDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource
   /** See Map Design.md */
-  design: any
+  design: MapDesign
   /** Called with new design */
-  onDesignChange: any
+  onDesignChange: (design: MapDesign) => void
   /** True to allow editing layers */
   allowEditingLayers: boolean
   filters?: any
@@ -27,11 +27,11 @@ export interface MapLayersDesignerComponentProps {
 export default class MapLayersDesignerComponent extends React.Component<MapLayersDesignerComponentProps> {
   // Updates design with the specified changes
   updateDesign(changes: any) {
-    const design = _.extend({}, this.props.design, changes)
+    const design = _.extend({}, this.props.design, changes) as MapDesign
     return this.props.onDesignChange(design)
   }
 
-  handleLayerViewChange = (index: any, layerView: any) => {
+  handleLayerViewChange = (index: any, layerView: MapLayerView) => {
     const layerViews = this.props.design.layerViews.slice()
 
     // Update self
@@ -41,7 +41,7 @@ export default class MapLayersDesignerComponent extends React.Component<MapLayer
     if (layerView.group && layerView.visible) {
       _.each(this.props.design.layerViews, (lv, i) => {
         if (lv.visible && i !== index && lv.group === layerView.group) {
-          return (layerViews[i] = _.extend({}, lv, { visible: false }))
+          layerViews[i] = _.extend({}, lv, { visible: false })
         }
       })
     }
@@ -84,7 +84,7 @@ export default class MapLayersDesignerComponent extends React.Component<MapLayer
       if (filter) {
         const jsonql = exprCompiler.compileExpr({ expr: filter, tableAlias: "{alias}" })
         if (jsonql) {
-          filters.push({ table: filter.table, jsonql })
+          filters.push({ table: (filter as OpExpr).table, jsonql })
         }
       }
     }
@@ -123,7 +123,7 @@ export default class MapLayersDesignerComponent extends React.Component<MapLayer
                 items: this.props.design.layerViews,
                 onReorder: this.handleReorder,
                 renderItem: this.renderLayerView,
-                getItemId: (layerView) => layerView.id
+                getItemId: (layerView: MapLayerView) => layerView.id
               })
             )
           )

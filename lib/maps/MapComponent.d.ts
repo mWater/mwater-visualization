@@ -1,28 +1,38 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { ReactNode } from "react";
 import MapControlComponent from "./MapControlComponent";
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
-export default class MapComponent extends React.Component {
-    static propTypes: {
-        schema: PropTypes.Validator<object>;
-        dataSource: PropTypes.Validator<object>;
-        mapDataSource: PropTypes.Validator<PropTypes.InferProps<{
-            getLayerDataSource: PropTypes.Validator<(...args: any[]) => any>;
-        }>>;
-        design: PropTypes.Validator<object>;
-        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
-        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
-        extraFilters: PropTypes.Requireable<(PropTypes.InferProps<{
-            table: PropTypes.Validator<string>;
-            jsonql: PropTypes.Validator<object>;
-        }> | null | undefined)[]>;
-        titleElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
-        extraTitleButtonsElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
-    };
+import UndoStack from "../UndoStack";
+import { DataSource, Schema } from "mwater-expressions";
+import { MapDataSource } from "./MapDataSource";
+import { MapDesign } from "./MapDesign";
+import { JsonQLFilter } from "../JsonQLFilter";
+export interface MapComponentProps {
+    schema: Schema;
+    dataSource: DataSource;
+    mapDataSource: MapDataSource;
+    design: MapDesign;
+    onDesignChange?: (design: MapDesign) => void;
+    /** Called with (tableId, rowId) when item is clicked */
+    onRowClick?: (tableId: string, rowId: any) => void;
+    /** Extra filters to apply to view */
+    extraFilters?: JsonQLFilter[];
+    /** Extra element to include in title at left */
+    titleElem?: ReactNode;
+    /** Extra elements to add to right */
+    extraTitleButtonsElem?: ReactNode;
+}
+interface MapComponentState {
+    undoStack: UndoStack;
+    transientDesign: MapDesign;
+    zoomLocked: boolean;
+}
+/** Map with designer on right */
+export default class MapComponent extends React.Component<MapComponentProps, MapComponentState> {
     static contextTypes: {
         locale: PropTypes.Requireable<string>;
     };
-    constructor(props: any);
+    constructor(props: MapComponentProps);
     componentWillReceiveProps(nextProps: any): void;
     handleUndo: () => void;
     handleRedo: () => void;
@@ -39,7 +49,8 @@ export default class MapComponent extends React.Component {
             borderBottom: string;
         };
     }, HTMLElement>;
-    handleDesignChange: (design: any) => any;
+    handleDesignChange: (design: any) => void;
+    getDesign(): MapDesign;
     renderView(): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent>;
     renderDesigner(): React.CElement<import("./MapControlComponent").MapControlComponentProps, MapControlComponent>;
     render(): React.DetailedReactHTMLElement<{
@@ -50,3 +61,4 @@ export default class MapComponent extends React.Component {
         };
     }, HTMLElement>;
 }
+export {};

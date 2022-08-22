@@ -1,8 +1,6 @@
 import _ from "lodash"
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
-import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
 import { default as Rcslider } from "rc-slider"
 import LayerFactory from "./LayerFactory"
 import * as ui from "react-library/lib/bootstrap"
@@ -143,15 +141,13 @@ export default class MapLayerViewDesignerComponent extends React.Component<
     return R(
       "div",
       null,
-      layer.isEditable()
-        ? layer.createDesignerElement({
-            design: this.props.layerView.design,
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            onDesignChange: this.handleSaveEditing,
-            filters: this.props.filters
-          })
-        : undefined,
+      layer.isEditable() && 
+      layer.createDesignerElement({
+        design: this.props.layerView.design,
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        onDesignChange: this.handleSaveEditing
+      }),
       this.renderOpacityControl(),
       this.renderAdvanced()
     )

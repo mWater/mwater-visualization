@@ -7,6 +7,7 @@ import { ExprComponent } from "mwater-expressions-ui"
 import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import * as DashboardUtils from "../dashboards/DashboardUtils"
+import { DashboardDesign } from "../dashboards/DashboardDesign"
 
 interface PopupFilterJoinsEditComponentProps {
   /** Schema to use */
@@ -60,7 +61,7 @@ export default class PopupFilterJoinsEditComponent extends React.Component<
     }
 
     // Get filterable tables of popup
-    const popupDashboard = { items: this.props.popup.items, layout: "blocks" }
+    const popupDashboard: DashboardDesign = { items: this.props.popup.items, layout: "blocks" }
     let filterableTables = DashboardUtils.getFilterableTables(popupDashboard, this.props.schema)
 
     // Always include self as first

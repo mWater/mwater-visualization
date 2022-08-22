@@ -10,10 +10,10 @@ export interface AdminScopeAndDetailLevelComponentProps {
     scopeLevel?: number;
     /** Detail level within scope region */
     detailLevel?: number;
-    onScopeAndDetailLevelChange: any;
+    onScopeAndDetailLevelChange: (scope: number | null, scopeLevel: number | null, detailLevel: number | null) => void;
 }
 export default class AdminScopeAndDetailLevelComponent extends React.Component<AdminScopeAndDetailLevelComponentProps> {
-    handleScopeChange: (scope: any, scopeLevel: any) => any;
-    handleDetailLevelChange: (detailLevel: any) => any;
+    handleScopeChange: (scope: number | null, scopeLevel: number | null) => void;
+    handleDetailLevelChange: (detailLevel: any) => void;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }

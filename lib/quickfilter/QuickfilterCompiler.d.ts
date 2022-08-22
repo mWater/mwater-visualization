@@ -1,4 +1,4 @@
-import { Schema } from "mwater-expressions";
+import { OpExpr, Schema } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { Quickfilter, QuickfilterLock } from "./Quickfilter";
 /** Compiles quickfilter values into filters */
@@ -12,10 +12,5 @@ export default class QuickfilterCompiler {
      * See README for values
      */
     compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[] | null | undefined): JsonQLFilter[];
-    compileToFilterExpr(expr: any, value: any, multi: any): {
-        type: string;
-        op: any;
-        table: any;
-        exprs: any[];
-    } | null;
+    compileToFilterExpr(expr: any, value: any, multi: any): OpExpr | null;
 }

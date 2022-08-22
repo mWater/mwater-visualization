@@ -17,22 +17,22 @@ export interface AdminScopeAndDetailLevelComponentProps {
   scopeLevel?: number
   /** Detail level within scope region */
   detailLevel?: number
-  onScopeAndDetailLevelChange: any
+  onScopeAndDetailLevelChange: (scope: number | null, scopeLevel: number | null, detailLevel: number | null) => void
 }
 
 // Scope and detail level setter for AdminChoropleth layers when using admin_regions
 export default class AdminScopeAndDetailLevelComponent extends React.Component<AdminScopeAndDetailLevelComponentProps> {
-  handleScopeChange = (scope: any, scopeLevel: any) => {
+  handleScopeChange = (scope: number | null, scopeLevel: number | null) => {
     if (scope) {
       // Detail level will be set by DetailLevelSelectComponent
-      return this.props.onScopeAndDetailLevelChange(scope, scopeLevel, null)
+      this.props.onScopeAndDetailLevelChange(scope, scopeLevel, null)
     } else {
-      return this.props.onScopeAndDetailLevelChange(null, null, 0)
+      this.props.onScopeAndDetailLevelChange(null, null, 0)
     }
   }
 
   handleDetailLevelChange = (detailLevel: any) => {
-    return this.props.onScopeAndDetailLevelChange(this.props.scope, this.props.scopeLevel, detailLevel)
+    this.props.onScopeAndDetailLevelChange(this.props.scope ?? null, this.props.scopeLevel ?? null, detailLevel)
   }
 
   render() {

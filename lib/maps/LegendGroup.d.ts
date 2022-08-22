@@ -1,6 +1,9 @@
 import React from "react";
 export interface LegendGroupProps {
-    items?: any;
+    items?: {
+        color: string;
+        name: string;
+    }[];
     radiusLayer?: boolean;
     defaultColor?: string;
     name?: string;

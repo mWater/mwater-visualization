@@ -13,7 +13,10 @@ export interface DetailLevelSelectComponentProps {
     onChange: any;
 }
 interface DetailLevelSelectComponentState {
-    options: any;
+    options: {
+        label: string;
+        value: any;
+    }[] | null;
 }
 export default class DetailLevelSelectComponent extends React.Component<DetailLevelSelectComponentProps, DetailLevelSelectComponentState> {
     constructor(props: any);

@@ -14,7 +14,7 @@ export default class DirectWidgetDataSource implements WidgetDataSource {
     /** general data source */
     dataSource: DataSource
     /** API url to use for talking to mWater server. Not needed if no map widgets */
-    apiUrl: string
+    apiUrl?: string
     /** client id to use for talking to mWater server. Not needed if no map widgets */
     client?: string | undefined
   }
@@ -27,7 +27,7 @@ export default class DirectWidgetDataSource implements WidgetDataSource {
     /** general data source */
     dataSource: DataSource
     /** API url to use for talking to mWater server. Not needed if no map widgets */
-    apiUrl: string
+    apiUrl?: string
     /** client id to use for talking to mWater server. Not needed if no map widgets */
     client?: string
   }) {
@@ -45,6 +45,10 @@ export default class DirectWidgetDataSource implements WidgetDataSource {
 
   /** For map widgets, the following is required */
   getMapDataSource(design: any): MapDataSource {
+    if (!this.options.apiUrl) {
+      throw new Error("Maps not supported")
+    }
+    
     return new DirectMapDataSource({
       apiUrl: this.options.apiUrl,
       client: this.options.client,

@@ -1,4 +1,5 @@
 import React from "react";
+import ImagePopupComponent from "./ImagePopupComponent";
 import { DataSource } from "mwater-expressions";
 export interface ImageMosaicChartViewComponentProps {
     /** Design of chart */
@@ -11,7 +12,9 @@ export interface ImageMosaicChartViewComponentProps {
     height?: number;
     onRowClick?: any;
 }
+/** creates a d3 calendar visualization */
 export default class ImageMosaicChartViewComponent extends React.Component<ImageMosaicChartViewComponentProps> {
+    imagePopup: ImagePopupComponent | null;
     shouldComponentUpdate(prevProps: any): boolean;
     handleClick: (primaryKey: any, image: any) => any;
     renderImage: (primaryKey: any, image: any, imageManager: any) => React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
