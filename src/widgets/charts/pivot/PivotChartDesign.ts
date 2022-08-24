@@ -30,6 +30,11 @@ export interface PivotChartDesign {
   striping?: "columns" | "rows" 
 }
 
+/**
+ * Segments are the building block of pivot tables. Each is either on the row or column axis. They represent one 
+ * expression (enum/text) that is analyzed.
+ * Segments can be nested to allow sub-division and are ordered.
+ */
 export interface PivotChartSegment {
   /** id of segment */
   id: string
@@ -38,7 +43,7 @@ export interface PivotChartSegment {
   label?: string
   
   /** enum/text axis that determines values. Optional. */
-  valueAxis?: Axis
+  valueAxis?: Axis | null
 
   /** Limit date-type and enum fields to values actually present */
   valueAxisOnlyValuesPresent?: boolean
@@ -76,15 +81,20 @@ export interface PivotChartSegment {
   borderAfter?: 0 | 1 | 2 | 3 
 }
 
+/** These compose the data area of the table. There is an intersection for each possible
+ * combination that makes sense of segments that form a rectangle. An intersection is 
+ * id-ed by "rowid:columnid" or "rowid,rowid:columnid,columnid" etc. depending on its component 
+ * ids.
+ */
 export interface PivotChartIntersection {
   /** axis that determines value to display in cells. Must be aggregate */
-  valueAxis: Axis
+  valueAxis?: Axis | null
 
   /** optional logical expression to filter by */
   filter?: Expr
 
   /** color axis for background of cells */
-  backgroundColorAxis?: Axis
+  backgroundColorAxis?: Axis | null
 
   /** fractional background opacity */
   backgroundColorOpacity?: number

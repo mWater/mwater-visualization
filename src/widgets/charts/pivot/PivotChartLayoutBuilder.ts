@@ -5,6 +5,7 @@ import Color from "color"
 import * as PivotChartUtils from "./PivotChartUtils"
 import canonical from "canonical-json"
 import { PivotChartDesign, PivotChartSegment } from "./PivotChartDesign"
+import { PivotChartLayout } from "./PivotChartLayout"
 
 const maxRows = 500
 const maxColumns = 50
@@ -27,7 +28,7 @@ export default class PivotChartLayoutBuilder {
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
   }
 
-  buildLayout(design: PivotChartDesign, data: PivotChartData, locale: string) {
+  buildLayout(design: PivotChartDesign, data: PivotChartData, locale: string): PivotChartLayout {
     // Create empty layout
     let cell, cells, column, columnIndex, depth: any, i, layoutRow, refCell, rowIndex, segment
     let asc, end
@@ -402,7 +403,13 @@ export default class PivotChartLayoutBuilder {
   // Build a cell which is the intersection of a row and column, where row and column are nested arrays
   // from getRowsOrColumns
   // dataIndexed is created above. See there for format
-  buildIntersectionCell(design: PivotChartDesign, dataIndexed: any, locale: string, row: any, column: any) {
+  buildIntersectionCell(
+    design: PivotChartDesign, 
+    dataIndexed: any, 
+    locale: string, 
+    row: { segment: PivotChartSegment, label: string, value: any }[], 
+    column: { segment: PivotChartSegment, label: string, value: any }[]) {
+
     // Get intersection id
     let i, part, text
     const intersectionId = PivotChartUtils.getIntersectionId(
@@ -437,7 +444,7 @@ export default class PivotChartLayoutBuilder {
 
     // Format using axis builder if present. Blank otherwise
     if (value != null) {
-      text = this.axisBuilder.formatValue(intersection.valueAxis, value, locale)
+      text = this.axisBuilder.formatValue(intersection.valueAxis!, value, locale)
     } else {
       text = intersection.valueAxis?.nullLabel || null
     }
@@ -700,7 +707,7 @@ export default class PivotChartLayoutBuilder {
   // For segments with no children, there will be an array of single value array entries (array of array)
   // data is lookup of query results by intersection id
   // parentSegments are ancestry of current segment, starting with root
-  getRowsOrColumns(isRow: any, segment: PivotChartSegment, data: { [intersectionId: string]: any[] }, locale: string, parentSegments: PivotChartSegment[] = [], parentValues: any[] = []): 
+  getRowsOrColumns(isRow: boolean, segment: PivotChartSegment, data: { [intersectionId: string]: any[] }, locale: string, parentSegments: PivotChartSegment[] = [], parentValues: any[] = []): 
     { segment: PivotChartSegment, label: string, value: any }[][] {
     // If no axis, categories are just null
     let categories, value

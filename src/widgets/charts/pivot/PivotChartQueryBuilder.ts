@@ -1,26 +1,35 @@
 import _ from "lodash"
-import { ExprCompiler } from "mwater-expressions"
+import { Expr, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import { injectTableAlias } from "mwater-expressions"
 import * as PivotChartUtils from "./PivotChartUtils"
+import { PivotChartDesign } from "./PivotChartDesign"
+import { JsonQLFilter } from "../../../JsonQLFilter"
+import { JsonQLSelectQuery } from "jsonql"
 
-// Builds pivot table queries.
-// Result is flat list for each intersection with each row being data for a single cell
-// columns of result are:
-//  value: value of the cell (aggregate)
-//  r0: row segment value (if present)
-//  r1: inner row segment value (if present)
-//  ...
-//  c0: column segment value (if present)
-//  c1: inner column segment value (if present)
-//  ...
-// Also produces queries needed to order row/column segments when ordered
-// These are indexed by the segment id and contain the values in order (already asc/desc corrected)
-// each row containing only { value: }
+/** Builds pivot table queries.
+ * Result is flat list for each intersection with each row being data for a single cell
+ * columns of result are:
+ *  value: value of the cell (aggregate)
+ *  r0: row segment value (if present)
+ *  r1: inner row segment value (if present)
+ *  ...
+ *  c0: column segment value (if present)
+ *  c1: inner column segment value (if present)
+ *  ...
+ * Also produces queries needed to order row/column segments when ordered
+ * These are indexed by the segment id and contain the values in order (already asc/desc corrected)
+ * each row containing only { value: }
+ */
 export default class PivotChartQueryBuilder {
-  // Pass in schema
-  constructor(options: any) {
+  schema: Schema
+  exprUtils: ExprUtils
+  axisBuilder: AxisBuilder
+
+  constructor(options: {
+    schema: Schema
+  }) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
@@ -29,7 +38,7 @@ export default class PivotChartQueryBuilder {
   // Create the queries needed for the chart.
   // extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
   // Queries are indexed by intersection id, as one query is made for each intersection
-  createQueries(design: any, extraFilters: any) {
+  createQueries(design: PivotChartDesign, extraFilters: JsonQLFilter[]) {
     let filter, intersectionId, relevantFilters, whereClauses
     const exprCompiler = new ExprCompiler(this.schema)
 
@@ -46,7 +55,7 @@ export default class PivotChartQueryBuilder {
         const intersection = design.intersections[intersectionId]
 
         // Create shell of query
-        const query = {
+        const query: JsonQLSelectQuery = {
           type: "query",
           selects: [],
           from: exprCompiler.compileTable(design.table, "main"),
@@ -65,7 +74,7 @@ export default class PivotChartQueryBuilder {
             expr: this.axisBuilder.compileAxis({ axis: rowSegment.valueAxis, tableAlias: "main" }),
             alias: `r${i}`
           })
-          query.groupBy.push(i + 1)
+          query.groupBy!.push(i + 1)
           if (rowSegment.filter) {
             filters.push(rowSegment.filter)
           }
@@ -78,7 +87,7 @@ export default class PivotChartQueryBuilder {
             expr: this.axisBuilder.compileAxis({ axis: columnSegment.valueAxis, tableAlias: "main" }),
             alias: `c${i}`
           })
-          query.groupBy.push(i + 1 + rowPath.length)
+          query.groupBy!.push(i + 1 + rowPath.length)
           if (columnSegment.filter) {
             filters.push(columnSegment.filter)
           }
@@ -169,7 +178,7 @@ export default class PivotChartQueryBuilder {
         }
 
         // Get all intersection filters
-        const intersectionFilters = []
+        const intersectionFilters: Expr[] = []
         for (intersectionId of _.keys(design.intersections)) {
           if (intersectionId.includes(segment.id)) {
             ;({ filter } = design.intersections[intersectionId])

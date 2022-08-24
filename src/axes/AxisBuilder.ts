@@ -59,7 +59,7 @@ export default class AxisBuilder {
      aggrNeed is "none", "optional" or "required"
      types: optional list of types to require it to be one of
   */
-  cleanAxis(options: { axis: Axis | null; table?: string | null; aggrNeed?: AggrNeed; types?: string[] }): Axis | null {
+  cleanAxis(options: { axis: Axis | null | undefined; table?: string | null; aggrNeed?: AggrNeed; types?: string[] }): Axis | null {
     let aggrStatuses: AggrStatus[] | undefined = undefined
     let { axis } = options
 

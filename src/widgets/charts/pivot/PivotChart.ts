@@ -14,12 +14,12 @@ import * as PivotChartUtils from "./PivotChartUtils"
 import PivotChartQueryBuilder from "./PivotChartQueryBuilder"
 import PivotChartLayoutBuilder from "./PivotChartLayoutBuilder"
 import { WidgetDataSource } from "../../WidgetDataSource"
-import { PivotChartDesign } from "./PivotChartDesign"
+import { PivotChartDesign, PivotChartSegment } from "./PivotChartDesign"
+import { JsonQLFilter } from "../../../JsonQLFilter"
 
 // Store true as a weakly cached value if a design is already clean
 const cleanDesignCache = new WeakCache()
 
-// See README.md for the design
 export default class PivotChart extends Chart {
   cleanDesign(design: PivotChartDesign, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
@@ -30,7 +30,7 @@ export default class PivotChart extends Chart {
       return design
     }
 
-    const cleanedDesign = produce(design, (draft: any) => {
+    const cleanedDesign = produce(design, (draft) => {
       // Fill in defaults
       draft.version = design.version || 1
       draft.rows = design.rows || []
@@ -50,7 +50,7 @@ export default class PivotChart extends Chart {
         }
 
         // Cleans a single segment
-        const cleanSegment = (segment: any) => {
+        const cleanSegment = (segment: PivotChartSegment) => {
           if (segment.valueAxis) {
             segment.valueAxis = axisBuilder.cleanAxis({
               axis: segment.valueAxis ? original(segment.valueAxis) : null,
@@ -66,14 +66,14 @@ export default class PivotChart extends Chart {
           }
 
           if (segment.filter) {
-            segment.filter = exprCleaner.cleanExpr(segment.filter ? original(segment.filter) : null, {
+            segment.filter = exprCleaner.cleanExpr(segment.filter ? original(segment.filter)! : null, {
               table: design.table,
               types: ["boolean"]
             })
           }
 
           if (segment.orderExpr) {
-            return (segment.orderExpr = exprCleaner.cleanExpr(segment.orderExpr ? original(segment.orderExpr) : null, {
+            return (segment.orderExpr = exprCleaner.cleanExpr(segment.orderExpr ? original(segment.orderExpr)! : null, {
               table: design.table,
               aggrStatuses: ["aggregate"],
               types: ["enum", "text", "boolean", "date", "datetime", "number"]
@@ -115,8 +115,10 @@ export default class PivotChart extends Chart {
             }
           }
 
+          // if (intersection.)
+
           if (intersection.filter) {
-            intersection.filter = exprCleaner.cleanExpr(intersection.filter ? original(intersection.filter) : null, {
+            intersection.filter = exprCleaner.cleanExpr(intersection.filter ? original(intersection.filter)! : null, {
               table: design.table,
               types: ["boolean"]
             })
@@ -142,8 +144,7 @@ export default class PivotChart extends Chart {
         }
 
         // Clean filter
-        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
-        return
+        draft.filter = exprCleaner.cleanExpr(design.filter ?? null, { table: design.table, types: ["boolean"] })
       }
     })
 
@@ -249,42 +250,46 @@ export default class PivotChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
+  getData(design: PivotChartDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (error: any, data?: any) => void) {
     const queryBuilder = new PivotChartQueryBuilder({ schema })
     const queries = queryBuilder.createQueries(design, filters)
 
     // Run queries in parallel
-    return async.map(
+    async.map(
       _.pairs(queries),
       (item, cb) => {
-        return dataSource.performQuery(item[1], (err: any, rows: any) => {
-          return cb(err, [item[0], rows])
+        dataSource.performQuery(item[1], (err: any, rows: any) => {
+          cb(err, [item[0], rows])
         })
       },
-      (err, items) => {
+      (err, items: any[]) => {
         if (err) {
-          return callback(err)
+          callback(err)
+          return
         }
 
-        const data = _.object(items)
+        const data: any = _.object(items)
 
         // Add header and footer data
         const textWidget = new TextWidget()
-        return textWidget.getData(design.header, schema, dataSource, filters, (error: any, headerData: any) => {
+        textWidget.getData(design.header, schema, dataSource, filters, (error: any, headerData: any) => {
           if (error) {
-            return callback(error)
+            callback(error)
+            return
           }
 
           data.header = headerData
 
-          return textWidget.getData(design.footer, schema, dataSource, filters, (error: any, footerData: any) => {
+          textWidget.getData(design.footer, schema, dataSource, filters, (error: any, footerData: any) => {
             if (error) {
-              return callback(error)
+              callback(error)
+              return
             }
 
             data.footer = footerData
 
-            return callback(null, data)
+            callback(null, data)
+            return
           })
         })
       }
@@ -328,7 +333,7 @@ export default class PivotChart extends Chart {
     return []
   }
 
-  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any) {
+  createDataTable(design: PivotChartDesign, schema: Schema, dataSource: DataSource, data: any, locale: string) {
     // Create layout
     const layout = new PivotChartLayoutBuilder({ schema }).buildLayout(design, data, locale)
 
