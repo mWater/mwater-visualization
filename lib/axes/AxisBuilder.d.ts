@@ -21,7 +21,7 @@ export default class AxisBuilder {
        types: optional list of types to require it to be one of
     */
     cleanAxis(options: {
-        axis: Axis | null;
+        axis: Axis | null | undefined;
         table?: string | null;
         aggrNeed?: AggrNeed;
         types?: string[];

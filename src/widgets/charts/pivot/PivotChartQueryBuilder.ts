@@ -116,15 +116,11 @@ export default class PivotChartQueryBuilder {
         const iterable = intersection.backgroundColorConditions || []
         for (i = 0; i < iterable.length; i++) {
           const backgroundColorCondition = iterable[i]
-          try {
-            query.selects.push({
-              type: "select",
-              expr: exprCompiler.compileExpr({ expr: backgroundColorCondition.condition ?? null, tableAlias: "main" }),
-              alias: `bcc${i}`
-            })
-          } catch (error) {
-            continue
-          }
+          query.selects.push({
+            type: "select",
+            expr: exprCompiler.compileExpr({ expr: backgroundColorCondition.condition ?? null, tableAlias: "main" }),
+            alias: `bcc${i}`
+          })
         }
 
         // If all selects are null, don't create query

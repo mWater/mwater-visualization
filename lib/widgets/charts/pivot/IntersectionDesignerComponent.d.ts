@@ -1,17 +1,19 @@
 import React from "react";
 import * as ui from "react-library/lib/bootstrap";
-import { DataSource, Schema } from "mwater-expressions";
+import { DataSource, Expr, Schema } from "mwater-expressions";
+import { PivotChartIntersection } from "./PivotChartDesign";
+import { JsonQLFilter } from "../../../JsonQLFilter";
 export interface IntersectionDesignerComponentProps {
-    intersection: any;
+    intersection: PivotChartIntersection;
     table: string;
     schema: Schema;
     dataSource: DataSource;
-    onChange: any;
-    filters?: any;
+    onChange: (intersection: PivotChartIntersection) => void;
+    filters?: JsonQLFilter[];
 }
 export default class IntersectionDesignerComponent extends React.Component<IntersectionDesignerComponentProps> {
-    constructor(...args: any[]);
-    update(): any;
+    constructor(props: IntersectionDesignerComponentProps);
+    update(...args: any[]): any;
     handleBackgroundColorAxisChange: (backgroundColorAxis: any) => any;
     handleBackgroundColorChange: (backgroundColor: any) => any;
     handleBackgroundColorConditionsChange: (backgroundColorConditions: any) => any;
@@ -84,16 +86,21 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 interface BackgroundColorConditionsComponentProps {
-    colorConditions?: any;
+    colorConditions?: {
+        condition?: Expr;
+        color?: string;
+    }[];
     table: string;
     schema: Schema;
     dataSource: DataSource;
-    onChange: any;
+    onChange: (colorConditions?: {
+        condition?: Expr;
+        color?: string;
+    }[]) => void;
 }
+/** Displays background color conditions */
 declare class BackgroundColorConditionsComponent extends React.Component<BackgroundColorConditionsComponentProps> {
-    handleAdd: () => any;
-    handleChange: (index: any, colorCondition: any) => any;
-    handleRemove: (index: any) => any;
+    handleAdd: () => void;
     render(): React.CElement<{
         label: React.ReactNode;
         labelMuted?: boolean | undefined;

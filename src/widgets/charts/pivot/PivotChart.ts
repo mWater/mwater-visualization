@@ -115,7 +115,12 @@ export default class PivotChart extends Chart {
             }
           }
 
-          // if (intersection.)
+          for (const colorCondition of intersection.backgroundColorConditions || []) {
+            colorCondition.condition = exprCleaner.cleanExpr(colorCondition.condition ? original(colorCondition.condition)! : null, {
+              table: design.table,
+              types: ["boolean"]
+            })
+          }
 
           if (intersection.filter) {
             intersection.filter = exprCleaner.cleanExpr(intersection.filter ? original(intersection.filter)! : null, {
