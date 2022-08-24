@@ -438,7 +438,10 @@ export function NewMapViewComponent(props: {
   }, [props.onDesignChange, props.zoomLocked, props.design, map])
 
   function performAutoZoom() {
+    setBusy((b) => b + 1)
     props.mapDataSource.getBounds(props.design, getCompiledFilters(), (error, bounds) => {
+      setBusy((b) => b - 1)
+
       if (bounds) {
         map!.fitBounds([bounds.w, bounds.s, bounds.e, bounds.n], { padding: 20 })
 
@@ -460,7 +463,7 @@ export function NewMapViewComponent(props: {
     if (props.design.autoBounds) {
       performAutoZoom()
     }
-  }, [map,props.extraFilters, props.design.autoBounds])
+  }, [map, props.extraFilters, props.design.autoBounds])
 
   // Set initial bounds
   useEffect(() => {
