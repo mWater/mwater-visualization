@@ -5,7 +5,7 @@ import Color from "color"
 import * as PivotChartUtils from "./PivotChartUtils"
 import canonical from "canonical-json"
 import { PivotChartDesign, PivotChartSegment } from "./PivotChartDesign"
-import { PivotChartLayout } from "./PivotChartLayout"
+import { PivotChartLayout, PivotChartLayoutCell } from "./PivotChartLayout"
 
 const maxRows = 500
 const maxColumns = 50
@@ -70,7 +70,7 @@ export default class PivotChartLayoutBuilder {
 
     // Create indexed data (index each intersection's array by canonical json of rX and cX)
     const dataIndexed = _.mapValues(data, (list) =>
-      _.zipObject(_.map(list, (row) => [canonical(_.pick(row, (v, k) => k.match(/^[rc]\d$/))), row]))
+      _.zipObject(_.map(list, (row) => [canonical(_.pick(row, (v, k) => k!.match(/^[rc]\d$/))), row]))
     )
 
     // Emit column headers, leaving blank space at left for row headers
@@ -449,7 +449,7 @@ export default class PivotChartLayoutBuilder {
       text = intersection.valueAxis?.nullLabel || null
     }
 
-    const cell = {
+    const cell: PivotChartLayoutCell = {
       type: "intersection",
       subtype: "value",
       section: intersectionId,
@@ -474,12 +474,12 @@ export default class PivotChartLayoutBuilder {
       backgroundColor = this.axisBuilder.getValueColor(intersection.backgroundColorAxis, entry?.bc)
     }
 
-    if (!backgroundColor && intersection.backgroundColor && !intersection.colorAxis) {
+    if (!backgroundColor && intersection.backgroundColor && !intersection.backgroundColorAxis) {
       ;({ backgroundColor } = intersection)
     }
 
     if (backgroundColor) {
-      backgroundColor = Color(backgroundColor).alpha(intersection.backgroundColorOpacity).string()
+      backgroundColor = Color(backgroundColor).alpha(intersection.backgroundColorOpacity || 1).string()
       cell.backgroundColor = backgroundColor
     }
 

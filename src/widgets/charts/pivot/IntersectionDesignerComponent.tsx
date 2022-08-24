@@ -10,26 +10,30 @@ import AxisComponent from "../../../axes/AxisComponent"
 import ColorComponent from "../../../ColorComponent"
 import { FilterExprComponent } from "mwater-expressions-ui"
 import { ExprComponent } from "mwater-expressions-ui"
-import { DataSource, Schema } from "mwater-expressions"
+import { DataSource, Expr, Schema } from "mwater-expressions"
+import { PivotChartIntersection } from "./PivotChartDesign"
+import { JsonQLFilter } from "../../../JsonQLFilter"
+import { ListEditorComponent } from "react-library/lib/ListEditorComponent"
 
 export interface IntersectionDesignerComponentProps {
-  intersection: any
+  intersection: PivotChartIntersection
   table: string
   schema: Schema
   dataSource: DataSource
-  onChange: any
-  filters?: any
+  onChange: (intersection: PivotChartIntersection) => void
+  filters?: JsonQLFilter[]
 }
 
 // Design an intersection of a pivot table
 export default class IntersectionDesignerComponent extends React.Component<IntersectionDesignerComponentProps> {
-  constructor(...args: any[]) {
-    super(...args)
+  constructor(props: IntersectionDesignerComponentProps) {
+    super(props)
+
     this.update = this.update.bind(this)
   }
 
   // Updates intersection with the specified changes
-  update() {
+  update(...args: any[]) {
     return update(this.props.intersection, this.props.onChange, arguments)
   }
 
@@ -87,7 +91,7 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
           label: "Show Empty Cells as"
         },
         R(ui.TextInput, {
-          value: this.props.intersection.valueAxis.nullLabel,
+          value: this.props.intersection.valueAxis.nullLabel ?? null,
           emptyNull: true,
           onChange: this.update("valueAxis.nullLabel"),
           placeholder: "Blank"
@@ -198,14 +202,14 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
       ui.FormGroup,
       {
         labelMuted: true,
-        label: `Background Opacity: ${Math.round(this.props.intersection.backgroundColorOpacity * 100)}%`
+        label: `Background Opacity: ${Math.round((this.props.intersection.backgroundColorOpacity ?? 1) * 100)}%`
       },
       R(Rcslider, {
         min: 0,
         max: 100,
         step: 1,
         tipTransitionName: "rc-slider-tooltip-zoom-down",
-        value: this.props.intersection.backgroundColorOpacity * 100,
+        value: (this.props.intersection.backgroundColorOpacity ?? 1) * 100,
         onChange: this.handleBackgroundColorOpacityChange
       })
     )
@@ -228,31 +232,19 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
 }
 
 interface BackgroundColorConditionsComponentProps {
-  colorConditions?: any
+  colorConditions?: { condition?: Expr, color?: string }[]
   table: string
   schema: Schema
   dataSource: DataSource
-  onChange: any
+  onChange: (colorConditions?: { condition?: Expr, color?: string }[]) => void
 }
 
-// Displays background color conditions
+/** Displays background color conditions */
 class BackgroundColorConditionsComponent extends React.Component<BackgroundColorConditionsComponentProps> {
   handleAdd = () => {
     const colorConditions = (this.props.colorConditions || []).slice()
     colorConditions.push({})
-    return this.props.onChange(colorConditions)
-  }
-
-  handleChange = (index: any, colorCondition: any) => {
-    const colorConditions = this.props.colorConditions.slice()
-    colorConditions[index] = colorCondition
-    return this.props.onChange(colorConditions)
-  }
-
-  handleRemove = (index: any) => {
-    const colorConditions = this.props.colorConditions.slice()
-    colorConditions.splice(index, 1)
-    return this.props.onChange(colorConditions)
+    this.props.onChange(colorConditions)
   }
 
   render() {
@@ -264,17 +256,20 @@ class BackgroundColorConditionsComponent extends React.Component<BackgroundColor
         labelMuted: true,
         help: "Add conditions that, if met, set the color of the cell. Useful for flagging certain values"
       },
-      _.map(this.props.colorConditions, (colorCondition, i) => {
-        return R(BackgroundColorConditionComponent, {
-          key: i,
-          colorCondition,
-          table: this.props.table,
-          schema: this.props.schema,
-          dataSource: this.props.dataSource,
-          onChange: this.handleChange.bind(null, i),
-          onRemove: this.handleRemove.bind(null, i)
-        })
-      }),
+      <ListEditorComponent<{ condition?: Expr, color?: string }>
+        items={this.props.colorConditions || []}
+        renderItem={(item, index, onItemChange) => {
+          return R(BackgroundColorConditionComponent, {
+            key: index,
+            colorCondition: item,
+            table: this.props.table,
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            onChange: onItemChange
+          })
+        }}
+        onItemsChange={this.props.onChange}
+      />,
       R(
         ui.Button,
         { type: "link", size: "sm", onClick: this.handleAdd },
@@ -284,6 +279,7 @@ class BackgroundColorConditionsComponent extends React.Component<BackgroundColor
     )
   }
 }
+
 interface BackgroundColorConditionComponentProps {
   colorCondition: any
   table: string
@@ -294,52 +290,47 @@ interface BackgroundColorConditionComponentProps {
 
 // Displays single background color condition
 class BackgroundColorConditionComponent extends React.Component<BackgroundColorConditionComponentProps> {
-  constructor(...args: any[]) {
-    super(...args)
+  constructor(props: BackgroundColorConditionComponentProps) {
+    super(props)
     this.update = this.update.bind(this)
   }
 
   // Updates intersection with the specified changes
-  update() {
+  update(...args: any[]) {
     return update(this.props.colorCondition, this.props.onChange, arguments)
   }
 
   render() {
     return R(
-      "div",
-      { className: "card mb-3" },
+      "div", {},
       R(
-        "div",
-        { className: "card-body" },
-        R(
-          ui.FormGroup,
-          {
-            labelMuted: true,
-            label: "Condition"
-          },
-          R(ExprComponent, {
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            onChange: this.update("condition"),
-            types: ["boolean"],
-            aggrStatuses: ["aggregate", "literal"],
-            table: this.props.table,
-            value: this.props.colorCondition.condition
-          })
-        ),
+        ui.FormGroup,
+        {
+          labelMuted: true,
+          label: "Condition"
+        },
+        R(ExprComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          onChange: this.update("condition"),
+          types: ["boolean"],
+          aggrStatuses: ["aggregate", "literal"],
+          table: this.props.table,
+          value: this.props.colorCondition.condition
+        })
+      ),
 
-        R(
-          ui.FormGroup,
-          {
-            labelMuted: true,
-            label: "Color",
-            hint: "Color to display when condition is met"
-          },
-          R(ColorComponent, {
-            color: this.props.colorCondition.color,
-            onChange: this.update("color")
-          })
-        )
+      R(
+        ui.FormGroup,
+        {
+          labelMuted: true,
+          label: "Color",
+          hint: "Color to display when condition is met"
+        },
+        R(ColorComponent, {
+          color: this.props.colorCondition.color,
+          onChange: this.update("color")
+        })
       )
     )
   }

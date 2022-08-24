@@ -44,31 +44,31 @@ export interface PivotChartLayoutCell {
   section: string
   
   /** true if cell is on top edge of section */
-  sectionTop: boolean
+  sectionTop?: boolean
 
   /** true if cell is on bottom edge of section */
-  sectionBottom: boolean
+  sectionBottom?: boolean
 
   /** true if cell is on left edge of section */
-  sectionLeft: boolean
+  sectionLeft?: boolean
 
   /** true if cell is on right edge of section */
-  sectionRight: boolean
+  sectionRight?: boolean
 
   /** segment if a row or column cell */
   segment?: PivotChartSegment
   
   /** weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy) */
-  borderLeft: number
+  borderLeft?: number
 
   /** weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy) */
-  borderRight: number
+  borderRight?: number
 
   /** weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy) */
-  borderTop: number
+  borderTop?: number
 
   /** weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy) */
-  borderBottom: number
+  borderBottom?: number
   
   /** true if bold */
   bold?: boolean

@@ -105,7 +105,7 @@ export interface PivotChartIntersection {
   /** array of conditional colors that override axis and background color 
    * Each contains: { condition: aggregate boolean expression, color: color value }
    */
-  backgroundColorConditions?: { condition: Expr, color: string }[]
+  backgroundColorConditions?: { condition?: Expr, color?: string }[]
 
   /** true if bold */
   bold?: boolean

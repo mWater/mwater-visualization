@@ -96,7 +96,7 @@ export default class PivotChartQueryBuilder {
         // Add value
         query.selects.push({
           type: "select",
-          expr: this.axisBuilder.compileAxis({ axis: intersection?.valueAxis, tableAlias: "main" }),
+          expr: this.axisBuilder.compileAxis({ axis: intersection?.valueAxis!, tableAlias: "main" }),
           alias: "value"
         })
         if (intersection?.filter) {
@@ -119,7 +119,7 @@ export default class PivotChartQueryBuilder {
           try {
             query.selects.push({
               type: "select",
-              expr: exprCompiler.compileExpr({ expr: backgroundColorCondition.condition, tableAlias: "main" }),
+              expr: exprCompiler.compileExpr({ expr: backgroundColorCondition.condition ?? null, tableAlias: "main" }),
               alias: `bcc${i}`
             })
           } catch (error) {
