@@ -1,9 +1,65 @@
 import { Schema } from "mwater-expressions";
 import { ExprUtils } from "mwater-expressions";
 import AxisBuilder from "../../../axes/AxisBuilder";
-import { JsonQLFilter } from "../../..";
+import { JsonQLFilter, WidgetScope } from "../../..";
 import { LayeredChartDesign } from "./LayeredChartDesign";
-import { JsonQLQuery } from "jsonql";
+import { JsonQLExpr, JsonQLQuery } from "jsonql";
+import { ChartOptions, PrimitiveArray, ChartTypes } from "billboard.js";
+/** Data for a chart */
+declare type C3ChartData = {
+    [key: string]: any[];
+};
+/** Intermediate data structure that contains most of chart formatting */
+interface C3Data {
+    types?: {
+        [key: string]: ChartTypes;
+    };
+    columns: PrimitiveArray[];
+    xAxisType?: "category" | "indexed" | "log" | "timeseries";
+    xAxisTickFit?: boolean;
+    xs?: {
+        [key: string]: string;
+    };
+    /** map of "layername:index" to { layerIndex, row } */
+    dataMap: {
+        [key: string]: {
+            layerIndex: number;
+            row: any[];
+        };
+    };
+    format: {
+        [layerId: string]: (value: any) => string;
+    };
+    xAxisLabelText?: string;
+    yAxisLabelText?: string;
+    titleText?: string;
+    legendHide?: boolean;
+    /**
+       * Set custom data name.
+       */
+    names?: {
+        [key: string]: string;
+    };
+    /**
+     * Set groups for the data for stacking.
+     */
+    groups?: string[][];
+    /**
+     * Set label text colors.
+     */
+    colors?: {
+        [key: string]: string;
+    };
+    order?: "asc" | "desc";
+    color?: any;
+    /**
+     * Set custom data class.
+     * If this option is specified, the element g for the data has an additional class that has the prefix billboard-target- (e.g. billboard-target-additional-data1-class).
+     */
+    classes?: {
+        [key: string]: string;
+    };
+}
 export default class LayeredChartCompiler {
     schema: Schema;
     exprUtils: ExprUtils;
@@ -18,141 +74,27 @@ export default class LayeredChartCompiler {
     createQueries(design: LayeredChartDesign, extraFilters?: JsonQLFilter[] | null): {
         [key: string]: JsonQLQuery;
     };
-    createDataMap(design: any, data: any): {};
-    createChartOptions(options: any): {
-        data: {
-            types: {};
-            columns: any;
-            names: {};
-            groups: any;
-            xs: any;
-            colors: {};
-            labels: any;
-            order: string | null;
-            color: any;
-            classes: any;
-        };
-        legend: {
-            hide: any;
-        };
-        grid: {
-            focus: {
-                show: boolean;
-            };
-        };
-        axis: {
-            x: {
-                type: string;
-                label: {
-                    text: any;
-                    position: string;
-                };
-                tick: {
-                    fit: any;
-                };
-            };
-            y: {
-                label: {
-                    text: any;
-                    position: string;
-                };
-                max: any;
-                min: any;
-                padding: {
-                    top: number | undefined;
-                    bottom: number | undefined;
-                };
-                tick: {
-                    format: any;
-                };
-            };
-            rotated: any;
-        };
-        size: {
-            width: any;
-            height: any;
-        };
-        pie: {
-            label: {
-                show: boolean;
-                format: ((value: any, ratio: any, id: any) => string) | undefined;
-            };
-            expand: boolean;
-        };
-        donut: {
-            label: {
-                show: boolean;
-                format: ((value: any, ratio: any, id: any) => string) | undefined;
-            };
-            expand: boolean;
-        };
-        transition: {
-            duration: number;
+    createDataMap(design: LayeredChartDesign, data: C3ChartData): {
+        [key: string]: {
+            layerIndex: number;
+            row: any[];
         };
     };
-    isCategoricalX(design: any): boolean;
-    compileData(design: LayeredChartDesign, data: any, locale?: string): {
-        columns: any;
-        types: {};
-        names: {};
-        dataMap: {};
-        colors: {};
-        xAxisType: string;
-        titleText: any;
-        order: string | null;
-        format: {};
-    };
-    compileDataPolar(design: any, data: any, locale: any): {
-        columns: any;
-        types: {};
-        names: {};
-        dataMap: {};
-        colors: {};
-        xAxisType: string;
-        titleText: any;
-        order: string | null;
-        format: {};
-    };
-    compileDataNonCategorical(design: any, data: any, locale: any): {
-        columns: any;
-        types: {};
-        names: {};
-        groups: any;
-        dataMap: {};
-        colors: {};
-        xs: {};
-        legendHide: any;
-        classes: {};
-        xAxisType: string;
-        xAxisTickFit: boolean;
-        xAxisLabelText: any;
-        yAxisLabelText: any;
-        titleText: any;
-        order: null;
-        format: {};
-    };
+    createChartOptions(options: {
+        design: LayeredChartDesign;
+        data: any;
+        width: number;
+        height: number;
+        locale?: string;
+    }): ChartOptions;
+    isCategoricalX(design: LayeredChartDesign): boolean;
+    compileData(design: LayeredChartDesign, data: C3ChartData, locale?: string): C3Data;
+    compileDataPolar(design: LayeredChartDesign, data: C3ChartData, locale: any): C3Data;
+    compileDataNonCategorical(design: LayeredChartDesign, data: C3ChartData, locale?: string): C3Data;
     fixStringYValues(rows?: any): any;
     flattenRowData(rows: any): any[];
-    compileDataCategorical(design: any, data: any, locale: any): {
-        columns: string[][];
-        types: {};
-        names: {};
-        dataMap: {};
-        colors: {};
-        xs: {};
-        groups: any;
-        legendHide: any;
-        classes: {};
-        xAxisType: string;
-        xAxisTickFit: boolean;
-        xAxisLabelText: any;
-        yAxisLabelText: any;
-        titleText: any;
-        order: null;
-        format: {};
-        color: (color: any, d: any) => any;
-    };
-    compileExpr(expr: any): import("jsonql").JsonQLExpr;
+    compileDataCategorical(design: LayeredChartDesign, data: C3ChartData, locale?: string): C3Data;
+    compileExpr(expr: any): JsonQLExpr;
     getLayerType(design: any, layerIndex: any): any;
     getLayerTypeString(design: any, layerIndex: any): any;
     doesLayerNeedGrouping(design: any, layerIndex: any): boolean;
@@ -165,44 +107,7 @@ export default class LayeredChartCompiler {
     compileTitleText(design: any, locale?: string): any;
     compileYAxisLabelText(design: any, locale?: string): any;
     compileXAxisLabelText(design: any, locale: any): any;
-    createScope(design: any, layerIndex: any, row: any, locale: any): {
-        name: string;
-        filter: {
-            table: any;
-            jsonql: {
-                type: string;
-                op: string;
-                exprs: (string | number | boolean | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken | {
-                    type: string;
-                    op: string;
-                    exprs: {
-                        type: string;
-                        op: string;
-                        exprs: import("jsonql").JsonQLExpr[];
-                    }[];
-                } | null)[];
-            };
-        } | {
-            table: any;
-            jsonql: string | number | boolean | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken | {
-                type: string;
-                op: string;
-                exprs: {
-                    type: string;
-                    op: string;
-                    exprs: import("jsonql").JsonQLExpr[];
-                }[];
-            } | null;
-        };
-        filterExpr: import("mwater-expressions").LiteralExpr | import("mwater-expressions").FieldExpr | import("mwater-expressions").OpExpr | import("mwater-expressions").IdExpr | import("mwater-expressions").ScalarExpr | import("mwater-expressions").CaseExpr | import("mwater-expressions").ScoreExpr | import("mwater-expressions").BuildEnumsetExpr | import("mwater-expressions").VariableExpr | import("mwater-expressions").ExtensionExpr | import("mwater-expressions").LegacyComparisonExpr | import("mwater-expressions").LegacyCountExpr | {
-            table: any;
-            type: string;
-            op: string;
-            exprs: any[];
-        } | null;
-        data: {
-            layerIndex: any;
-        };
-    };
+    createScope(design: LayeredChartDesign, layerIndex: number, row: any, locale?: string): WidgetScope;
     makeRowsCumulative(rows: any): any[];
 }
+export {};

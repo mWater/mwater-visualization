@@ -10,7 +10,7 @@ import ColorComponent from "../../../ColorComponent"
 import * as ui from "react-library/lib/bootstrap"
 import { Checkbox } from "react-library/lib/bootstrap"
 import { DataSource, Schema } from "mwater-expressions"
-import { LayeredChartDesign } from "./LayeredChartDesign"
+import { LayeredChartDesign, YThreshold } from "./LayeredChartDesign"
 import { JsonQLFilter } from "../../.."
 
 export interface LayeredChartDesignerComponentProps {
@@ -369,6 +369,7 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
         )
       )
     }
+    return null
   }
 
   render() {
@@ -404,15 +405,11 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
 }
 
 // Thresholds are lines that are added at certain values
-class ThresholdsComponent extends React.Component {
-  static propTypes = {
-    thresholds: PropTypes.arrayOf(
-      PropTypes.shape({ value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string })
-    ),
-    onThresholdsChange: PropTypes.func.isRequired,
-    showHighlightColor: PropTypes.bool.isRequired
-  }
-
+class ThresholdsComponent extends React.Component<{
+  thresholds?: YThreshold[]
+  onThresholdsChange: (thresholds?: YThreshold[]) => void
+  showHighlightColor: boolean
+}> {
   handleAdd = () => {
     const thresholds = (this.props.thresholds || []).slice()
     thresholds.push({ value: null, label: "", highlightColor: null })
@@ -435,7 +432,7 @@ class ThresholdsComponent extends React.Component {
     return R(
       "div",
       null,
-      _.map(this.props.thresholds, (threshold, index) => {
+      _.map(this.props.thresholds || [], (threshold, index) => {
         return R(ThresholdComponent, {
           threshold,
           onThresholdChange: this.handleChange.bind(null, index),
@@ -454,15 +451,12 @@ class ThresholdsComponent extends React.Component {
   }
 }
 
-class ThresholdComponent extends React.Component {
-  static propTypes = {
-    threshold: PropTypes.shape({ value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string })
-      .isRequired,
-    onThresholdChange: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired,
-    showHighlightColor: PropTypes.bool.isRequired
-  }
-
+class ThresholdComponent extends React.Component<{
+  threshold: YThreshold
+  onThresholdChange: (threshold: YThreshold) => void
+  showHighlightColor: boolean
+  onRemove: () => void
+}> {
   render() {
     return R(
       "div",
@@ -486,7 +480,7 @@ class ThresholdComponent extends React.Component {
           style: { display: "inline-block", width: "8em" },
           size: "sm",
           value: this.props.threshold.label,
-          onChange: (v) => this.props.onThresholdChange(_.extend({}, this.props.threshold, { label: v }))
+          onChange: (v: string) => this.props.onThresholdChange(_.extend({}, this.props.threshold, { label: v }))
         })
       ),
       "  ",

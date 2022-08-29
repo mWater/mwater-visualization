@@ -26,12 +26,8 @@ export interface LayeredChartDesign {
     header?: TextWidgetDesign;
     /** text widget design to display in header */
     footer?: TextWidgetDesign;
-    /** array of { value:, label:, color: } thresholds to draw on y-axis. Only for non-polar. Color takes effect if y > threshold */
-    yThresholds?: {
-        value: number;
-        label: string;
-        color: string;
-    }[];
+    /** array of { value:, label:, highlightColor: } thresholds to draw on y-axis. Only for non-polar. Color takes effect if y > threshold */
+    yThresholds?: YThreshold[];
     /** order of pie/donut charts. Default is "desc" (if undefined). Can be "desc", "asc", "natural" */
     polarOrder?: "desc" | "asc" | "natural";
     /** True to hide percentage for pie/donut */
@@ -69,4 +65,12 @@ export interface LayeredChartDesignLayer {
     xColorMap?: boolean;
     /** Optional type of trendline */
     trendline?: "linear";
+    /** True to only display x-axis values that are actually present (for enums) */
+    xAxisOnlyValuesPresent?: boolean;
+}
+/** Threshold to display on y-axis */
+export interface YThreshold {
+    value: number | null;
+    label: string | null;
+    highlightColor: string | null;
 }

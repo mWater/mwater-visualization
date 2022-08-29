@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import { LayeredChartDesign } from "./LayeredChartDesign";
+import { WidgetScope } from "../../../WidgetScope";
 export interface LayeredChartViewComponentProps {
     schema: Schema;
     dataSource: DataSource;
@@ -11,9 +12,9 @@ export interface LayeredChartViewComponentProps {
     width: number;
     height: number;
     /** scope of the widget (when the widget self-selects a particular scope) */
-    scope?: any;
+    scope?: WidgetScope;
     /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-    onScopeChange?: any;
+    onScopeChange?: (scope?: WidgetScope) => void;
 }
 interface LayeredChartViewComponentState {
     headerHeight: any;

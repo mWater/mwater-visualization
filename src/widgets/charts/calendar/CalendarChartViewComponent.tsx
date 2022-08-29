@@ -112,18 +112,18 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
 
     const scopeData: WidgetScope = {
       name:
-        this.axisBuilder.summarizeAxis(this.props.design.dateAxis, this.context.locale) +
+        this.axisBuilder.summarizeAxis(this.props.design.dateAxis!, this.context.locale) +
         " is " +
         this.axisBuilder.formatValue(this.props.design.dateAxis!, data, this.context.locale),
       filter: {
-        jsonql: this.axisBuilder.createValueFilter(this.props.design.dateAxis, data),
+        jsonql: this.axisBuilder.createValueFilter(this.props.design.dateAxis!, data),
         table: this.props.design.table
       },
-      filterExpr: this.axisBuilder.createValueFilterExpr(this.props.design.dateAxis, data),
+      filterExpr: this.axisBuilder.createValueFilterExpr(this.props.design.dateAxis!, data),
       data
     }
 
-    return this.props.onScopeChange?.(scopeData)
+    this.props.onScopeChange?.(scopeData)
   }
 
   // Redraw component

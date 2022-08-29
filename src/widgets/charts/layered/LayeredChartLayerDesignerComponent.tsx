@@ -98,7 +98,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
 
   handleXAxisChange = (axis: any) => {
     const layer = this.props.design.layers[this.props.index]
-    const axesChanges = { x: axis }
+    const axesChanges: any = { x: axis }
 
     // Default y to count if x or color present and not scatter
     if (axis && this.doesLayerNeedGrouping(layer) && !layer.axes?.y) {
@@ -115,7 +115,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
 
   handleColorAxisChange = (axis: any) => {
     const layer = this.props.design.layers[this.props.index]
-    const axesChanges = { color: axis }
+    const axesChanges: any = { color: axis }
 
     // Default y to count if x or color present and not scatter
     if (axis && this.doesLayerNeedGrouping(layer) && !layer.axes?.y) {
@@ -167,6 +167,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
         R("span", { className: "fas fa-times" })
       )
     }
+    return null
   }
 
   renderTable() {
@@ -438,6 +439,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
             return this.renderColor()
           }
         }
+        return null
       })(),
       layer.axes.y ? this.renderFilter() : undefined,
       layer.axes.y ? this.renderName() : undefined

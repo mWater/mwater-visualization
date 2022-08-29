@@ -10,6 +10,7 @@ import TextComponent from "../../text/TextComponent"
 import * as d3 from "d3"
 import { LayeredChartDesign } from "./LayeredChartDesign"
 import c3 from 'billboard.js'
+import { WidgetScope } from "../../../WidgetScope"
 
 export interface LayeredChartViewComponentProps {
   schema: Schema
@@ -20,9 +21,9 @@ export interface LayeredChartViewComponentProps {
   width: number
   height: number
   /** scope of the widget (when the widget self-selects a particular scope) */
-  scope?: any
+  scope?: WidgetScope
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange?: any
+  onScopeChange?: (scope?: WidgetScope) => void
 }
 
 interface LayeredChartViewComponentState {
@@ -398,7 +399,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
         let scope
         const dataPoint = this.lookupDataPoint(dataMap, d)
         if (dataPoint) {
-          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale)
+          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale || "en")
         }
 
         // Determine if scoped
@@ -451,7 +452,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
 
     // Create scope
     const compiler = new LayeredChartCompiler({ schema: this.props.schema })
-    const scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale)
+    const scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale || "en")
 
     // If same scope data, remove scope
     if (this.props.scope && _.isEqual(scope.data, this.props.scope.data)) {

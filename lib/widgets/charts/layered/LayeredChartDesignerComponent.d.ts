@@ -46,6 +46,6 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
         className: string;
     }, HTMLElement> | undefined;
     renderThresholds(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | null;
-    renderYRange(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | undefined;
+    renderYRange(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | null;
     render(): React.CElement<any, TabbedComponent>;
 }

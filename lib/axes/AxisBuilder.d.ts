@@ -57,10 +57,10 @@ export default class AxisBuilder {
     isAxisAggr(axis: any): any;
     doesAxisSupportCumulative(axis: any): boolean;
     formatCategory(axis: any, category: any): any;
-    summarizeAxis(axis: any, locale: any): string;
-    formatValue(axis: Axis, value: any, locale: string, legacyPercentFormat?: any): any;
-    createValueFilter(axis: any, value: any): JsonQLExpr;
-    createValueFilterExpr(axis: any, value: any): Expr;
+    summarizeAxis(axis: Axis, locale?: string): string;
+    formatValue(axis: Axis, value: any, locale?: string, legacyPercentFormat?: any): any;
+    createValueFilter(axis: Axis, value: any): JsonQLExpr;
+    createValueFilterExpr(axis: Axis, value: any): Expr;
     isCategorical(axis: any): boolean;
     convertAxisToExpr(axis: any): any;
 }

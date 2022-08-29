@@ -44,7 +44,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
         className: string;
         type: string;
         onClick: any;
-    }, HTMLElement> | undefined;
+    }, HTMLElement> | null;
     renderTable(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent>;
     handlexAxisOnlyValuesPresentChange: (xAxisOnlyValuesPresent: boolean) => void;
     renderXAxis(): (React.CElement<ui.CheckboxProps, ui.Checkbox> | React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | undefined)[] | undefined;

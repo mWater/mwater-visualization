@@ -1,6 +1,6 @@
 import _ from "lodash"
 import uuid from "uuid"
-import { AggrStatus, Expr, ExprCompiler, FieldExpr, LiteralType, Schema } from "mwater-expressions"
+import { AggrStatus, Expr, ExprCompiler, FieldExpr, LiteralType, OpExpr, Schema } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
@@ -993,7 +993,7 @@ export default class AxisBuilder {
   }
 
   // Summarize axis as a string
-  summarizeAxis(axis: any, locale: any) {
+  summarizeAxis(axis: Axis, locale?: string) {
     if (!axis) {
       return "None"
     }
@@ -1003,7 +1003,7 @@ export default class AxisBuilder {
   // TODO add xform support
 
   // Get a string (or React DOM actually) representation of an axis value
-  formatValue(axis: Axis, value: any, locale: string, legacyPercentFormat?: any) {
+  formatValue(axis: Axis, value: any, locale?: string, legacyPercentFormat?: any) {
     if (value == null) {
       return axis?.nullLabel || "None"
     }
@@ -1065,7 +1065,7 @@ export default class AxisBuilder {
 
   // Creates a filter (jsonql with {alias} for table name) based on a specific value
   // of the axis. Used to filter by a specific point/bar.
-  createValueFilter(axis: any, value: any): JsonQLExpr {
+  createValueFilter(axis: Axis, value: any): JsonQLExpr {
     if (value != null) {
       return {
         type: "op",
@@ -1083,20 +1083,20 @@ export default class AxisBuilder {
 
   // Creates a filter expression (mwater-expression) based on a specific value
   // of the axis. Used to filter by a specific point/bar.
-  createValueFilterExpr(axis: any, value: any): Expr {
+  createValueFilterExpr(axis: Axis, value: any): Expr {
     const axisExpr = this.convertAxisToExpr(axis)
     const axisExprType = this.exprUtils.getExprType(axisExpr)
 
     if (value != null) {
       return {
-        table: axis.expr.table,
+        table: (axis.expr as OpExpr).table,
         type: "op",
         op: "=",
         exprs: [axisExpr, { type: "literal", valueType: axisExprType, value }]
       }
     } else {
       return {
-        table: axis.expr.table,
+        table: (axis.expr as OpExpr).table,
         type: "op",
         op: "is null",
         exprs: [axisExpr]
