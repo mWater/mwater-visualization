@@ -68,7 +68,7 @@ export default class LayeredChart extends Chart {
             axis: axis ? original(axis) : null,
             table: layer.table,
             aggrNeed,
-            types: LayeredChartUtils.getAxisTypes(draft, layer, axisKey)
+            types: LayeredChartUtils.getAxisTypes(draft, layer, axisKey) ?? undefined
           })
         }
 

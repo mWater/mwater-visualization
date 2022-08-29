@@ -71,7 +71,7 @@ export default class PivotChartQueryBuilder {
           const rowSegment = rowPath[i]
           query.selects.push({
             type: "select",
-            expr: this.axisBuilder.compileAxis({ axis: rowSegment.valueAxis, tableAlias: "main" }),
+            expr: this.axisBuilder.compileAxis({ axis: rowSegment.valueAxis!, tableAlias: "main" }),
             alias: `r${i}`
           })
           query.groupBy!.push(i + 1)
@@ -84,7 +84,7 @@ export default class PivotChartQueryBuilder {
           const columnSegment = columnPath[i]
           query.selects.push({
             type: "select",
-            expr: this.axisBuilder.compileAxis({ axis: columnSegment.valueAxis, tableAlias: "main" }),
+            expr: this.axisBuilder.compileAxis({ axis: columnSegment.valueAxis!, tableAlias: "main" }),
             alias: `c${i}`
           })
           query.groupBy!.push(i + 1 + rowPath.length)
@@ -227,7 +227,7 @@ export default class PivotChartQueryBuilder {
           selects: [
             {
               type: "select",
-              expr: this.axisBuilder.compileAxis({ axis: segment.valueAxis, tableAlias: "main" }),
+              expr: this.axisBuilder.compileAxis({ axis: segment.valueAxis!, tableAlias: "main" }),
               alias: "value"
             }
           ],

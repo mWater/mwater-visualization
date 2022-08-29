@@ -1,10 +1,10 @@
-import { PivotChartSegment } from "./PivotChartDesign";
-export declare function getSegmentPaths(segments: any): any;
-export declare function getAllSegments(segments: any): any[];
+import { PivotChartDesign, PivotChartSegment } from "./PivotChartDesign";
+export declare function getSegmentPaths(segments: PivotChartSegment[]): PivotChartSegment[][];
+export declare function getAllSegments(segments: PivotChartSegment[]): PivotChartSegment[];
 export declare function getIntersectionId(rowPath: any, columnPath: any): string;
-export declare function findSegment(segments: any, id: any): unknown;
+export declare function findSegment(segments: PivotChartSegment[], id: any): PivotChartSegment | null | undefined;
 export declare function canSummarizeSegment(segments: any, id: any): boolean;
-export declare function summarizeSegment(design: any, id: any, label: any): any;
+export declare function summarizeSegment(design: PivotChartDesign, id: any, label: any): PivotChartDesign;
 export declare function replaceSegment(segments: any, replacement: any): PivotChartSegment[];
 export declare function removeSegment(segments: any, id: any): PivotChartSegment[];
 export declare function insertBeforeSegment(segments: any, id: any): PivotChartSegment[];

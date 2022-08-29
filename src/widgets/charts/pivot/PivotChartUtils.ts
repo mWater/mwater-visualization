@@ -1,21 +1,19 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import _ from "lodash"
 import uuid from "uuid"
-import { PivotChartSegment } from "./PivotChartDesign"
+import { PivotChartDesign, PivotChartSegment } from "./PivotChartDesign"
 
 // Misc utils for working with pivot charts
 
 // Get all paths through a set of segments (e.g. if a contains b, c, then [[a,b], [a,c]])
-export function getSegmentPaths(segments: any) {
-  let paths: any = []
+export function getSegmentPaths(segments: PivotChartSegment[]): PivotChartSegment[][] {
+  let paths: PivotChartSegment[][] = []
 
   // Use recursive
   for (var segment of segments) {
     if (!segment.children || segment.children.length === 0) {
       paths.push([segment])
     } else {
-      paths = paths.concat(_.map(exports.getSegmentPaths(segment.children), (childPath) => [segment].concat(childPath)))
+      paths = paths.concat(_.map(getSegmentPaths(segment.children), (childPath) => [segment].concat(childPath)))
     }
   }
 
@@ -23,14 +21,14 @@ export function getSegmentPaths(segments: any) {
 }
 
 // Get all paths through a set of segments (e.g. if a contains b, c, then [[a,b], [a,c]])
-export function getAllSegments(segments: any) {
-  let allSegments = []
+export function getAllSegments(segments: PivotChartSegment[]): PivotChartSegment[] {
+  let allSegments: PivotChartSegment[] = []
 
   // Use recursive
   for (let segment of segments) {
     allSegments.push(segment)
     if (segment.children && segment.children.length > 0) {
-      allSegments = allSegments.concat(exports.getAllSegments(segment.children))
+      allSegments = allSegments.concat(getAllSegments(segment.children))
     }
   }
 
@@ -42,8 +40,8 @@ export function getIntersectionId(rowPath: any, columnPath: any) {
   return `${_.pluck(rowPath, "id").join(",")}:${_.pluck(columnPath, "id").join(",")}`
 }
 
-export function findSegment(segments: any, id: any) {
-  return _.findWhere(exports.getAllSegments(segments), { id })
+export function findSegment(segments: PivotChartSegment[], id: any): PivotChartSegment | null | undefined {
+  return _.findWhere(getAllSegments(segments), { id })
 }
 
 // Determine if can summarize segment (if segment before has a value axis and has no children)
@@ -57,13 +55,13 @@ export function canSummarizeSegment(segments: any, id: any) {
 }
 
 // Finds the segment before one with id
-function findPreviousSegment(segments: any, id: any) {
+function findPreviousSegment(segments: PivotChartSegment[], id: any): PivotChartSegment | null {
   // Find in list (shallow)
   const index = _.findIndex(segments, { id })
 
-  // False if first
+  // Null if first
   if (index === 0) {
-    return false
+    return null
   }
 
   // If found, check previous
@@ -81,18 +79,18 @@ function findPreviousSegment(segments: any, id: any) {
     }
   }
 
-  return false
+  return null
 }
 
 // Summarize a segment, returning a new copy of the design with
 // all intersections created.
-export function summarizeSegment(design: any, id: any, label: any) {
+export function summarizeSegment(design: PivotChartDesign, id: any, label: any) {
   let columnPath, prevIntersection, prevSegment, rowPath, summaryIntersection
   design = _.cloneDeep(design)
 
   // Label segment
-  const rowSegment = exports.findSegment(design.rows, id)
-  const columnSegment = exports.findSegment(design.columns, id)
+  const rowSegment = findSegment(design.rows, id)
+  const columnSegment = findSegment(design.columns, id)
 
   if (rowSegment) {
     rowSegment.label = label
@@ -106,21 +104,21 @@ export function summarizeSegment(design: any, id: any, label: any) {
     prevSegment = findPreviousSegment(design.rows, id)
 
     // Copy all intersections
-    for (rowPath of exports.getSegmentPaths(design.rows)) {
-      for (columnPath of exports.getSegmentPaths(design.columns)) {
+    for (rowPath of getSegmentPaths(design.rows)) {
+      for (columnPath of getSegmentPaths(design.columns)) {
         // Skip if prev segment not part of it
-        if (!rowPath.includes(prevSegment)) {
+        if (!prevSegment || !rowPath.includes(prevSegment)) {
           continue
         }
 
         // Create copy of intersection
-        prevIntersection = design.intersections[exports.getIntersectionId(rowPath, columnPath)]
+        prevIntersection = design.intersections[getIntersectionId(rowPath, columnPath)]
 
         summaryIntersection = _.cloneDeep(prevIntersection)
 
         // Find new row path (since has no children, will be only one)
-        const summaryRowPath = _.find(exports.getSegmentPaths(design.rows), (path) => path.includes(rowSegment))
-        design.intersections[exports.getIntersectionId(summaryRowPath, columnPath)] = summaryIntersection
+        const summaryRowPath = _.find(getSegmentPaths(design.rows), (path) => path.includes(rowSegment))
+        design.intersections[getIntersectionId(summaryRowPath, columnPath)] = summaryIntersection
       }
     }
   }
@@ -129,23 +127,23 @@ export function summarizeSegment(design: any, id: any, label: any) {
     prevSegment = findPreviousSegment(design.columns, id)
 
     // Copy all intersections
-    for (columnPath of exports.getSegmentPaths(design.columns)) {
-      for (rowPath of exports.getSegmentPaths(design.rows)) {
+    for (columnPath of getSegmentPaths(design.columns)) {
+      for (rowPath of getSegmentPaths(design.rows)) {
         // Skip if prev segment not part of it
-        if (!columnPath.includes(prevSegment)) {
+        if (!prevSegment || !columnPath.includes(prevSegment)) {
           continue
         }
 
         // Create copy of intersection
-        prevIntersection = design.intersections[exports.getIntersectionId(rowPath, columnPath)]
+        prevIntersection = design.intersections[getIntersectionId(rowPath, columnPath)]
 
         summaryIntersection = _.cloneDeep(prevIntersection)
 
         // Find new column path (since has no children, will be only one)
-        const summaryColumnPath = _.find(exports.getSegmentPaths(design.columns), (path) =>
+        const summaryColumnPath = _.find(getSegmentPaths(design.columns), (path) =>
           path.includes(columnSegment)
         )
-        design.intersections[exports.getIntersectionId(rowPath, summaryColumnPath)] = summaryIntersection
+        design.intersections[getIntersectionId(rowPath, summaryColumnPath)] = summaryIntersection
       }
     }
   }
@@ -154,20 +152,20 @@ export function summarizeSegment(design: any, id: any, label: any) {
 }
 
 // Recursively map segments, flattening and compacting
-function mapSegments(segments: PivotChartSegment[], mapFunc: any): PivotChartSegment[] {
-  segments = _.map(segments, mapFunc)
+function mapSegments(segments: PivotChartSegment[], mapFunc: (segment: PivotChartSegment) => PivotChartSegment | null): PivotChartSegment[] {
+  let segments2 = _.map(segments, mapFunc)
 
   // Map children
-  segments = _.map(segments, function (segment) {
+  segments2 = _.map(segments2, function (segment) {
     if (!segment || !segment.children || segment.children.length === 0) {
       return segment
     }
 
-    return _.extend({}, segment, { children: mapSegments(segment.children, mapFunc) })
+    return { ...segment, children: mapSegments(segment.children, mapFunc) }
   })
 
   // Flatten and compact
-  return _.compact(_.flatten(segments))
+  return _.compact(_.flatten(segments2)) as PivotChartSegment[]
 }
 
 // Replace segment

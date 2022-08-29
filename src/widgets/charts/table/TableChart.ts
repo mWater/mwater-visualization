@@ -4,41 +4,66 @@ const R = React.createElement
 import uuid from "uuid"
 import { default as produce } from "immer"
 import { original } from "immer"
-import { DataSource, injectTableAlias, Schema } from "mwater-expressions"
+import { DataSource, Expr, injectTableAlias, Schema } from "mwater-expressions"
 import Chart, { ChartCreateViewElementOptions } from "../Chart"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import TableChartViewComponent from "./TableChartViewComponent"
 import { ExprCleaner } from "mwater-expressions"
+import { JsonQLSelectQuery } from "jsonql"
+import { Axis } from "../../../axes/Axis"
+import { JsonQLFilter } from "../../../JsonQLFilter"
+import { Image } from "mwater-forms/lib/RotationAwareImageComponent"
 
-/*
-Design is:
+export interface TableChartDesign {
+  version?: number
 
-  table: table to use for data source
-  titleText: title text
-  columns: array of columns
-  filter: optional logical expression to filter by
-  orderings: array of orderings
-  limit: optional limit to number of rows
+  /** table to use for data source */
+  table: string
 
-column:
-  id: unique id of column (uuid v4)
-  headerText: header text
-  textAxis: axis that creates the text value of the column. NOTE: now no longer using as an axis, but only using expression within!
-  format: optional d3-format format for numeric values. Default if null is ","
+  titleText?: string
 
-ordering:
-  axis: axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within!
-  direction: "asc"/"desc"
+  columns: TableChartColumn[]
 
-*/
+  /** optional logical expression to filter by */
+  filter: Expr
+
+  orderings: TableChartOrdering[]
+
+  /** optional limit to number of rows */
+  limit?: number
+}
+
+export interface TableChartColumn {
+  /** unique id of column (uuid v4) */
+  id: string
+
+  /** header text */
+  headerText?: string
+
+  /** axis that creates the text value of the column. NOTE: now no longer using as an axis, but only using expression within! */
+  textAxis?: Axis | null
+
+  /** optional d3-format format for numeric values. Default if null is "," */
+  format?: string | null
+}
+
+export interface TableChartOrdering {
+  /** axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within! */
+  axis: Axis | null
+  direction: "asc" | "desc"
+}
+
+/** 
+ * Table control
+ */
 export default class TableChart extends Chart {
-  cleanDesign(design: any, schema: Schema) {
+  cleanDesign(design: TableChartDesign, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, (draft: any) => {
+    design = produce(design, (draft) => {
       draft.version = design.version || 1
 
       // Always have at least one column
@@ -152,14 +177,14 @@ export default class TableChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
+  getData(design: TableChartDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (error: any, data?: any) => void) {
     let column
     const exprUtils = new ExprUtils(schema)
     const exprCompiler = new ExprCompiler(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
     // Create shell of query
-    const query = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: [],
       from: exprCompiler.compileTable(design.table, "main"),
@@ -174,16 +199,12 @@ export default class TableChart extends Chart {
       _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.axis))
 
     // For each column
-    for (
-      let colNum = 0, end = design.columns.length, asc = 0 <= end;
-      asc ? colNum < end : colNum > end;
-      asc ? colNum++ : colNum--
-    ) {
+    for (let colNum = 0 ; colNum < design.columns.length ; colNum++) {
       column = design.columns[colNum]
 
-      const exprType = exprUtils.getExprType(column.textAxis?.expr)
+      const exprType = exprUtils.getExprType(column.textAxis?.expr ?? null)
 
-      let compiledExpr = exprCompiler.compileExpr({ expr: column.textAxis?.expr, tableAlias: "main" })
+      let compiledExpr = exprCompiler.compileExpr({ expr: column.textAxis?.expr!, tableAlias: "main" })
 
       // Handle special case of geometry, converting to GeoJSON
       if (exprType === "geometry") {
@@ -205,7 +226,7 @@ export default class TableChart extends Chart {
 
       // Add group by if not aggregate
       if (isAggr && !axisBuilder.isAxisAggr(column.textAxis)) {
-        query.groupBy.push(colNum + 1)
+        query.groupBy!.push(colNum + 1)
       }
     }
 
@@ -216,19 +237,19 @@ export default class TableChart extends Chart {
       const ordering = iterable[i]
       query.selects.push({
         type: "select",
-        expr: exprCompiler.compileExpr({ expr: ordering.axis?.expr, tableAlias: "main" }),
+        expr: exprCompiler.compileExpr({ expr: ordering.axis?.expr ?? null, tableAlias: "main" }),
         alias: `o${i}`
       })
 
-      query.orderBy.push({
+      query.orderBy!.push({
         ordinal: design.columns.length + i + 1,
         direction: ordering.direction,
         nulls: ordering.direction === "desc" ? "last" : "first"
       })
 
       // Add group by if non-aggregate
-      if (isAggr && exprUtils.getExprAggrStatus(ordering.axis?.expr) === "individual") {
-        query.groupBy.push(design.columns.length + i + 1)
+      if (isAggr && exprUtils.getExprAggrStatus(ordering.axis?.expr ?? null) === "individual") {
+        query.groupBy!.push(design.columns.length + i + 1)
       }
     }
 
@@ -236,7 +257,7 @@ export default class TableChart extends Chart {
     if (!isAggr) {
       query.selects.push({
         type: "select",
-        expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey },
+        expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey },
         alias: "id"
       })
     }
@@ -319,7 +340,7 @@ export default class TableChart extends Chart {
         }
 
         if (exprType === "imagelist" && value) {
-          return _.map(value, (img) => dataSource.getImageUrl(img.id)).join(" ")
+          return _.map(value, (img: Image) => dataSource.getImageUrl(img.id)).join(" ")
         }
 
         return exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, locale)

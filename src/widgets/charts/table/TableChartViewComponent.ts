@@ -7,6 +7,7 @@ import { default as Linkify } from "react-linkify"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { formatValue } from "../../../valueFormatter"
+import { Image } from "mwater-forms/lib/RotationAwareImageComponent"
 
 export interface TableChartViewComponentProps {
   /** Design of chart */
@@ -15,6 +16,7 @@ export interface TableChartViewComponentProps {
   data: any
   /** Schema to use */
   schema: Schema
+  dataSource: DataSource
   width?: number
   height?: number
   /** scope of the widget (when the widget self-selects a particular scope) */
@@ -25,7 +27,7 @@ export interface TableChartViewComponentProps {
 }
 
 export default class TableChartViewComponent extends React.Component<TableChartViewComponentProps> {
-  shouldComponentUpdate(prevProps: any) {
+  shouldComponentUpdate(prevProps: TableChartViewComponentProps) {
     return !_.isEqual(prevProps, this.props)
   }
 
@@ -132,7 +134,7 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
       node = null
     } else {
       // Parse if should be JSON
-      if (["image", "imagelist", "geometry", "text[]"].includes(exprType) && _.isString(value)) {
+      if (["image", "imagelist", "geometry", "text[]"].includes(exprType || "") && _.isString(value)) {
         value = JSON.parse(value)
       }
 
@@ -161,7 +163,7 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
           node = this.renderImage(value.id)
           break
         case "imagelist":
-          node = _.map(value, (v) => this.renderImage(v.id))
+          node = _.map(value, (v: Image) => this.renderImage(v.id))
           break
         default:
           node = "" + value

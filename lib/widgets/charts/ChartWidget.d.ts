@@ -6,12 +6,15 @@ import ChartViewComponent from "./ChartViewComponent";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
 import { DataSource, Schema } from "mwater-expressions";
 import { WidgetDataSource } from "../WidgetDataSource";
+import Chart from "./Chart";
+/** A widget which is a chart */
 export default class ChartWidget extends Widget {
-    constructor(chart: any);
+    chart: Chart;
+    constructor(chart: Chart);
     createViewElement(options: CreateViewElementOptions): React.CElement<any, ChartWidgetComponent>;
-    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): any;
-    getFilterableTables(design: any, schema: Schema): any;
-    isAutoHeight(): any;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): void;
+    getFilterableTables(design: any, schema: Schema): string[];
+    isAutoHeight(): boolean;
 }
 interface ChartWidgetComponentProps {
     /** schema to use */
@@ -40,7 +43,9 @@ interface ChartWidgetComponentProps {
     /** Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE */
     connectResizeHandle?: any;
 }
-declare class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps> {
+declare class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps, {
+    editDesign: any;
+}> {
     static contextTypes: {
         locale: PropTypes.Requireable<string>;
     };

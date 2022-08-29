@@ -45,6 +45,6 @@ export default class Chart {
         onClick: () => void;
     }[];
     createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any): void;
-    getFilterableTables(design: any, schema: Schema): void;
+    getFilterableTables(design: any, schema: Schema): string[];
     getPlaceholderIcon(): string;
 }

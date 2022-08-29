@@ -73,11 +73,11 @@ export default class PivotChart extends Chart {
           }
 
           if (segment.orderExpr) {
-            return (segment.orderExpr = exprCleaner.cleanExpr(segment.orderExpr ? original(segment.orderExpr)! : null, {
+            segment.orderExpr = exprCleaner.cleanExpr(segment.orderExpr ? original(segment.orderExpr)! : null, {
               table: design.table,
               aggrStatuses: ["aggregate"],
               types: ["enum", "text", "boolean", "date", "datetime", "number"]
-            }))
+            })
           }
         }
 

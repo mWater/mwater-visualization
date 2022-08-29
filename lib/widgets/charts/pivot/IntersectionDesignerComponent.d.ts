@@ -36,7 +36,7 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hasSuccess?: boolean | undefined;
         hasWarnings?: boolean | undefined;
         hasErrors?: boolean | undefined;
-    }, ui.FormGroup> | undefined;
+    }, ui.FormGroup> | null;
     renderFilter(): React.CElement<{
         label: React.ReactNode;
         labelMuted?: boolean | undefined;

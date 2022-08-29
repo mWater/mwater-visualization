@@ -20,4 +20,5 @@ export function getAxisTypes(design: any, layer: any, axis: any) {
     case "y":
       return ["number"]
   }
+  return null
 }

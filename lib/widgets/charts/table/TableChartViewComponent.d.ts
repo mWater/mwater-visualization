@@ -1,5 +1,5 @@
 import React from "react";
-import { Schema } from "mwater-expressions";
+import { DataSource, Schema } from "mwater-expressions";
 export interface TableChartViewComponentProps {
     /** Design of chart */
     design: any;
@@ -7,6 +7,7 @@ export interface TableChartViewComponentProps {
     data: any;
     /** Schema to use */
     schema: Schema;
+    dataSource: DataSource;
     width?: number;
     height?: number;
     /** scope of the widget (when the widget self-selects a particular scope) */
@@ -16,7 +17,7 @@ export interface TableChartViewComponentProps {
     onRowClick?: any;
 }
 export default class TableChartViewComponent extends React.Component<TableChartViewComponentProps> {
-    shouldComponentUpdate(prevProps: any): boolean;
+    shouldComponentUpdate(prevProps: TableChartViewComponentProps): boolean;
     render(): React.DetailedReactHTMLElement<{
         style: {
             width: number | undefined;

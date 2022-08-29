@@ -122,7 +122,7 @@ export default class Chart {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: Schema) {
+  getFilterableTables(design: any, schema: Schema): string[] {
     throw new Error("Not implemented")
   }
 

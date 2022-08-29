@@ -9,10 +9,12 @@ import c3 from 'billboard.js'
 function getC3Css() {
   const css = []
   if (document.styleSheets) {
-    for (let sheet of document.styleSheets) {
+    for (let sheetIndex = 0 ; sheetIndex < document.styleSheets.length ; sheetIndex++) {
+      const sheet = document.styleSheets[sheetIndex]
       const rules = sheet?.cssRules || sheet.rules
       if (rules) {
-        for (let rule of rules) {
+        for (let ruleIndex = 0 ; ruleIndex < rules.length ; ruleIndex++) {
+          const rule = rules[ruleIndex]
           if (rule.cssText && rule.cssText.startsWith(".bb")) {
             css.push(rule.cssText)
           }

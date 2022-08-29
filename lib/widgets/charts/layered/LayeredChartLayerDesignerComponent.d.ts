@@ -15,7 +15,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     isLayerPolar(layer: any): boolean;
     doesLayerNeedGrouping(layer: any): boolean;
     isXAxisRequired(layer: any): boolean;
-    getAxisTypes(layer: any, axisKey: any): string[] | undefined;
+    getAxisTypes(layer: any, axisKey: any): string[] | null;
     getAxisLabel(icon: any, label: any): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     getXAxisLabel(layer: any): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     getYAxisLabel(layer: any): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;

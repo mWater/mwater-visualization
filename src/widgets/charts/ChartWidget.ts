@@ -10,10 +10,13 @@ import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import * as ui from "react-library/lib/bootstrap"
 import { DataSource, Schema } from "mwater-expressions"
 import { WidgetDataSource } from "../WidgetDataSource"
+import Chart from "./Chart"
 
-// A widget which is a chart
+/** A widget which is a chart */
 export default class ChartWidget extends Widget {
-  constructor(chart: any) {
+  chart: Chart
+
+  constructor(chart: Chart) {
     super()
     this.chart = chart
   }
@@ -104,7 +107,7 @@ interface ChartWidgetComponentProps {
 }
 
 // Complete chart widget
-class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps> {
+class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps, { editDesign: any }> {
   static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
@@ -156,20 +159,20 @@ class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps
     if (this.state.editDesign) {
       return
     }
-    return this.setState({ editDesign: this.props.design })
+    this.setState({ editDesign: this.props.design })
   }
 
   handleEndEditing = () => {
     this.props.onDesignChange(this.state.editDesign)
-    return this.setState({ editDesign: null })
+    this.setState({ editDesign: null })
   }
 
   handleCancelEditing = () => {
-    return this.setState({ editDesign: null })
+    this.setState({ editDesign: null })
   }
 
   handleEditDesignChange = (design: any) => {
-    return this.setState({ editDesign: design })
+    this.setState({ editDesign: design })
   }
 
   renderChart(design: any, onDesignChange: any, width: any, height: any) {

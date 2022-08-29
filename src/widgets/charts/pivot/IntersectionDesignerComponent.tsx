@@ -98,6 +98,7 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         })
       )
     }
+    return null
   }
 
   renderFilter() {

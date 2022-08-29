@@ -275,7 +275,7 @@ export default class SegmentDesignerComponent extends React.Component<
         table: this.props.table,
         types: ["enum", "text", "boolean", "date", "datetime", "number"],
         aggrStatuses: ["aggregate"],
-        value: this.props.segment.orderExpr
+        value: this.props.segment.orderExpr ?? null
       }),
 
       this.props.segment.orderExpr

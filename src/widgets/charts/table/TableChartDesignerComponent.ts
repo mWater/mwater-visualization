@@ -14,53 +14,54 @@ import ReorderableListComponent from "react-library/lib/reorderable/ReorderableL
 import * as ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../../../valueFormatter"
 import { getDefaultFormat } from "../../../valueFormatter"
+import { TableChartColumn, TableChartDesign } from "./TableChart"
 
 export interface TableChartDesignerComponentProps {
-  design: any
+  design: TableChartDesign
   schema: Schema
   dataSource: DataSource
-  onDesignChange: any
+  onDesignChange: (design: TableChartDesign) => void
 }
 
 export default class TableChartDesignerComponent extends React.Component<TableChartDesignerComponentProps> {
   // Updates design with the specified changes
   updateDesign(changes: any) {
-    const design = _.extend({}, this.props.design, changes)
-    return this.props.onDesignChange(design)
+    const design = _.extend({}, this.props.design, changes) as TableChartDesign
+    this.props.onDesignChange(design)
   }
 
   handleTitleTextChange = (ev: any) => {
-    return this.updateDesign({ titleText: ev.target.value })
+    this.updateDesign({ titleText: ev.target.value })
   }
   handleTableChange = (table: any) => {
-    return this.updateDesign({ table })
+    this.updateDesign({ table })
   }
   handleFilterChange = (filter: any) => {
-    return this.updateDesign({ filter })
+    this.updateDesign({ filter })
   }
   handleOrderingsChange = (orderings: any) => {
-    return this.updateDesign({ orderings })
+    this.updateDesign({ orderings })
   }
   handleLimitChange = (limit: any) => {
-    return this.updateDesign({ limit })
+    this.updateDesign({ limit })
   }
 
   handleColumnChange = (index: any, column: any) => {
     const columns = this.props.design.columns.slice()
     columns[index] = column
-    return this.updateDesign({ columns })
+    this.updateDesign({ columns })
   }
 
   handleRemoveColumn = (index: any) => {
     const columns = this.props.design.columns.slice()
     columns.splice(index, 1)
-    return this.updateDesign({ columns })
+    this.updateDesign({ columns })
   }
 
   handleAddColumn = () => {
     const columns = this.props.design.columns.slice()
     columns.push({ id: uuid() })
-    return this.updateDesign({ columns })
+    this.updateDesign({ columns })
   }
 
   renderTable() {
@@ -136,7 +137,7 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
         items: this.props.design.columns,
         onReorder: this.handleReorder,
         renderItem: this.renderColumn,
-        getItemId: (item) => item.id
+        getItemId: (item: TableChartColumn) => item.id
       }),
       R(
         "button",
