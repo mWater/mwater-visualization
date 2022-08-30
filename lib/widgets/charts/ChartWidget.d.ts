@@ -7,6 +7,7 @@ import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
 import { DataSource, Schema } from "mwater-expressions";
 import { WidgetDataSource } from "../WidgetDataSource";
 import Chart from "./Chart";
+import { JsonQLFilter } from "../../JsonQLFilter";
 /** A widget which is a chart */
 export default class ChartWidget extends Widget {
     chart: Chart;
@@ -23,17 +24,19 @@ interface ChartWidgetComponentProps {
     dataSource: DataSource;
     widgetDataSource: WidgetDataSource;
     /** Chart object to use */
-    chart: any;
+    chart: Chart;
     /** Design of chart */
     design: any;
     /** null/undefined for readonly */
     onDesignChange?: any;
-    width?: number;
+    /** Width in pixels */
+    width: number;
+    /** Height, if a fixed height widget, or one that uses aspect ratio */
     height?: number;
     /** scope of the widget (when the widget self-selects a particular scope) */
     scope?: any;
     /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
-    filters?: any;
+    filters: JsonQLFilter[];
     /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
     onScopeChange?: any;
     /** Called with (tableId, rowId) when item is clicked */
@@ -65,7 +68,7 @@ declare class ChartWidgetComponent extends React.PureComponent<ChartWidgetCompon
         onDoubleClick: (() => void) | undefined;
         style: {
             position: "relative";
-            width: number | undefined;
+            width: number;
         };
     }, HTMLElement>;
 }

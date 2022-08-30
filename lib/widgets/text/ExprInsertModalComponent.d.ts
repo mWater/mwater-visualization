@@ -1,22 +1,24 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
+import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter";
 export interface ExprInsertModalComponentProps {
     /** Schema to use */
     schema: Schema;
     /** Data source to use to get values */
     dataSource: DataSource;
     /** Called with expr item to insert */
-    onInsert: any;
+    onInsert: (exprItem: HtmlItemExpr) => void;
     singleRowTable?: string;
 }
 interface ExprInsertModalComponentState {
-    exprItem: any;
-    open: any;
+    exprItem: HtmlItemExpr | null;
+    open: boolean;
 }
 export default class ExprInsertModalComponent extends React.Component<ExprInsertModalComponentProps, ExprInsertModalComponentState> {
-    constructor(props: any);
+    constructor(props: ExprInsertModalComponentProps);
     open(): void;
-    handleInsert: (ev: any) => void;
-    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | null;
+    handleInsert: () => void;
+    render(): React.CElement<import("react-library/lib/ActionCancelModalComponent").ActionCancelModalComponentProps, ActionCancelModalComponent> | null;
 }
 export {};

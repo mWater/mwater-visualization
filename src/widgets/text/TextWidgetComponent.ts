@@ -6,12 +6,14 @@ import TextComponent from "./TextComponent"
 import TextWidget from "./TextWidget"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import { DataSource, Schema } from "mwater-expressions"
+import { JsonQLFilter } from "../../JsonQLFilter"
+import { TextWidgetDesign } from "./TextWidgetDesign"
 
 export interface TextWidgetComponentProps {
-  design: any
+  design: TextWidgetDesign
   /** Called with new design. null/undefined for readonly */
-  onDesignChange?: any
-  filters?: any
+  onDesignChange?: (design: TextWidgetDesign) => void
+  filters: JsonQLFilter[]
   schema: Schema
   /** Data source to use for chart */
   dataSource: DataSource
@@ -24,11 +26,13 @@ export interface TextWidgetComponentProps {
 }
 
 // Widget which displays styled text with embedded expressions
-export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetComponentProps> {
+export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetComponentProps, { loading: boolean, exprValues: any, error: any, cacheExpiry: any }> {
+  divComp: HTMLElement | null
   constructor(props: any) {
     super(props)
 
     this.state = {
+      loading: false,
       // Map of expression id to expression value
       exprValues: {},
       error: null,
@@ -77,7 +81,7 @@ export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetCo
 
   scrollToTOCEntry(entryId: any) {
     // Find entry in divComp
-    const entries = this.divComp.querySelectorAll("h1,h2,h3,h4,h5,h6,h7,h8,h9")
+    const entries = this.divComp!.querySelectorAll("h1,h2,h3,h4,h5,h6,h7,h8,h9")
 
     const entry = entries[entryId]
     if (entry) {
@@ -93,7 +97,7 @@ export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetCo
       "div",
       {
         ref: (c) => {
-          return (this.divComp = c)
+          this.divComp = c
         }
       },
       R(TextComponent, {

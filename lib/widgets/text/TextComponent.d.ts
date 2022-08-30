@@ -42,7 +42,7 @@ export default class TextComponent extends React.Component<TextComponentProps> {
         className: string;
         onMouseDown: (ev: any) => void;
     }, HTMLElement>;
-    renderModals(): (React.CElement<any, ExprInsertModalComponent> | React.CElement<any, ExprUpdateModalComponent>)[];
+    renderModals(): (React.CElement<import("./ExprInsertModalComponent").ExprInsertModalComponentProps, ExprInsertModalComponent> | React.CElement<any, ExprUpdateModalComponent>)[];
     refRichTextComponent: (c: RichTextComponent | null) => void;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }

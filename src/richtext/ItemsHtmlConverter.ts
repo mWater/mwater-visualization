@@ -1,7 +1,13 @@
 import _ from "lodash"
 
-export type HtmlItem = string | HtmlItemElement
-export interface HtmlItemElement {
+export type HtmlItem = string | HtmlItemBase
+
+export interface HtmlItemBase {
+  type: string
+  items?: HtmlItem[]
+}
+
+export interface HtmlItemElement extends HtmlItemBase {
   type: "element"
   tag: string
   items?: HtmlItem[]
@@ -10,11 +16,12 @@ export interface HtmlItemElement {
   target?: string
 }
 
-// Converts items (JSON contents of rich text) to HTML and back to allow editing
-// Items are array of:
-//  string (html text)
-//  { type: "element", tag: "h1", items: [nested items] }
-//  elements can contain style (object), href, target
+/** Converts items (JSON contents of rich text) to HTML and back to allow editing
+ * Items are array of:
+ *  string (html text)
+ *  { type: "element", tag: "h1", items: [nested items] }
+ *  elements can contain style (object), href, target
+ */
 export default class ItemsHtmlConverter {
   static isBlank = (items: HtmlItem[] | undefined): boolean => {
     if (!items) {
@@ -118,13 +125,13 @@ export default class ItemsHtmlConverter {
 
   // Converts an item that is not an element to html. Override in subclass.
   // To be reversible, should contain data-embed which contains JSON of item
-  convertSpecialItemToHtml(item: any) {
+  convertSpecialItemToHtml(item: HtmlItemBase) {
     // To be implemented by subclasses
     return ""
   }
 
   // Converts an HTML DOM element to items
-  convertElemToItems(elem: any): HtmlItem[] {
+  convertElemToItems(elem: HTMLElement): HtmlItem[] {
     // console.log elem.outerHTML
 
     // Walk DOM tree, adding strings and expressions
@@ -135,12 +142,12 @@ export default class ItemsHtmlConverter {
         // Element
         // Handle embeds
         var style
-        if (node.dataset?.embed) {
-          items.push(JSON.parse(node.dataset.embed))
+        if ((node as HTMLElement).dataset?.embed) {
+          items.push(JSON.parse((node as HTMLElement).dataset!.embed!))
           continue
         }
 
-        let tag = node.tagName.toLowerCase()
+        let tag = (node as HTMLElement).tagName.toLowerCase()
         // Strip namespace
         if (tag.match(/:/)) {
           tag = tag.split(":")[1]
@@ -149,49 +156,49 @@ export default class ItemsHtmlConverter {
         // Whitelist tags
         if (!allowedTags[tag]) {
           // Just add contents
-          items = items.concat(this.convertElemToItems(node))
+          items = items.concat(this.convertElemToItems((node as HTMLElement)))
           continue
         }
 
-        const item: HtmlItemElement = { type: "element", tag, items: this.convertElemToItems(node) }
+        const item: HtmlItemElement = { type: "element", tag, items: this.convertElemToItems((node as HTMLElement)) }
 
         // Add style
-        if (node.style != null) {
-          for (style of node.style) {
+        if ((node as HTMLElement).style != null) {
+          for (style of (node as HTMLElement).style) {
             if (!allowedStyles[style]) {
               continue
             }
 
             item.style = item.style || {}
-            item.style[style] = node.style[style]
+            item.style[style] = (node as HTMLElement).style[style]
           }
         }
 
         // Convert align (Firefox)
-        if (node.align) {
+        if ((node as HTMLDivElement).align) {
           item.style = item.style || {}
-          item.style["text-align"] = node.align
+          item.style["text-align"] = (node as HTMLDivElement).align
         }
 
         // Add href and target
-        if (node.href) {
+        if ((node as HTMLLinkElement).href) {
           // There is a quirk of the href property that it includes the complete url, even if
           // it is just an anchor. Use outerHTML to bypass the problem
-          const hrefMatches = node.outerHTML.match('href="(.*?)"')
+          const hrefMatches = (node as HTMLElement).outerHTML.match('href="(.*?)"')
           const href = hrefMatches?.[1]
           if (href) {
             item.href = href
           }
         }
-        if (node.target) {
-          item.target = node.target
+        if ((node as HTMLLinkElement).target) {
+          item.target = (node as HTMLLinkElement).target
         }
 
         items.push(item)
 
         // Handle text
       } else if (node.nodeType === 3) {
-        let text = node.nodeValue
+        let text = node.nodeValue!
 
         // Strip word joiner used to allow editing at end of string
         text = text.replace(/\u2060/g, "")

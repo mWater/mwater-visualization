@@ -15,7 +15,7 @@ export default class LayeredChart extends Chart {
         filters: any;
         onDesignChange: (design: any) => any;
     }>;
-    getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[] | null, callback: any): void;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     createViewElement(options: ChartCreateViewElementOptions): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any): {
         label: string;

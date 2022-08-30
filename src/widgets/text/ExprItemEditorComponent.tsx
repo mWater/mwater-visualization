@@ -9,21 +9,22 @@ import TableSelectComponent from "../../TableSelectComponent"
 import { getFormatOptions } from "../../valueFormatter"
 import { getDefaultFormat } from "../../valueFormatter"
 import { Checkbox } from "react-library/lib/bootstrap"
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter"
 
-interface ExprItemEditorComponentProps {
+export interface ExprItemEditorComponentProps {
   /** Schema to use */
   schema: Schema
   /** Data source to use to get values */
   dataSource: DataSource
   /** Expression item to edit */
-  exprItem: any
+  exprItem: HtmlItemExpr
   /** Called with expr item */
-  onChange: any
+  onChange: (exprItem: HtmlItemExpr) => void
   singleRowTable?: string
 }
 
 interface ExprItemEditorComponentState {
-  table: any
+  table: string
 }
 
 // Expression editor that allows changing an expression item
@@ -41,35 +42,38 @@ export default class ExprItemEditorComponent extends React.Component<
   }
 
   handleTableChange = (table: any) => {
-    return this.setState({ table })
+    this.setState({ table })
   }
 
   handleExprChange = (expr: any) => {
-    const exprItem = _.extend({}, this.props.exprItem, { expr })
-    return this.props.onChange(exprItem)
+    const exprItem = _.extend({}, this.props.exprItem, { expr }) as HtmlItemExpr
+    this.props.onChange(exprItem)
   }
 
   handleIncludeLabelChange = (value: any) => {
     const exprItem = _.extend({}, this.props.exprItem, {
       includeLabel: value,
       labelText: value ? this.props.exprItem.labelText : undefined
-    })
-    return this.props.onChange(exprItem)
+    }) as HtmlItemExpr
+    this.props.onChange(exprItem)
   }
 
   handleLabelTextChange = (ev: any) => {
-    const exprItem = _.extend({}, this.props.exprItem, { labelText: ev.target.value || null })
-    return this.props.onChange(exprItem)
+    const exprItem = _.extend({}, this.props.exprItem, { labelText: ev.target.value || null }) as HtmlItemExpr
+    this.props.onChange(exprItem)
   }
 
   handleFormatChange = (ev: any) => {
-    const exprItem = _.extend({}, this.props.exprItem, { format: ev.target.value || null })
-    return this.props.onChange(exprItem)
+    const exprItem = _.extend({}, this.props.exprItem, { format: ev.target.value || null }) as HtmlItemExpr
+    this.props.onChange(exprItem)
   }
 
   renderFormat() {
     const exprUtils = new ExprUtils(this.props.schema)
     const exprType = exprUtils.getExprType(this.props.exprItem.expr)
+    if (!exprType) {
+      return null
+    }
 
     const formats = getFormatOptions(exprType)
     if (!formats) {

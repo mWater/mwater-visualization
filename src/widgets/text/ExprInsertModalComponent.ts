@@ -1,13 +1,11 @@
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
 import uuid from "uuid"
-import { DataSource, ExprUtils, Schema } from "mwater-expressions"
-import { ExprComponent } from "mwater-expressions-ui"
+import { DataSource, Schema } from "mwater-expressions"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
-import TableSelectComponent from "../../TableSelectComponent"
 import ExprItemEditorComponent from "./ExprItemEditorComponent"
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter"
 
 export interface ExprInsertModalComponentProps {
   /** Schema to use */
@@ -15,13 +13,13 @@ export interface ExprInsertModalComponentProps {
   /** Data source to use to get values */
   dataSource: DataSource
   /** Called with expr item to insert */
-  onInsert: any
+  onInsert: (exprItem: HtmlItemExpr) => void
   singleRowTable?: string
 }
 
 interface ExprInsertModalComponentState {
-  exprItem: any
-  open: any
+  exprItem: HtmlItemExpr | null
+  open: boolean
 }
 
 // Modal that displays an expression builder
@@ -29,7 +27,7 @@ export default class ExprInsertModalComponent extends React.Component<
   ExprInsertModalComponentProps,
   ExprInsertModalComponentState
 > {
-  constructor(props: any) {
+  constructor(props: ExprInsertModalComponentProps) {
     super(props)
 
     this.state = {
@@ -39,17 +37,17 @@ export default class ExprInsertModalComponent extends React.Component<
   }
 
   open() {
-    return this.setState({ open: true, exprItem: { type: "expr", id: uuid() } })
+    this.setState({ open: true, exprItem: { type: "expr", id: uuid(), expr: null } })
   }
 
-  handleInsert = (ev: any) => {
+  handleInsert = () => {
     if (!this.state.exprItem) {
       return
     }
 
     // Close first to avoid strange effects when mixed with pojoviews
-    return this.setState({ open: false }, () => {
-      return this.props.onInsert(this.state.exprItem)
+    this.setState({ open: false }, () => {
+      this.props.onInsert(this.state.exprItem!)
     })
   }
 

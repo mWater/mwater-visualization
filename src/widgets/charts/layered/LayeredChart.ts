@@ -181,7 +181,7 @@ export default class LayeredChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[] | null, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     const compiler = new LayeredChartCompiler({ schema })
     const queries = compiler.createQueries(design, filters)
 

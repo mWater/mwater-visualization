@@ -37,3 +37,12 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
     }, HTMLElement> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
+export interface TableChartColumnDesignerComponentProps {
+    design: any;
+    schema: Schema;
+    dataSource: DataSource;
+    index: number;
+    onChange: any;
+    onRemove: any;
+    connectDragSource: any;
+}

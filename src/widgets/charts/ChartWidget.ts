@@ -11,6 +11,7 @@ import * as ui from "react-library/lib/bootstrap"
 import { DataSource, Schema } from "mwater-expressions"
 import { WidgetDataSource } from "../WidgetDataSource"
 import Chart from "./Chart"
+import { JsonQLFilter } from "../../JsonQLFilter"
 
 /** A widget which is a chart */
 export default class ChartWidget extends Widget {
@@ -85,17 +86,24 @@ interface ChartWidgetComponentProps {
   dataSource: DataSource
   widgetDataSource: WidgetDataSource
   /** Chart object to use */
-  chart: any
+  chart: Chart
   /** Design of chart */
   design: any
   /** null/undefined for readonly */
   onDesignChange?: any
-  width?: number
+
+  /** Width in pixels */
+  width: number
+
+  /** Height, if a fixed height widget, or one that uses aspect ratio */
   height?: number
+
   /** scope of the widget (when the widget self-selects a particular scope) */
   scope?: any
+
   /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
-  filters?: any
+  filters: JsonQLFilter[]
+
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
   onScopeChange?: any
   /** Called with (tableId, rowId) when item is clicked */
@@ -209,13 +217,12 @@ class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps
     if (this.props.chart.hasDesignerPreview()) {
       // Create chart (maxing out at half of width of screen)
       const chartWidth = Math.min(document.body.clientWidth / 2, this.props.width)
-      const chartHeight = this.props.height * (chartWidth / this.props.width)
+      const chartHeight = this.props.height != null ? this.props.height * (chartWidth / this.props.width) : undefined
       const chart = this.renderChart(
         this.state.editDesign,
         (design: any) => this.setState({ editDesign: design }),
         chartWidth,
-        chartHeight,
-        chartWidth
+        chartHeight
       )
 
       const content = R(
@@ -232,7 +239,7 @@ class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps
               borderRadius: 8,
               padding: 10,
               width: chartWidth + 20,
-              height: chartHeight + 20,
+              height: chartHeight != null ? chartHeight + 20 : undefined,
               overflow: "hidden"
             }
           },

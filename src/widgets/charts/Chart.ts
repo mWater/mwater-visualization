@@ -76,7 +76,14 @@ export default class Chart {
   //   dataSource: dataSource to use
   //   design: design
   //   onDesignChange: function
-  createDesignerElement(options: any) {
+  createDesignerElement(options: {
+    schema: Schema
+    dataSource: DataSource
+    /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
+    filters?: JsonQLFilter[]
+    design: any
+    onDesignChange: (design: any) => void
+  }): ReactNode {
     throw new Error("Not implemented")
   }
 
@@ -117,7 +124,7 @@ export default class Chart {
   }
 
   // Creates a table form of the chart data. Array of arrays
-  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any) {
+  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any): any[][] {
     throw new Error("Not implemented")
   }
 

@@ -1,12 +1,10 @@
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-import { DataSource, ExprUtils, Schema } from "mwater-expressions"
-import { ExprComponent } from "mwater-expressions-ui"
+import { DataSource, Schema } from "mwater-expressions"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
-import TableSelectComponent from "../../TableSelectComponent"
 import ExprItemEditorComponent from "./ExprItemEditorComponent"
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter"
 
 export interface ExprUpdateModalComponentProps {
   /** Schema to use */
@@ -17,9 +15,9 @@ export interface ExprUpdateModalComponentProps {
 }
 
 interface ExprUpdateModalComponentState {
-  open: any
-  onUpdate: any
-  exprItem: any
+  open: boolean
+  onUpdate: ((exprItem: HtmlItemExpr) => void) | null
+  exprItem: HtmlItemExpr | null
 }
 
 // Modal that displays an expression builder for updating an expression
@@ -52,8 +50,8 @@ export default class ExprUpdateModalComponent extends React.Component<
         actionLabel: "Update",
         onAction: () => {
           // Close first to avoid strange effects when mixed with pojoviews
-          return this.setState({ open: false }, () => {
-            return this.state.onUpdate(this.state.exprItem)
+          this.setState({ open: false }, () => {
+            return this.state.onUpdate!(this.state.exprItem!)
           })
         },
         onCancel: () => this.setState({ open: false }),

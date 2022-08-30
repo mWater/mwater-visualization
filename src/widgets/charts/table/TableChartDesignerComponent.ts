@@ -238,13 +238,14 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
   }
 }
 
-interface TableChartColumnDesignerComponentProps {
+export interface TableChartColumnDesignerComponentProps {
   design: any
   schema: Schema
   dataSource: DataSource
   index: number
   onChange: any
   onRemove: any
+  connectDragSource: any
 }
 
 class TableChartColumnDesignerComponent extends React.Component<TableChartColumnDesignerComponentProps> {
@@ -282,6 +283,7 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
         R("span", { className: "fas fa-times" })
       )
     }
+    return null
   }
 
   renderExpr() {
@@ -311,6 +313,9 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
     // Get type
     const exprUtils = new ExprUtils(this.props.schema)
     const exprType = exprUtils.getExprType(column.textAxis?.expr)
+    if (!exprType) {
+      return null
+    }
 
     const formats = getFormatOptions(exprType)
     if (!formats) {

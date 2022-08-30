@@ -2,11 +2,16 @@ import React from "react"
 const R = React.createElement
 import _ from "lodash"
 import async from "async"
-import { DataSource, ExprUtils, Schema } from "mwater-expressions"
+import { DataSource, ExprUtils, OpExpr, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import Widget, { CreateViewElementOptions } from "../Widget"
+import { JsonQLFilter } from "../../JsonQLFilter"
+import { JsonQLSelectQuery } from "jsonql"
+import { HtmlItem } from "../../richtext/ItemsHtmlConverter"
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter"
+import { TextWidgetDesign } from "./TextWidgetDesign"
 
 export default class TextWidget extends Widget {
   // Creates a React element that is a view of the widget
@@ -48,10 +53,10 @@ export default class TextWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     // Evaluates a single exprItem
     const evalExprItem = (exprItem: any, cb: any) => {
-      let query, whereClauses
+      let query: JsonQLSelectQuery, whereClauses
       if (!exprItem.expr) {
         return cb(null)
       }
@@ -79,10 +84,10 @@ export default class TextWidget extends Widget {
       }
 
       // In case of "sum where"/"count where", extract where clause to make faster
-      if (expr?.op === "sum where") {
+      if (expr && expr.type == "op" && expr?.op === "sum where") {
         whereClauses.push(exprCompiler.compileExpr({ expr: expr.exprs[1], tableAlias: "main" }))
         expr = { type: "op", table: expr.table, op: "sum", exprs: [expr.exprs[0]] }
-      } else if (expr?.op === "count where") {
+      } else if (expr && expr.type == "op" && expr?.op === "count where") {
         whereClauses.push(exprCompiler.compileExpr({ expr: expr.exprs[0], tableAlias: "main" }))
         expr = { type: "op", table: expr.table, op: "count", exprs: [] }
       }
@@ -116,6 +121,7 @@ export default class TextWidget extends Widget {
       if (aggrStatus === "individual" || aggrStatus === "literal") {
         // Get two distinct examples to know if unique if not aggregate
         query = {
+          type: "query",
           distinct: true,
           selects: [{ type: "select", expr: compiledExpr, alias: "value" }],
           from: table ? exprCompiler.compileTable(table, "main") : undefined,
@@ -123,6 +129,7 @@ export default class TextWidget extends Widget {
         }
       } else {
         query = {
+          type: "query",
           selects: [{ type: "select", expr: compiledExpr, alias: "value" }],
           from: table ? exprCompiler.compileTable(table, "main") : undefined
         }
@@ -158,20 +165,20 @@ export default class TextWidget extends Widget {
     return async.each(
       this.getExprItems(design.items),
       (exprItem, cb) => {
-        return evalExprItem(exprItem, (error: any, value: any) => {
+        evalExprItem(exprItem, (error: any, value: any) => {
           if (error) {
-            return cb(error)
+            cb(error)
           } else {
             exprValues[exprItem.id] = value
-            return cb(null)
+            cb(null)
           }
         })
       },
       (error) => {
         if (error) {
-          return callback(error)
+          callback(error)
         } else {
-          return callback(null, exprValues)
+          callback(null, exprValues)
         }
       }
     )
@@ -183,27 +190,27 @@ export default class TextWidget extends Widget {
   }
 
   // Get expression items recursively
-  getExprItems(items: any) {
-    let exprItems = []
+  getExprItems(items: HtmlItem[]): HtmlItemExpr[] {
+    let exprItems: any[] = []
     for (let item of items || []) {
-      if (item.type === "expr") {
+      if ((item as any).type === "expr") {
         exprItems.push(item)
       }
-      if (item.items) {
-        exprItems = exprItems.concat(this.getExprItems(item.items))
+      if ((item as any).items) {
+        exprItems = exprItems.concat(this.getExprItems((item as any).items))
       }
     }
     return exprItems
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: Schema) {
+  getFilterableTables(design: TextWidgetDesign, schema: Schema) {
     const exprItems = this.getExprItems(design.items)
 
-    let filterableTables = _.map(exprItems, (exprItem) => exprItem.expr?.table)
+    let filterableTables = _.map(exprItems, (exprItem) => (exprItem.expr as OpExpr)?.table)
 
     filterableTables = _.uniq(_.compact(filterableTables))
-    return filterableTables
+    return filterableTables as string[]
   }
 
   // Get table of contents entries for the widget, entries that should be displayed in the TOC.

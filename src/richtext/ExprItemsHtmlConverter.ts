@@ -1,17 +1,37 @@
 import _ from "lodash"
-import ItemsHtmlConverter from "./ItemsHtmlConverter"
+import ItemsHtmlConverter, { HtmlItemBase } from "./ItemsHtmlConverter"
 import { Expr, ExprUtils, Schema } from "mwater-expressions"
 import uuid from "uuid"
 import { formatValue } from "../valueFormatter"
 import { canFormatType } from "../valueFormatter"
 
-// ItemsHtmlConverter that supports embedded mwater expressions
+export interface HtmlItemExpr extends HtmlItemBase {
+  type: "expr"
+ 
+  /** unique id */
+  id: string
 
-// Converts items (JSON contents of rich text) to HTML and back to allow editing
-// Items are array of:
-//  string (html text)
-//  { type: "element", tag: "h1", items: [nested items] }
-//  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text, format: d3 format if number }
+  /** Expression to display */
+  expr: Expr
+
+  /** true to include label */
+  includeLabel?: boolean
+
+  /** override label text */
+  labelText?: string
+
+  /** d3 format if number */
+  format?: string
+}
+
+/**
+ * ItemsHtmlConverter that supports embedded mwater expressions
+ * Converts items (JSON contents of rich text) to HTML and back to allow editing
+ * Items are array of:
+ *  string (html text)
+ *  { type: "element", tag: "h1", items: [nested items] }
+ *  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text, format: d3 format if number }
+ */
 export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
   schema: Schema
   designMode: boolean
@@ -36,32 +56,34 @@ export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
 
   // Converts an item that is not an element to html. Override in subclass.
   // To be reversible, should contain data-embed which contains JSON of item
-  convertSpecialItemToHtml(item: any) {
+  convertSpecialItemToHtml(item: HtmlItemBase) {
     let html = ""
 
     if (item.type === "expr") {
+      const exprItem = item as HtmlItemExpr
+
       let exprHtml, text
       if (this.summarizeExprs) {
-        text = new ExprUtils(this.schema).summarizeExpr(item.expr, this.locale)
+        text = new ExprUtils(this.schema).summarizeExpr(exprItem.expr, this.locale)
         if (text.length > 30) {
           text = text.substr(0, 30) + "..."
         }
 
         exprHtml = _.escape(text)
-      } else if (_.has(this.exprValues, item.id)) {
+      } else if (_.has(this.exprValues, exprItem.id)) {
         // If has data
         const exprUtils = new ExprUtils(this.schema)
-        const value = this.exprValues[item.id]
+        const value = this.exprValues[exprItem.id]
 
         if (value != null) {
           // Get expression type
-          const exprType = exprUtils.getExprType(item.expr)
+          const exprType = exprUtils.getExprType(exprItem.expr)
 
           // Format if can format
           if (exprType && canFormatType(exprType)) {
-            text = formatValue(exprType, value, item.format)
+            text = formatValue(exprType, value, exprItem.format)
           } else {
-            text = exprUtils.stringifyExprLiteral(item.expr, value, this.locale)
+            text = exprUtils.stringifyExprLiteral(exprItem.expr, value, this.locale)
           }
 
           exprHtml = _.escape(text)
@@ -74,8 +96,8 @@ export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
       }
 
       // Add label
-      if (item.includeLabel) {
-        const label = item.labelText || new ExprUtils(this.schema).summarizeExpr(item.expr, this.locale) + ":\u00A0"
+      if (exprItem.includeLabel) {
+        const label = exprItem.labelText || new ExprUtils(this.schema).summarizeExpr(exprItem.expr, this.locale) + ":\u00A0"
         exprHtml = '<span class="text-muted">' + _.escape(label) + "</span>" + exprHtml
       }
 
@@ -95,7 +117,7 @@ export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
     return html
   }
 
-  convertElemToItems(elem: any) {
+  convertElemToItems(elem: HTMLElement) {
     const items = super.convertElemToItems(elem)
 
     // Ensure exprs have unique ids

@@ -36,7 +36,14 @@ export default class Chart {
     isAutoHeight(): boolean;
     hasDesignerPreview(): boolean;
     getEditLabel(): string;
-    createDesignerElement(options: any): void;
+    createDesignerElement(options: {
+        schema: Schema;
+        dataSource: DataSource;
+        /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
+        filters?: JsonQLFilter[];
+        design: any;
+        onDesignChange: (design: any) => void;
+    }): ReactNode;
     getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): void;
     createViewElement(options: ChartCreateViewElementOptions): ReactNode;
     createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any): {
@@ -44,7 +51,7 @@ export default class Chart {
         icon?: string;
         onClick: () => void;
     }[];
-    createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any): void;
+    createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any): any[][];
     getFilterableTables(design: any, schema: Schema): string[];
     getPlaceholderIcon(): string;
 }

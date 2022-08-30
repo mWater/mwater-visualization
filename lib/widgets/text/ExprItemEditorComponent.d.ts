@@ -1,26 +1,27 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface ExprItemEditorComponentProps {
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter";
+export interface ExprItemEditorComponentProps {
     /** Schema to use */
     schema: Schema;
     /** Data source to use to get values */
     dataSource: DataSource;
     /** Expression item to edit */
-    exprItem: any;
+    exprItem: HtmlItemExpr;
     /** Called with expr item */
-    onChange: any;
+    onChange: (exprItem: HtmlItemExpr) => void;
     singleRowTable?: string;
 }
 interface ExprItemEditorComponentState {
-    table: any;
+    table: string;
 }
 export default class ExprItemEditorComponent extends React.Component<ExprItemEditorComponentProps, ExprItemEditorComponentState> {
     constructor(props: any);
     handleTableChange: (table: any) => void;
-    handleExprChange: (expr: any) => any;
-    handleIncludeLabelChange: (value: any) => any;
-    handleLabelTextChange: (ev: any) => any;
-    handleFormatChange: (ev: any) => any;
+    handleExprChange: (expr: any) => void;
+    handleIncludeLabelChange: (value: any) => void;
+    handleLabelTextChange: (ev: any) => void;
+    handleFormatChange: (ev: any) => void;
     renderFormat(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | null;

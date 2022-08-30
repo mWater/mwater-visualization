@@ -1,12 +1,16 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import Widget, { CreateViewElementOptions } from "../Widget";
+import { JsonQLFilter } from "../../JsonQLFilter";
+import { HtmlItem } from "../../richtext/ItemsHtmlConverter";
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter";
+import { TextWidgetDesign } from "./TextWidgetDesign";
 export default class TextWidget extends Widget {
     createViewElement(options: CreateViewElementOptions): React.CElement<{
         schema: Schema;
         dataSource: DataSource;
         widgetDataSource: import("../WidgetDataSource").WidgetDataSource;
-        filters: import("../..").JsonQLFilter[];
+        filters: JsonQLFilter[];
         design: object;
         onDesignChange: ((design: object) => void) | null | undefined;
         width: number | undefined;
@@ -17,9 +21,9 @@ export default class TextWidget extends Widget {
         } | undefined;
         ref: ((widget: any) => void) | undefined;
     }, any>;
-    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): void;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     isAutoHeight(): boolean;
-    getExprItems(items: any): any;
-    getFilterableTables(design: any, schema: Schema): any[];
+    getExprItems(items: HtmlItem[]): HtmlItemExpr[];
+    getFilterableTables(design: TextWidgetDesign, schema: Schema): string[];
     getTOCEntries(design: any, namedStrings: any): any;
 }

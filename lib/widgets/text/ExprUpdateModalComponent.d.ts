@@ -1,6 +1,7 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter";
 export interface ExprUpdateModalComponentProps {
     /** Schema to use */
     schema: Schema;
@@ -9,9 +10,9 @@ export interface ExprUpdateModalComponentProps {
     singleRowTable?: string;
 }
 interface ExprUpdateModalComponentState {
-    open: any;
-    onUpdate: any;
-    exprItem: any;
+    open: boolean;
+    onUpdate: ((exprItem: HtmlItemExpr) => void) | null;
+    exprItem: HtmlItemExpr | null;
 }
 export default class ExprUpdateModalComponent extends React.Component<ExprUpdateModalComponentProps, ExprUpdateModalComponentState> {
     constructor(props: any);
