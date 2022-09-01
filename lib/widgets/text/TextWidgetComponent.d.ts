@@ -27,7 +27,7 @@ export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetCo
     divComp: HTMLElement | null;
     constructor(props: any);
     isLoadNeeded(newProps: any, oldProps: any): boolean;
-    load(props: any, prevProps: any, callback: any): any;
+    load(props: any, prevProps: any, callback: any): void;
     scrollToTOCEntry(entryId: any): void;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }

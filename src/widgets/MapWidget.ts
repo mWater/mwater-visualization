@@ -1,11 +1,9 @@
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
 import Widget, { CreateViewElementOptions } from "./Widget"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
-import LayerFactory from "../maps/LayerFactory"
 import * as MapUtils from "../maps/MapUtils"
 import { DataSource, Schema } from "mwater-expressions"
 import { WidgetDataSource } from "./WidgetDataSource"

@@ -1,7 +1,7 @@
 import { DataSource } from "mwater-expressions"
 import React from "react"
 const R = React.createElement
-import Dropzone from "react-dropzone"
+import Dropzone, { DropzoneState } from "react-dropzone"
 import uuid from "uuid"
 
 export interface ImageUploaderComponentProps {
@@ -16,12 +16,16 @@ interface ImageUploaderComponentState {
   uid: any
   uploading: any
   editing: any
+  files: File[] | null
 }
 
 export default class ImageUploaderComponent extends React.Component<
   ImageUploaderComponentProps,
   ImageUploaderComponentState
 > {
+  progressBar: HTMLDivElement | null
+  xhr: XMLHttpRequest
+
   constructor(props: any) {
     super(props)
 
@@ -75,36 +79,29 @@ export default class ImageUploaderComponent extends React.Component<
   }
 
   renderUploader() {
-    return R(
-      "div",
-      null,
-      R(
-        Dropzone,
-        {
-          className: "dropzone",
-          multiple: false,
-          onDrop: this.onFileDrop
-        },
+    return <div>
+      <Dropzone multiple={false} onDrop={this.onFileDrop}>
+        {({getRootProps, getInputProps}: DropzoneState) => (
+          <div {...getRootProps({ className: "dropzone" })}>
+            <input {...getInputProps()} />
+            { this.state.uploading
+            ? <div className="progress">
+                <div 
+                  className="progress-bar"
+                  style={{ width: "0%" }}
+                  ref={(c) => {
+                    this.progressBar = c
+                  }}
+                />
+              </div>
+            : <div>Drop file here or click to select file</div>
+            }
+          </div>
+        )}
+      </Dropzone>
 
-        this.state.uploading
-          ? R(
-              "div",
-              { className: "progress" },
-              R("div", {
-                className: "progress-bar",
-                style: { width: "0%" },
-                ref: (c: any) => {
-                  return (this.progressBar = c)
-                }
-              })
-            )
-          : R("div", null, "Drop file here or click to select file")
-      ),
-
-      this.state.uid
-        ? R("a", { className: "link-plain", onClick: () => this.setState({ editing: false }) }, "Cancel")
-        : undefined
-    )
+      { this.state.uid && <a className="link-plain" onClick={() => this.setState({ editing: false })}>Cancel</a> }
+    </div>
   }
 
   renderPreview() {

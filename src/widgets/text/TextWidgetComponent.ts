@@ -8,6 +8,8 @@ import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import { DataSource, Schema } from "mwater-expressions"
 import { JsonQLFilter } from "../../JsonQLFilter"
 import { TextWidgetDesign } from "./TextWidgetDesign"
+import { HtmlItem } from "../../richtext/ItemsHtmlConverter"
+import { HtmlItemExpr } from "../../richtext/ExprItemsHtmlConverter"
 
 export interface TextWidgetComponentProps {
   design: TextWidgetDesign
@@ -43,14 +45,16 @@ export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetCo
   // Override to determine if a load is needed. Not called on mounting
   isLoadNeeded(newProps: any, oldProps: any) {
     // Get expression items recursively
-    function getExprItems(items: any) {
-      let exprItems = []
+    function getExprItems(items: HtmlItem[]): HtmlItemExpr[] {
+      let exprItems: HtmlItemExpr[] = []
       for (let item of items || []) {
-        if (item.type === "expr") {
-          exprItems.push(item)
-        }
-        if (item.items) {
-          exprItems = exprItems.concat(getExprItems(item.items))
+        if (typeof item === "object") {
+          if (item.type === "expr") {
+            exprItems.push(item as HtmlItemExpr)
+          }
+          if (item.items) {
+            exprItems = exprItems.concat(getExprItems(item.items))
+          }
         }
       }
       return exprItems
@@ -74,8 +78,8 @@ export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetCo
     }
 
     // Get data
-    return props.widgetDataSource.getData(props.design, props.filters, (error: any, data: any) => {
-      return callback({ error, exprValues: data || {}, cacheExpiry: props.dataSource.getCacheExpiry() })
+    props.widgetDataSource.getData(props.design, props.filters, (error: any, data: any) => {
+      callback({ error, exprValues: data || {}, cacheExpiry: props.dataSource.getCacheExpiry() })
     })
   }
 
@@ -103,7 +107,6 @@ export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetCo
       R(TextComponent, {
         design: this.props.design,
         onDesignChange: this.props.onDesignChange,
-        filters: this.props.filters,
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         exprValues,

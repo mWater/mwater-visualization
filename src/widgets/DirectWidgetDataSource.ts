@@ -2,6 +2,7 @@ import { DataSource, Schema } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
 import DirectMapDataSource from "../maps/DirectMapDataSource"
 import { MapDataSource } from "../maps/MapDataSource"
+import { MapDesign } from "../maps/MapDesign"
 import Widget from "./Widget"
 import { WidgetDataSource } from "./WidgetDataSource"
 
@@ -44,7 +45,7 @@ export default class DirectWidgetDataSource implements WidgetDataSource {
   }
 
   /** For map widgets, the following is required */
-  getMapDataSource(design: any): MapDataSource {
+  getMapDataSource(design: MapDesign): MapDataSource {
     if (!this.options.apiUrl) {
       throw new Error("Maps not supported")
     }

@@ -65,7 +65,7 @@
     "react-dnd": "^6.0.0",
     "react-dnd-html5-backend": "^6.0.0",
     "react-dom": "^16.14.0",
-    "react-dropzone": "^3.5.3",
+    "react-dropzone": "^14.2.2",
     "react-float-affixed": "^1.0.0",
     "react-lazy-load-image-component": "^1.5.1",
     "react-library": "github:mWater/react-library",
