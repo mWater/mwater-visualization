@@ -118,7 +118,8 @@ export default class PivotChart extends Chart {
           for (const colorCondition of intersection.backgroundColorConditions || []) {
             colorCondition.condition = exprCleaner.cleanExpr(colorCondition.condition ? original(colorCondition.condition)! : null, {
               table: design.table,
-              types: ["boolean"]
+              types: ["boolean"],
+              aggrStatuses: ["aggregate", "literal"]
             })
           }
 
