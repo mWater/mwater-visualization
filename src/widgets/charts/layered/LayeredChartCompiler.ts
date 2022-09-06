@@ -67,7 +67,7 @@ interface C3Data {
    */
   colors?: { [key: string]: string }
 
-  order?: "asc" | "desc"
+  order?: "asc" | "desc" | null
 
   color?: any
 
@@ -1014,7 +1014,7 @@ export default class LayeredChartCompiler {
       xAxisLabelText: this.compileXAxisLabelText(design, locale),
       yAxisLabelText: this.compileYAxisLabelText(design, locale),
       titleText: this.compileTitleText(design, locale),
-      order: undefined, // Use order of data for stacking
+      order: null, // Use order of data for stacking
       format,
       color: (color: any, d: any) => {
         // Handle overall series color which calls with a non-object for d

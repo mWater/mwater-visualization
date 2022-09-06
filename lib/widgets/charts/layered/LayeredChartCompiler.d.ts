@@ -50,7 +50,7 @@ interface C3Data {
     colors?: {
         [key: string]: string;
     };
-    order?: "asc" | "desc";
+    order?: "asc" | "desc" | null;
     color?: any;
     /**
      * Set custom data class.
