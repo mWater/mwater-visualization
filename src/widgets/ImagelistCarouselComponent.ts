@@ -78,7 +78,7 @@ export default class ImagelistCarouselComponent extends React.Component<
     return R(
       "div",
       {
-        className: "image-carousel-component carousel slide",
+        className: "image-carousel-component carousel carousel-dark slide",
         style: { height: this.props.height, overflow: "hidden" }
       },
       this.props.imagelist.length < 10
