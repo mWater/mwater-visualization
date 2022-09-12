@@ -1,15 +1,61 @@
 import { JsonQLExpr, JsonQLQuery, JsonQLSelect } from "jsonql";
 import { Schema } from "mwater-expressions";
+import { JsonQLFilter } from "../JsonQLFilter";
 import { DatagridDesign, DatagridDesignColumn, DatagridDesignSubtable } from "./DatagridDesign";
 export default class DatagridQueryBuilder {
     schema: Schema;
     constructor(schema: Schema);
-    createQuery(design: any, options?: {}): JsonQLQuery;
-    createSimpleQuery(design: any, options: any): JsonQLQuery;
-    createComplexQuery(design: any, options: any): JsonQLQuery;
-    createComplexMainQuery(design: DatagridDesign, options: any): JsonQLQuery;
-    createComplexSubtableQuery(design: DatagridDesign, options: any, subtable: any, subtableIndex: any): JsonQLQuery;
-    getMainOrderByExprs(design: any, isAggr?: boolean): JsonQLExpr[];
+    createQuery(design: DatagridDesign, options?: {
+        /** start at row offset */
+        offset?: number;
+        /** limit rows */
+        limit?: number;
+        /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+        extraFilters?: JsonQLFilter[];
+        /** repeat main level values in subtable rows instead of leaving blank */
+        fillSubtableRows?: boolean;
+    }): JsonQLQuery;
+    createSimpleQuery(design: any, options?: {
+        /** start at row offset */
+        offset?: number;
+        /** limit rows */
+        limit?: number;
+        /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+        extraFilters?: JsonQLFilter[];
+        /** repeat main level values in subtable rows instead of leaving blank */
+        fillSubtableRows?: boolean;
+    }): JsonQLQuery;
+    createComplexQuery(design: DatagridDesign, options?: {
+        /** start at row offset */
+        offset?: number;
+        /** limit rows */
+        limit?: number;
+        /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+        extraFilters?: JsonQLFilter[];
+        /** repeat main level values in subtable rows instead of leaving blank */
+        fillSubtableRows?: boolean;
+    }): JsonQLQuery;
+    createComplexMainQuery(design: DatagridDesign, options?: {
+        /** start at row offset */
+        offset?: number;
+        /** limit rows */
+        limit?: number;
+        /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+        extraFilters?: JsonQLFilter[];
+        /** repeat main level values in subtable rows instead of leaving blank */
+        fillSubtableRows?: boolean;
+    }): JsonQLQuery;
+    createComplexSubtableQuery(design: DatagridDesign, options: {
+        /** start at row offset */
+        offset?: number | undefined;
+        /** limit rows */
+        limit?: number | undefined;
+        /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+        extraFilters?: JsonQLFilter[] | undefined;
+        /** repeat main level values in subtable rows instead of leaving blank */
+        fillSubtableRows?: boolean | undefined;
+    } | undefined, subtable: any, subtableIndex: any): JsonQLQuery;
+    getMainOrderByExprs(design: DatagridDesign, isAggr?: boolean): JsonQLExpr[];
     getMainOrderByDirections(design: any, isAggr?: boolean): any[];
     getSubtableOrderByExprs(design: DatagridDesign, subtable: DatagridDesignSubtable): JsonQLExpr[];
     getSubtableOrderByDirections(design: any, subtable: any): any[];

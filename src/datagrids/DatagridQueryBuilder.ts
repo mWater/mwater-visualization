@@ -4,6 +4,7 @@ import { Expr, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
+import { JsonQLFilter } from "../JsonQLFilter"
 import { DatagridDesign, DatagridDesignColumn, DatagridDesignSubtable } from "./DatagridDesign"
 
 // Builds a datagrid query.
@@ -24,7 +25,19 @@ export default class DatagridQueryBuilder {
   //  limit: limit rows
   //  extraFilters: array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
   //  fillSubtableRows: repeat main level values in subtable rows instead of leaving blank
-  createQuery(design: any, options = {}): JsonQLQuery {
+  createQuery(design: DatagridDesign, options: {
+    /** start at row offset */
+    offset?: number
+
+    /** limit rows */
+    limit?: number
+
+    /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+    extraFilters?: JsonQLFilter[]
+
+    /** repeat main level values in subtable rows instead of leaving blank */
+    fillSubtableRows?: boolean
+  } = {}): JsonQLQuery {
     // Create query to get the page of rows at the specific offset
     // Handle simple case
     if (!design.subtables || design.subtables.length === 0) {
@@ -35,7 +48,19 @@ export default class DatagridQueryBuilder {
   }
 
   // Simple query with no subtables
-  createSimpleQuery(design: any, options: any): JsonQLQuery {
+  createSimpleQuery(design: any, options: {
+    /** start at row offset */
+    offset?: number
+
+    /** limit rows */
+    limit?: number
+
+    /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+    extraFilters?: JsonQLFilter[]
+
+    /** repeat main level values in subtable rows instead of leaving blank */
+    fillSubtableRows?: boolean
+} = {}): JsonQLQuery {
     let column, i
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
@@ -130,7 +155,19 @@ export default class DatagridQueryBuilder {
   }
 
   // Query with subtables
-  createComplexQuery(design: any, options: any): JsonQLQuery {
+  createComplexQuery(design: DatagridDesign, options: {
+    /** start at row offset */
+    offset?: number
+
+    /** limit rows */
+    limit?: number
+
+    /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+    extraFilters?: JsonQLFilter[]
+
+    /** repeat main level values in subtable rows instead of leaving blank */
+    fillSubtableRows?: boolean
+} = {}): JsonQLQuery {
     // Queries to union
     let column, direction, i, index, subtable
     const unionQueries: JsonQLQuery[] = []
@@ -138,8 +175,8 @@ export default class DatagridQueryBuilder {
     // Create main query
     unionQueries.push(this.createComplexMainQuery(design, options))
 
-    for (index = 0; index < design.subtables.length; index++) {
-      subtable = design.subtables[index]
+    for (index = 0; index < design.subtables!.length; index++) {
+      subtable = design.subtables![index]
       unionQueries.push(this.createComplexSubtableQuery(design, options, subtable, index))
     }
 
@@ -183,8 +220,8 @@ export default class DatagridQueryBuilder {
     query.orderBy!.push({ expr: { type: "field", tableAlias: "unioned", column: "subtable" }, direction: "asc" })
 
     // Add orders of subtables
-    for (let stindex = 0; stindex < design.subtables.length; stindex++) {
-      subtable = design.subtables[stindex]
+    for (let stindex = 0; stindex < design.subtables!.length; stindex++) {
+      subtable = design.subtables![stindex]
       const iterable1 = this.getSubtableOrderByDirections(design, subtable)
       for (i = 0; i < iterable1.length; i++) {
         direction = iterable1[i]
@@ -196,7 +233,19 @@ export default class DatagridQueryBuilder {
   }
 
   // Create the main query (not joined to subtables) part of the overall complex query. See tests for more details
-  createComplexMainQuery(design: DatagridDesign, options: any): JsonQLQuery {
+  createComplexMainQuery(design: DatagridDesign, options: {
+    /** start at row offset */
+    offset?: number
+
+    /** limit rows */
+    limit?: number
+
+    /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+    extraFilters?: JsonQLFilter[]
+
+    /** repeat main level values in subtable rows instead of leaving blank */
+    fillSubtableRows?: boolean
+} = {}): JsonQLQuery {
     let i, type
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
@@ -294,7 +343,19 @@ export default class DatagridQueryBuilder {
   }
 
   // Create one subtable query part of the overall complex query. See tests for more details
-  createComplexSubtableQuery(design: DatagridDesign, options: any, subtable: any, subtableIndex: any): JsonQLQuery {
+  createComplexSubtableQuery(design: DatagridDesign, options: {
+    /** start at row offset */
+    offset?: number
+
+    /** limit rows */
+    limit?: number
+
+    /** array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. } */
+    extraFilters?: JsonQLFilter[]
+
+    /** repeat main level values in subtable rows instead of leaving blank */
+    fillSubtableRows?: boolean
+} = {}, subtable: any, subtableIndex: any): JsonQLQuery {
     let expr, i
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
@@ -397,7 +458,7 @@ export default class DatagridQueryBuilder {
   // Get expressions to order main query by
   // isAggr is true if any column or ordering is aggregate.
   // If so, only use explicit ordering
-  getMainOrderByExprs(design: any, isAggr = false): JsonQLExpr[] {
+  getMainOrderByExprs(design: DatagridDesign, isAggr = false): JsonQLExpr[] {
     const exprCompiler = new ExprCompiler(this.schema)
     const exprCleaner = new ExprCleaner(this.schema)
 
@@ -406,24 +467,24 @@ export default class DatagridQueryBuilder {
     // First explicit order bys
     for (let orderBy of design.orderBys || []) {
       // Clean first
-      const orderByExpr = exprCleaner.cleanExpr(orderBy.expr, { table: design.table })
+      const orderByExpr = exprCleaner.cleanExpr(orderBy.expr, { table: design.table! })
       exprs.push(exprCompiler.compileExpr({ expr: orderByExpr, tableAlias: "main" }))
     }
 
     if (!isAggr) {
       // Natural order if present
-      const { ordering } = this.schema.getTable(design.table)!
+      const { ordering } = this.schema.getTable(design.table!)!
       if (ordering) {
         exprs.push(
           exprCompiler.compileExpr({
-            expr: { type: "field", table: design.table, column: ordering },
+            expr: { type: "field", table: design.table!, column: ordering },
             tableAlias: "main"
           })
         )
       }
 
       // Always primary key
-      exprs.push({ type: "field", tableAlias: "main", column: this.schema.getTable(design.table)!.primaryKey })
+      exprs.push({ type: "field", tableAlias: "main", column: this.schema.getTable(design.table!)!.primaryKey })
     }
 
     return exprs
