@@ -1,7 +1,7 @@
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
-import { DataSource, Expr, ExprCompiler, FieldExpr, Schema } from "mwater-expressions"
+import { DataSource, Expr, ExprCleaner, ExprCompiler, FieldExpr, Schema } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import Widget, { CreateViewElementOptions } from "./Widget"
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
@@ -77,11 +77,15 @@ export default class ImageWidget extends Widget {
       return callback(null)
     }
 
+    const exprCleaner = new ExprCleaner(schema)
+    const expr = exprCleaner.cleanExpr(design.expr)
+    if (!expr) {
+      return callback(null)
+    }
+
     const { table } = (design.expr as FieldExpr)
-
     const exprCompiler = new ExprCompiler(schema)
-
-    const imageExpr = exprCompiler.compileExpr({ expr: design.expr, tableAlias: "main" })
+    const imageExpr = exprCompiler.compileExpr({ expr , tableAlias: "main" })
 
     // Get distinct to only show if single row match
     const query: JsonQLSelectQuery = {
