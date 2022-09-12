@@ -139,8 +139,12 @@ export default class LabeledExprGenerator {
             }
           ]
         } else {
-          // use code, full name, or name of dest table
-          joinColumn = this.schema.getColumn(column.idTable!, "code")
+          // use label, code, full name, or name of dest table
+          const label = this.schema.getTable(column.idTable!)!.label
+          if (label && typeof label == "string") {
+            joinColumn = this.schema.getColumn(column.idTable!, label)  
+          }
+          joinColumn = joinColumn || this.schema.getColumn(column.idTable!, "code")
           joinColumn = joinColumn || this.schema.getColumn(column.idTable!, "full_name")
           joinColumn = joinColumn || this.schema.getColumn(column.idTable!, "name")
           joinColumn = joinColumn || this.schema.getColumn(column.idTable!, "username")
