@@ -111,7 +111,7 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
         items={this.props.design}
         onItemsChange={this.handleDesignChange}
         renderItem={this.renderQuickfilter}
-        getReorderableKey={(item: any) => JSON.stringify(item)}
+        getReorderableKey={(item, index) => index}
       />,
       this.props.tables.length > 0
         ? R(
