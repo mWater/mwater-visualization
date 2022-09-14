@@ -19,7 +19,7 @@ export default class ImageUploaderComponent extends React.Component<ImageUploade
     constructor(props: any);
     onFileDrop: (files: any) => void;
     uploadProgress: (e: any) => string | undefined;
-    uploadComplete: (e: any) => any;
+    uploadComplete: (e: any) => void;
     createId(): string;
     renderUploader(): JSX.Element;
     renderPreview(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;

@@ -68,9 +68,10 @@ export default class ImageUploaderComponent extends React.Component<
   uploadComplete = (e: any) => {
     if (e.target.status === 200) {
       this.setState({ uploading: false, files: null, editing: false })
-      return this.props.onUpload(this.state.uid)
+      this.props.onUpload(this.state.uid)
     } else {
-      return alert(`Upload failed: ${e.target.responseText}`)
+      this.setState({ uploading: false, files: null, editing: false })
+      alert(`Upload failed: ${e.target.responseText}`)
     }
   }
 
