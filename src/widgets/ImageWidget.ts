@@ -111,9 +111,9 @@ export default class ImageWidget extends Widget {
     }
 
     // Execute query
-    return dataSource.performQuery(query, (error: any, rows: any) => {
+    dataSource.performQuery(query, (error: any, rows: any) => {
       if (error) {
-        return callback(error)
+        callback(error)
       } else {
         // If multiple, use null
         if (rows.length !== 1) {
@@ -125,7 +125,7 @@ export default class ImageWidget extends Widget {
             value = JSON.parse(rows[0].value)
           }
 
-          return callback(null, value)
+          callback(null, value)
         }
       }
     })
