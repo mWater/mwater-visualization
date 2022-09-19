@@ -47,7 +47,7 @@ export default class ImageUploaderComponent extends React.Component<
     this.xhr.addEventListener("load", this.uploadComplete, false)
 
     const id = this.createId()
-    this.xhr.open("POST", this.props.dataSource.getImageUrl(id))
+    this.xhr.open("POST", this.props.dataSource.getImageUploadUrl(id))
     this.xhr.send(fd)
     return this.setState({ uid: id })
   }
