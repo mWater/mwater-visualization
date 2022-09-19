@@ -81,8 +81,8 @@ export default class ImageUploaderComponent extends React.Component<
 
   renderUploader() {
     return <div>
-      <Dropzone multiple={false} onDrop={this.onFileDrop}>
-        {({getRootProps, getInputProps}: DropzoneState) => (
+      <Dropzone multiple={false} onDrop={this.onFileDrop} noDragEventsBubbling={true}>
+        {({getRootProps, getInputProps, isDragActive}: DropzoneState) => (
           <div {...getRootProps({ className: "dropzone" })}>
             <input {...getInputProps()} />
             { this.state.uploading
@@ -95,7 +95,13 @@ export default class ImageUploaderComponent extends React.Component<
                   }}
                 />
               </div>
-            : <div>Drop file here or click to select file</div>
+            : <div>
+                 {
+                 isDragActive ?
+                  "Drop the files here" 
+                  : "Drop file here or click to select file"
+                 }
+                </div>
             }
           </div>
         )}
