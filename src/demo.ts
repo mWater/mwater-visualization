@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-import PropTypes from "prop-types"
 import React from "react"
 import ReactDOM from "react-dom"
 const R = React.createElement
@@ -28,6 +25,8 @@ import { DragDropContextProvider } from "react-dnd"
 import { default as HTML5Backend } from "react-dnd-html5-backend"
 import { defaultT } from 'ez-localize'
 import { setMapTilerApiKey } from "./maps/vectorMaps"
+
+import "./index"
 
 // Setup localizer
 global.T = defaultT

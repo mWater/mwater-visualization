@@ -48,6 +48,10 @@ interface LoadState {
     limit: number;
     filters?: JsonQLFilter[];
 }
+/** Datagrid table itself without decorations such as edit button etc.
+ * See README.md for description of datagrid format
+ * Design should be cleaned already before being passed in (see DatagridUtils)
+ */
 export default class DatagridViewComponent extends React.Component<DatagridViewComponentProps, DatagridViewComponentState> {
     static defaultProps: {
         pageSize: number;
@@ -58,7 +62,7 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
     componentWillReceiveProps(nextProps: DatagridViewComponentProps): void;
     loadMoreRows(): void;
     reload: () => void;
-    deleteRow(rowIndex: any, callback: any): any;
+    deleteRow(rowIndex: any, callback: any): void;
     reloadRow(rowIndex: any, callback: any): void;
     handleColumnResize: (newColumnWidth: any, columnKey: any) => void;
     handleCellClick: (rowIndex: any, columnIndex: any) => void;

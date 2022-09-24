@@ -32,13 +32,8 @@ function ajax(url: any, cb: any) {
     request = new XMLHttpRequest()
   request.open("GET", url)
   request.onreadystatechange = function () {
-    /*jshint evil: true */
     if (request.readyState === 4 && request.status === 200) {
-      if (window.JSON) {
-        response = JSON.parse(request.responseText)
-      } else {
-        response = eval("(" + request.responseText + ")")
-      }
+      response = JSON.parse(request.responseText)
       cb(response)
     }
   }

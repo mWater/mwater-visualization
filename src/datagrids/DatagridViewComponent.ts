@@ -63,9 +63,10 @@ interface LoadState {
   filters?: JsonQLFilter[]
 }
 
-// Datagrid table itself without decorations such as edit button etc.
-// See README.md for description of datagrid format
-// Design should be cleaned already before being passed in (see DatagridUtils)
+/** Datagrid table itself without decorations such as edit button etc.
+ * See README.md for description of datagrid format
+ * Design should be cleaned already before being passed in (see DatagridUtils)
+ */
 export default class DatagridViewComponent extends React.Component<
   DatagridViewComponentProps,
   DatagridViewComponentState
@@ -113,7 +114,7 @@ export default class DatagridViewComponent extends React.Component<
     this.loadState = loadState
 
     // Perform the actual load
-    return this.props.datagridDataSource.getRows(
+    this.props.datagridDataSource.getRows(
       loadState.design,
       loadState.offset,
       loadState.limit,
@@ -147,12 +148,12 @@ export default class DatagridViewComponent extends React.Component<
     const newRows = this.state.rows.slice()
     _.pullAt(newRows, rowIndex)
     this.setState({ rows: newRows })
-    return callback()
+    callback()
   }
 
   // Reload a single row
   reloadRow(rowIndex: any, callback: any) {
-    return this.props.datagridDataSource.getRows(
+    this.props.datagridDataSource.getRows(
       this.props.design,
       rowIndex,
       1,
@@ -169,7 +170,7 @@ export default class DatagridViewComponent extends React.Component<
         const newRows = this.state.rows.slice()
         newRows[rowIndex] = rows[0]
         this.setState({ rows: newRows })
-        return callback()
+        callback()
       }
     )
   }
@@ -186,7 +187,7 @@ export default class DatagridViewComponent extends React.Component<
     const columns = this.props.design.columns.slice()
     columns[columnIndex] = column
 
-    return this.props.onDesignChange!(_.extend({}, this.props.design, { columns }))
+    this.props.onDesignChange!(_.extend({}, this.props.design, { columns }))
   }
 
   handleCellClick = (rowIndex: any, columnIndex: any) => {

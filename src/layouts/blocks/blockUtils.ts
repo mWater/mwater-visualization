@@ -67,7 +67,7 @@ export function dropBlock(rootBlock: LayoutBlock, sourceBlock: LayoutBlock, targ
       return _.extend({}, rootBlock, { blocks })
     } else {
       // Recurse
-      blocks = _.map(blocks, (block) => exports.dropBlock(block, sourceBlock, targetBlock, side))
+      blocks = _.map(blocks, (block) => dropBlock(block, sourceBlock, targetBlock, side))
       return _.extend({}, rootBlock, { blocks })
     }
   }
@@ -106,7 +106,7 @@ export function dropBlock(rootBlock: LayoutBlock, sourceBlock: LayoutBlock, targ
       return _.extend({}, rootBlock, { blocks })
     } else {
       // Recurse
-      blocks = _.map(blocks, (block) => exports.dropBlock(block, sourceBlock, targetBlock, side))
+      blocks = _.map(blocks, (block) => dropBlock(block, sourceBlock, targetBlock, side))
       return _.extend({}, rootBlock, { blocks })
     }
   }
@@ -131,7 +131,7 @@ export function updateBlock(rootBlock: LayoutBlock, block: LayoutBlock): LayoutB
     })
 
     // Recurse
-    blocks = _.map(blocks, (b) => exports.updateBlock(b, block))
+    blocks = _.map(blocks, (b) => updateBlock(b, block))
 
     return _.extend({}, rootBlock, { blocks })
   }
@@ -152,7 +152,7 @@ export function removeBlock(rootBlock: LayoutBlock, block: LayoutBlock): LayoutB
     // TODO remove weight
 
     // Recurse
-    blocks = _.compact(_.map(blocks, (b) => exports.removeBlock(b, block)))
+    blocks = _.compact(_.map(blocks, (b) => removeBlock(b, block))) as LayoutBlock[]
 
     // If empty and not root, return null
     if (blocks.length === 0 && rootBlock.type !== "root") {
@@ -198,7 +198,7 @@ export function cleanBlock(rootBlock: LayoutBlock): LayoutBlock {
     //     weights = _.take(rootBlock.w)
 
     // Recurse
-    blocks = _.map(blocks, (b) => exports.cleanBlock(b))
+    blocks = _.map(blocks, (b) => cleanBlock(b))
 
     return _.extend({}, rootBlock, { blocks })
   }
