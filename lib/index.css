@@ -495,6 +495,11 @@
   outline: none;
 }
 
+/* popup padding */
+.maplibregl-popup-content .mapboxgl-popup-content {
+  padding: 5px 10px;
+}
+
 /* For https://github.com/mWater/mwater-blue/issues/92 */
 .leaflet-top,
 .leaflet-bottom {
