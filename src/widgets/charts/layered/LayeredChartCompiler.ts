@@ -452,7 +452,7 @@ export default class LayeredChartCompiler {
 
   // Compiles data for a polar chart (pie/donut) with no x axis
   compileDataPolar(design: LayeredChartDesign, data: C3ChartData, locale: any): C3Data {
-    let order: "asc" | "desc" | undefined
+    let order: "asc" | "desc" | null
     const columns: any = []
     const types = {}
     const names = {}
@@ -525,7 +525,7 @@ export default class LayeredChartCompiler {
     } else if (design.polarOrder === "asc") {
       order = "asc"
     } else if (design.polarOrder === "natural") {
-      order = undefined
+      order = null
     } else {
       order = "desc"
     }

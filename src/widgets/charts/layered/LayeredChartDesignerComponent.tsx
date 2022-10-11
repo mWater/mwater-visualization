@@ -8,7 +8,7 @@ import TabbedComponent from "react-library/lib/TabbedComponent"
 import * as uiComponents from "../../../UIComponents"
 import ColorComponent from "../../../ColorComponent"
 import * as ui from "react-library/lib/bootstrap"
-import { Checkbox } from "react-library/lib/bootstrap"
+import { Checkbox, Select } from "react-library/lib/bootstrap"
 import { DataSource, Schema } from "mwater-expressions"
 import { LayeredChartDesign, YThreshold } from "./LayeredChartDesign"
 import { JsonQLFilter } from "../../.."
@@ -57,7 +57,7 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
     return this.updateDesign({ hidePercentage: value })
   }
   handlePolarOrderChange = (value: any) => {
-    return this.updateDesign({ polarOrder: value ? "desc" : "natural" })
+    return this.updateDesign({ polarOrder: value })
   }
   handleYThresholdsChange = (yThresholds: any) => {
     return this.updateDesign({ yThresholds })
@@ -302,14 +302,17 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
             >
               Hide Percentage
             </Checkbox>,
-            <Checkbox
-              key="polarOrder"
-              inline
-              value={(design.polarOrder || "desc") === "desc"}
+            <Select
+              size="sm"
+              value={design.polarOrder ?? "desc"}
               onChange={this.handlePolarOrderChange}
-            >
-              Descending Order
-            </Checkbox>
+              options={[
+                { value: "desc", label: "Descending Order" },
+                { value: "asc", label: "Ascending Order" },
+                { value: "natural", label: "Natural Order" }
+              ]}
+              inline
+            />
           ]
         : undefined,
       (design.labels && design.type === "bar" && !design.transpose) ? R('div', null, 
