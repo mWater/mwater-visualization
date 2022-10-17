@@ -35,10 +35,11 @@ export interface RowUpdate {
 export interface DatagridViewComponentState {
     rows: any[];
     entirelyLoaded: boolean;
-    /** set to { rowIndex: 0, 1, 2, columnIndex: 0, 1, 2... } if editing a cell */
+    /** set to { rowIndex: 0, 1, 2, columnIndex: 0, 1, 2..., rowId: id of row } if editing a cell */
     editingCell: {
         rowIndex: number;
         columnIndex: number;
+        rowId: any;
     } | null;
     savingCell: boolean;
 }
@@ -63,7 +64,13 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
     loadMoreRows(): void;
     reload: () => void;
     deleteRow(rowIndex: any, callback: any): void;
-    reloadRow(rowIndex: any, callback: any): void;
+    /** Reload a single row by index and id. Note that the row might be in a different
+     * ordinal position within the datagrid, or might have vanished from view if the change
+     * caused the row to be excluded by the filter. Always replace
+     * it where it was, unless it has disappeared from view in which case the row
+     * is removed.
+     */
+    reloadRow(rowIndex: number, rowId: any, callback: () => void): void;
     handleColumnResize: (newColumnWidth: any, columnKey: any) => void;
     handleCellClick: (rowIndex: any, columnIndex: any) => void;
     handleSaveEdit: () => void;

@@ -7,6 +7,7 @@ import ExprCellComponent from "./ExprCellComponent"
 import EditExprCellComponent from "./EditExprCellComponent"
 import DatagridDataSource from "./DatagridDataSource"
 import { DatagridDesign, JsonQLFilter } from ".."
+import produce from "immer"
 
 export interface DatagridViewComponentProps {
   /** Width of control */
@@ -50,8 +51,8 @@ export interface DatagridViewComponentState {
   rows: any[]
   entirelyLoaded: boolean
 
-  /** set to { rowIndex: 0, 1, 2, columnIndex: 0, 1, 2... } if editing a cell */
-  editingCell: { rowIndex: number; columnIndex: number } | null
+  /** set to { rowIndex: 0, 1, 2, columnIndex: 0, 1, 2..., rowId: id of row } if editing a cell */
+  editingCell: { rowIndex: number; columnIndex: number; rowId: any } | null
 
   savingCell: boolean
 }
@@ -151,24 +152,51 @@ export default class DatagridViewComponent extends React.Component<
     callback()
   }
 
-  // Reload a single row
-  reloadRow(rowIndex: any, callback: any) {
+  /** Reload a single row by index and id. Note that the row might be in a different
+   * ordinal position within the datagrid, or might have vanished from view if the change
+   * caused the row to be excluded by the filter. Always replace
+   * it where it was, unless it has disappeared from view in which case the row
+   * is removed.
+   */
+  reloadRow(rowIndex: number, rowId: any, callback: () => void) {
+    // Create new filters that only include one row
+    const filters = produce(this.props.filters || [], draft => {
+      draft.push({
+        table: this.props.design.table!,
+        jsonql: {
+          type: "op", 
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: this.props.schema.getTable(this.props.design.table!)?.primaryKey! },
+            { type: "literal", value: rowId }
+          ]
+        }
+      })
+    })
+
     this.props.datagridDataSource.getRows(
       this.props.design,
-      rowIndex,
+      0,
       1,
-      this.props.filters,
-      (error: any, rows: any) => {
-        if (error || !rows[0]) {
+      filters,
+      (error, rows) => {
+        if (error) {
           console.error(error)
           alert(T("Error loading data"))
           callback()
           return
         }
 
-        // Set row
-        const newRows = this.state.rows.slice()
-        newRows[rowIndex] = rows[0]
+        const newRows = produce(this.state.rows, draft => {
+          if (rows[0]) {
+            draft[rowIndex] = rows[0]    
+          }
+          else {
+            // If row missing, remove it from list
+            draft.splice(rowIndex, 1)
+          }
+        })
+        
         this.setState({ rows: newRows })
         callback()
       }
@@ -215,11 +243,6 @@ export default class DatagridViewComponent extends React.Component<
     // Get column
     const column = this.props.design.columns[columnIndex]
 
-    // // If not expr, return
-    // if (!column.type === "expr") {
-    //   return
-    // }
-
     // Get expression type
     const exprType = new ExprUtils(this.props.schema).getExprType(column.expr)!
 
@@ -228,11 +251,18 @@ export default class DatagridViewComponent extends React.Component<
       return
     }
 
-    this.props.canEditExpr(this.props.design.table!, this.state.rows[rowIndex].id, column.expr)
+    // Get row id
+    const rowId = this.state.rows[rowIndex].id
+    if (rowId == null) {
+      // No row id means aggregated table. Cannot edti
+      return
+    }
+
+    this.props.canEditExpr(this.props.design.table!, rowId, column.expr)
       .then(canEdit => {
         if (canEdit) {
           // Start editing
-          return this.setState({ editingCell: { rowIndex, columnIndex } })
+          this.setState({ editingCell: { rowIndex, columnIndex, rowId } })
         }
       }).catch(error => {
         console.error(error)
@@ -247,7 +277,7 @@ export default class DatagridViewComponent extends React.Component<
       return
     }
 
-    const rowId = this.state.rows[this.state.editingCell!.rowIndex].id
+    const rowId = this.state.editingCell!.rowId
     const { expr } = this.props.design.columns[this.state.editingCell!.columnIndex]
     const value = this.editCellComp.getValue()
 
@@ -255,7 +285,7 @@ export default class DatagridViewComponent extends React.Component<
       this.props.updateExprValues!(this.props.design.table!, [{ primaryKey: rowId, expr, value }])
         .then(() => {
           // Reload row
-          this.reloadRow(this.state.editingCell!.rowIndex, () => {
+          this.reloadRow(this.state.editingCell!.rowIndex, rowId, () => {
             this.setState({ editingCell: null, savingCell: false })
           })
         }).catch(error => {

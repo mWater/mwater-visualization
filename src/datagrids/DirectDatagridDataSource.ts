@@ -1,10 +1,12 @@
 import DatagridDataSource from "./DatagridDataSource"
 import DatagridQueryBuilder from "./DatagridQueryBuilder"
 import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
-import { DataSource, Schema } from "mwater-expressions"
+import { DataSource, Row, Schema } from "mwater-expressions"
+import { DatagridDesign } from "./DatagridDesign"
+import { JsonQLFilter } from "../JsonQLFilter"
 
-// Uses direct DataSource queries
-export default class DirectDatagridDataSource {
+/** Uses direct DataSource queries */
+export default class DirectDatagridDataSource implements DatagridDataSource {
   options: { schema: Schema; dataSource: DataSource }
 
   // Create dashboard data source that uses direct jsonql calls
@@ -15,8 +17,14 @@ export default class DirectDatagridDataSource {
     this.options = options
   }
 
-  // Gets the rows specified
-  getRows(design: any, offset: any, limit: any, filters: any, callback: any) {
+  /** Gets the rows specified */
+  getRows(
+    design: DatagridDesign,
+    offset: number,
+    limit: number,
+    filters: JsonQLFilter[] | undefined,
+    callback: (error: any, rows: Row[]) => void
+  ): void {
     const queryBuilder = new DatagridQueryBuilder(this.options.schema)
 
     // Create query to get the page of rows at the specific offset
