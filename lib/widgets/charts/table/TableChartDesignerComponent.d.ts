@@ -8,7 +8,7 @@ export interface TableChartDesignerComponentProps {
     onDesignChange: (design: TableChartDesign) => void;
 }
 export default class TableChartDesignerComponent extends React.Component<TableChartDesignerComponentProps> {
-    updateDesign(changes: any): void;
+    updateDesign(changes: Partial<TableChartDesign>): void;
     handleTitleTextChange: (ev: any) => void;
     handleTableChange: (table: any) => void;
     handleFilterChange: (filter: any) => void;
@@ -38,7 +38,7 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export interface TableChartColumnDesignerComponentProps {
-    design: any;
+    design: TableChartDesign;
     schema: Schema;
     dataSource: DataSource;
     index: number;

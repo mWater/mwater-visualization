@@ -47,6 +47,9 @@ export interface TableChartColumn {
 
   /** optional d3-format format for numeric values. Default if null is "," */
   format?: string | null
+
+  /** Summarize in the table footer, only applicable for number type column expressions */
+  summarize?: boolean
 }
 
 export interface TableChartOrdering {
@@ -198,6 +201,8 @@ export default class TableChart extends Chart {
       _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.textAxis)) ||
       _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.axis))
 
+    const totalColumns: string[] = []
+
     // For each column
     for (let colNum = 0 ; colNum < design.columns.length ; colNum++) {
       column = design.columns[colNum]
@@ -223,6 +228,11 @@ export default class TableChart extends Chart {
         expr: compiledExpr,
         alias: `c${colNum}`
       })
+
+
+      if(exprType === 'number' && column.summarize) {
+        totalColumns.push(`c${colNum}`)
+      }
 
       // Add group by if not aggregate
       if (isAggr && !axisBuilder.isAxisAggr(column.textAxis)) {
@@ -280,7 +290,25 @@ export default class TableChart extends Chart {
       query.where = whereClauses[0]
     }
 
-    return dataSource.performQuery(query, (error: any, data: any) => callback(error, { main: data }))
+    const summaryQuery: JsonQLSelectQuery = {
+      type: "query",
+      selects: design.columns.map((c: any, i) => {
+        if(totalColumns.includes(`c${i}`))
+          return { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "t", column: `c${i}` }] }, alias: `c${i}` }
+        else 
+          return { type: 'select', expr: {type: 'literal', value: null} , alias: `c${i}` }
+      }),
+      from: { type: "subquery", query, alias: "t" },
+    }
+
+    return dataSource.performQuery(query, (error: any, data: any) => {
+      if(totalColumns.length > 0) 
+        dataSource.performQuery(summaryQuery, (error: any, summary: any) => {
+          callback(error, { main: data, summary: summary[0] })
+        })
+      else 
+      callback(error, { main: data})
+    })
   }
 
   // Create a view element for the chart

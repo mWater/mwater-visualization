@@ -25,6 +25,8 @@ export interface TableChartColumn {
     textAxis?: Axis | null;
     /** optional d3-format format for numeric values. Default if null is "," */
     format?: string | null;
+    /** Summarize in the table footer, only applicable for number type column expressions */
+    summarize?: boolean;
 }
 export interface TableChartOrdering {
     /** axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within! */

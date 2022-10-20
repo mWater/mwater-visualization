@@ -114,6 +114,34 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
     )
   }
 
+  renderFooterCell(index: number) {
+    const exprUtils = new ExprUtils(this.props.schema)
+    const column = this.props.columns[index]
+    const exprType = exprUtils.getExprType(column.textAxis?.expr)
+    let node = null
+
+    if(exprType && exprType == 'number') {
+      node = formatValue(exprType, this.props.data.summary[`c${index}`], column.format)
+    }
+
+    return R("th", { key: index }, node)
+  }
+
+  renderFooter() {
+    if(!this.props.data.summary) {
+      return null
+    }
+
+    return R('tfoot', 
+      {key: 'foot'},
+      R(
+        'tr',
+        {key: 'foot'},
+        _.map(this.props.columns, (column, i) => R("th", { key: i }, this.renderFooterCell(i)))
+      )
+    )
+  }
+
   renderImage(id: any) {
     const url = this.props.dataSource.getImageUrl(id)
     return R("a", { href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 } }, "Image")
@@ -194,7 +222,8 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
       "table",
       { className: "table table-sm table-hover", style: { fontSize: "10pt", marginBottom: 0 } },
       this.renderHeader(),
-      this.renderBody()
+      this.renderBody(),
+      this.renderFooter()
     )
   }
 }

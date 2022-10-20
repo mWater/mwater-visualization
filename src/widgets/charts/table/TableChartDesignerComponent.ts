@@ -25,7 +25,7 @@ export interface TableChartDesignerComponentProps {
 
 export default class TableChartDesignerComponent extends React.Component<TableChartDesignerComponentProps> {
   // Updates design with the specified changes
-  updateDesign(changes: any) {
+  updateDesign(changes: Partial<TableChartDesign>) {
     const design = _.extend({}, this.props.design, changes) as TableChartDesign
     this.props.onDesignChange(design)
   }
@@ -239,7 +239,7 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
 }
 
 export interface TableChartColumnDesignerComponentProps {
-  design: any
+  design: TableChartDesign
   schema: Schema
   dataSource: DataSource
   index: number
@@ -300,7 +300,7 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         table: this.props.design.table,
-        value: column.textAxis ? column.textAxis.expr : undefined,
+        value: column.textAxis ? column.textAxis.expr : null,
         onChange: this.handleExprChange,
         aggrStatuses: ["literal", "individual", "aggregate"]
       })
@@ -312,7 +312,7 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
 
     // Get type
     const exprUtils = new ExprUtils(this.props.schema)
-    const exprType = exprUtils.getExprType(column.textAxis?.expr)
+    const exprType = exprUtils.getExprType(column.textAxis?.expr ?? null)
     if (!exprType) {
       return null
     }
@@ -344,7 +344,7 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
     const column = this.props.design.columns[this.props.index]
 
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
-    const placeholder = axisBuilder.summarizeAxis(column.textAxis, this.context.locale)
+    const placeholder = column.textAxis ? axisBuilder.summarizeAxis(column.textAxis ?? null, this.context.locale): ""
 
     return R(
       "div",
@@ -362,6 +362,17 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
     )
   }
 
+  renderSummarize() {
+    const column = this.props.design.columns[this.props.index]
+    const exprUtils = new ExprUtils(this.props.schema)
+    const exprType = exprUtils.getExprType(column.textAxis?.expr ?? null)
+    if (!exprType || exprType !== 'number') {
+      return null
+    }
+
+    return R(ui.Checkbox, {value: column.summarize, onChange: (summarize) => this.updateColumn({ summarize })}, "Show total")
+  }
+
   render() {
     const iconStyle = {
       cursor: "move",
@@ -376,7 +387,7 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
       this.props.connectDragSource(R("i", { className: "fa fa-bars", style: iconStyle })),
       this.renderRemove(),
       R("label", null, `Column ${this.props.index + 1}`),
-      R("div", { style: { marginLeft: 5 } }, this.renderExpr(), this.renderFormat(), this.renderHeader())
+      R("div", { style: { marginLeft: 5 } }, this.renderExpr(), this.renderFormat(), this.renderHeader(), this.renderSummarize())
     )
   }
 }
