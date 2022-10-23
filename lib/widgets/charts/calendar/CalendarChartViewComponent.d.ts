@@ -52,5 +52,5 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
             shapeRendering: string;
             lineHeight: number;
         };
-    }, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    }, string | React.JSXElementConstructor<any>>;
 }

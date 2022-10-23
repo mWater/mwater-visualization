@@ -73,7 +73,7 @@ declare class ImageWidgetDesignComponent extends React.Component<ImageWidgetDesi
     handleCaptionChange: (ev: any) => void;
     handleRotationChange: (rotation: any) => void;
     handleCaptionPositionChange: (captionPosition: any) => void;
-    handleOpenUrlInSameTabChange: (openUrlInSameTab?: boolean | undefined) => void;
+    handleOpenUrlInSameTabChange: (openUrlInSameTab?: boolean) => void;
     handleSave: () => any;
     handleCancel: () => void;
     renderExpressionEditor(): React.DetailedReactHTMLElement<{

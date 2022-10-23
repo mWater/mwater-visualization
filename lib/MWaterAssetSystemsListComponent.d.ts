@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Schema } from "mwater-expressions";
 /** Searchable list of asset system tables */
 export declare const MWaterAssetSystemsListComponent: (props: {

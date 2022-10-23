@@ -93,9 +93,6 @@ export { default as QuickfilterCompiler } from "./quickfilter/QuickfilterCompile
 
 export { ToggleEditComponent, OptionListComponent } from "./UIComponents"
 
-// Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
-import "./pathseg-polyfill"
-
 // http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 import $ from "jquery"
 

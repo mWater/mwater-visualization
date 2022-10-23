@@ -26,6 +26,6 @@ export default class HorizontalBlockComponent extends React.Component<Horizontal
     handleMouseDown: (index: any, ev: any) => void;
     handleMouseMove: (ev: any) => void;
     handleMouseUp: (ev: any) => void;
-    render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    render(): React.ReactElement<any, string | React.JSXElementConstructor<any>>;
 }
 export {};

@@ -27,5 +27,5 @@ export default class ImageMosaicChartViewComponent extends React.Component<Image
             overflowY: string;
         };
         className: string;
-    }, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    }, string | React.JSXElementConstructor<any>>;
 }

@@ -33,7 +33,7 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<{
     constructor(props: any);
     isLoadNeeded(newProps: any, oldProps: any): boolean;
     load(props: any, prevProps: any, callback: any): void;
-    render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | React.CElement<import("react-library/lib/LoadingComponent").LoadingComponentProps, LoadingComponent> | React.CElement<{
+    render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.CElement<import("react-library/lib/LoadingComponent").LoadingComponentProps, LoadingComponent> | React.CElement<{
         apiUrl: string;
         client?: string | undefined;
         user?: string | undefined;

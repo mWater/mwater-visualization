@@ -11,5 +11,5 @@ export default class PopoverComponent extends React.Component<PopoverComponentPr
     componentWillUnmount(): Element | undefined;
     componentDidUpdate(prevProps: any): Element | undefined;
     updatePopover(props: any, oldProps: any): Element | undefined;
-    render(): string | number | boolean | {} | React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | React.ReactPortal | null | undefined;
+    render(): boolean | {} | React.ReactChild | React.ReactPortal | null | undefined;
 }
