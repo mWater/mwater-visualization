@@ -2,6 +2,7 @@ import _ from "lodash"
 import * as d3Scale from "d3-scale"
 import * as brewer from "d3-scale-chromatic"
 import c_c from "color-mixer"
+import { AxisCategory } from "./axes/Axis"
 
 function rgbStringToHex(rgbString: any) {
   const rgbArray = rgbString
@@ -109,7 +110,7 @@ export default class ColorSchemeFactory {
   }
 
   // Create a color map for a series of categories. Null is treated specially and assumed to be last.
-  static createColorMapForCategories(categories: any, isCategorical: any) {
+  static createColorMapForCategories(categories: AxisCategory[], isCategorical: any) {
     let type
     if (isCategorical) {
       type = "schemeSet1"

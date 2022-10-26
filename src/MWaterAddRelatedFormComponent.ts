@@ -10,6 +10,7 @@ import querystring from "querystring"
 import { ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "./UIComponents"
 import * as formUtils from "mwater-forms/lib/formUtils" // TODO requireing this directly because of bizarre backbone issue
+import { Form } from "mwater-forms"
 
 interface MWaterAddRelatedFormComponentProps {
   table: string
@@ -98,8 +99,9 @@ interface AddRelatedFormModalComponentProps {
 }
 
 interface AddRelatedFormModalComponentState {
-  items: any
+  items: any[] | null
   search: any
+  error?: any
 }
 
 // Actual modal that displays the
@@ -119,18 +121,18 @@ class AddRelatedFormModalComponent extends React.Component<
 
   componentDidMount() {
     // Get all forms visible to user
-    const query = {}
+    const query: any = {}
     query.selector = JSON.stringify({ state: { $ne: "deleted" } })
     if (this.props.client) {
       query.client = this.props.client
     }
 
     // Get list of all form names
-    return $.getJSON(this.props.apiUrl + "forms?" + querystring.stringify(query), (forms) => {
+    return $.getJSON(this.props.apiUrl + "forms?" + querystring.stringify(query), (forms: Form[]) => {
       // Sort by modified.on desc but first by user
       forms = _.sortByOrder(
         forms,
-        [(form) => (form.created.by === this.props.user ? 1 : 0), (form) => form.modified.on],
+        [(form: Form) => (form.created.by === this.props.user ? 1 : 0), (form: Form) => form.modified!.on],
         ["desc", "desc"]
       )
 
@@ -140,7 +142,7 @@ class AddRelatedFormModalComponent extends React.Component<
       // Get _id, name, and description
       const items = _.map(forms, (form) => ({
         name: ExprUtils.localizeString(form.design.name, this.context.locale),
-        desc: `Modified ${moment(form.modified.on, moment.ISO_8601).format("ll")}`,
+        desc: `Modified ${moment(form.modified!.on, moment.ISO_8601).format("ll")}`,
         onClick: this.props.onSelect.bind(null, "responses:" + form._id)
       }))
 
@@ -171,7 +173,6 @@ class AddRelatedFormModalComponent extends React.Component<
         className: "form-control",
         placeholder: "Search...",
         key: "search",
-        ref: this.searchRef,
         style: { marginBottom: 10 },
         value: this.state.search,
         onChange: (ev: any) => this.setState({ search: ev.target.value })

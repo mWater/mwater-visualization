@@ -11,7 +11,7 @@ export interface DateRangeComponentProps {
   value: [string | null, string | null] | null
 
   /** Array of [start date, end date] in iso 8601 format */
-  onChange: (value: [string | null, string | null]) => void
+  onChange: (value: [string | null, string | null] | null) => void
 
   /** true if for datetime, not date   */
   datetime?: boolean
@@ -72,7 +72,7 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
     if (this.props.value?.[1] && this.fromMoment(value) > this.props.value[1]) {
       return this.props.onChange([this.fromMoment(value), null])
     } else {
-      return this.props.onChange([this.fromMoment(value), this.props.value?.[1]])
+      return this.props.onChange([this.fromMoment(value), this.props.value?.[1] ?? null])
     }
   }
 
@@ -87,7 +87,7 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
     if (this.props.value?.[0] && this.fromMoment(value) < this.props.value[0]) {
       this.props.onChange([null, this.fromMoment(value)])
     } else {
-      this.props.onChange([this.props.value?.[0], this.fromMoment(value)])
+      this.props.onChange([this.props.value?.[0] ?? null, this.fromMoment(value)])
     }
 
     return this.setState({ dropdownOpen: false })
@@ -221,8 +221,8 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
             inline: true,
             selectsStart: true,
             selected: startDate,
-            startDate,
-            endDate,
+            startDate: startDate ?? undefined,
+            endDate: endDate ?? undefined,
             showYearDropdown: true,
             onChange: this.handleStartChange
           })
@@ -234,8 +234,8 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
             inline: true,
             selectsEnd: true,
             selected: endDate,
-            startDate,
-            endDate,
+            startDate: startDate ?? undefined,
+            endDate: endDate ?? undefined,
             showYearDropdown: true,
             onChange: this.handleEndChange
           })

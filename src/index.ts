@@ -54,7 +54,6 @@ import "./layout-styles.css"
 
 export { setMapTilerApiKey } from "./maps/vectorMaps"
 
-export { default as CachingDataSource } from "./CachingDataSource"
 export { default as UndoStack } from "./UndoStack"
 export { default as DashboardViewComponent } from "./dashboards/DashboardViewComponent"
 export let BingLayer = require("./maps/BingLayer")

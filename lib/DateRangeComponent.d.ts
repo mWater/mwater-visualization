@@ -4,7 +4,7 @@ export interface DateRangeComponentProps {
     /** Array of [start date, end date] in iso 8601 format */
     value: [string | null, string | null] | null;
     /** Array of [start date, end date] in iso 8601 format */
-    onChange: (value: [string | null, string | null]) => void;
+    onChange: (value: [string | null, string | null] | null) => void;
     /** true if for datetime, not date   */
     datetime?: boolean;
 }

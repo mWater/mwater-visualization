@@ -62,8 +62,8 @@ describe("ImplicitFilterBuilder", function () {
               op: "exists",
               exprs: [
                 {
-                  type: "query",
-                  selects: [],
+                  type: "scalar",
+                  expr: null,
                   from: { type: "table", table: "t1", alias: "explicit" },
                   where: {
                     type: "op",
@@ -123,8 +123,8 @@ describe("ImplicitFilterBuilder", function () {
               op: "exists",
               exprs: [
                 {
-                  type: "query",
-                  selects: [],
+                  type: "scalar",
+                  expr: null,
                   from: { type: "table", table: "t1", alias: "explicit" },
                   where: {
                     type: "op",

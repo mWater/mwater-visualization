@@ -1,6 +1,7 @@
 import _ from "lodash"
-import { injectTableAlias, Schema } from "mwater-expressions"
+import { Column, injectTableAlias, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
+import { JsonQLFilter } from "./JsonQLFilter"
 
 // Given a series of explicit filters on tables (array of { table: table id, jsonql: JsonQL with {alias} for the table name to filter by })
 // extends the filters to all filterable tables with a single 1-n relationship.
@@ -30,15 +31,15 @@ export default class ImplicitFilterBuilder {
       let joins = _.filter(
         this.schema.getColumns(filterableTable),
         (column) =>
-          (column.type === "join" && column.join.type === "n-1" && column.join.toTable !== filterableTable) ||
+          (column.type === "join" && column.join!.type === "n-1" && column.join!.toTable !== filterableTable) ||
           (column.type === "id" && column.idTable !== filterableTable)
       )
 
       // Only keep if singular
       joins = _.flatten(
         _.filter(
-          _.values(_.groupBy(joins, (join) => (join.type === "id" ? join.idTable : join.join.toTable))),
-          (list) => list.length === 1
+          _.values(_.groupBy(joins, (join) => (join.type === "id" ? join.idTable : join.join!.toTable))),
+          (list) => (list as Column[]).length === 1
         )
       )
       allJoins = allJoins.concat(
@@ -56,7 +57,7 @@ export default class ImplicitFilterBuilder {
   // filterableTables: array of table ids of filterable tables
   // filters: array of { table: table id, jsonql: JsonQL with {alias} for the table name to filter by } of explicit filters
   // returns similar array, but including any extra implicit filters
-  extendFilters(filterableTables: any, filters: any) {
+  extendFilters(filterableTables: string[], filters: JsonQLFilter[]) {
     const implicitFilters = []
 
     // Find joins
@@ -67,17 +68,17 @@ export default class ImplicitFilterBuilder {
     // For each join, find filters on parent table
     for (var join of joins) {
       const parentFilters = _.filter(filters, (f) => {
-        const column = this.schema.getColumn(join.table, join.column)
-        return f.table === (column.type === "join" ? column.join.toTable : column.idTable) && f.jsonql
+        const column = this.schema.getColumn(join.table, join.column)!
+        return f.table === (column.type === "join" ? column.join!.toTable : column.idTable) && f.jsonql
       })
       if (parentFilters.length === 0) {
         continue
       }
 
-      const joinColumn = this.schema.getColumn(join.table, join.column)
+      const joinColumn = this.schema.getColumn(join.table, join.column)!
 
       // Create where exists with join to parent table (filtered) OR no parent exists
-      const implicitFilter = {
+      const implicitFilter: JsonQLFilter = {
         table: join.table,
         jsonql: {
           type: "op",
@@ -88,12 +89,12 @@ export default class ImplicitFilterBuilder {
               op: "exists",
               exprs: [
                 {
-                  type: "query",
+                  type: "scalar",
                   // select null
-                  selects: [],
+                  expr: null,
                   from: {
                     type: "table",
-                    table: joinColumn.type === "id" ? joinColumn.idTable : joinColumn.join.toTable,
+                    table: joinColumn.type === "id" ? joinColumn.idTable! : joinColumn.join!.toTable!,
                     alias: "explicit"
                   },
                   where: {
@@ -123,14 +124,12 @@ export default class ImplicitFilterBuilder {
 
       // Add filters
       for (let parentFilter of parentFilters) {
-        implicitFilter.jsonql.exprs[0].exprs[0].where.exprs.push(injectTableAlias(parentFilter.jsonql, "explicit"))
+        ((implicitFilter.jsonql! as any).exprs[0].exprs[0] as any).where.exprs.push(injectTableAlias(parentFilter.jsonql, "explicit"))
       }
 
       implicitFilters.push(implicitFilter)
     }
 
     return filters.concat(implicitFilters)
-
-    return filters
   }
 }
