@@ -35,6 +35,10 @@ export interface AxisComponentProps {
   required?: boolean
   /** Shows the color map */
   showColorMap?: boolean
+
+  /** Shows the expression, usefull in cases where expression is already set (e.g. Table widget column) */
+  showExpr?: boolean
+
   /** Is the draw order reorderable */
   reorderable?: boolean
   /** Should a color map be automatically created from a default palette */
@@ -59,7 +63,8 @@ export default class AxisComponent extends AsyncLoadComponent<
   static defaultProps = {
     reorderable: false,
     allowExcludedValues: false,
-    autosetColors: true
+    autosetColors: true,
+    showExpr: true
   }
 
   static contextTypes = { locale: PropTypes.string }
@@ -425,7 +430,7 @@ export default class AxisComponent extends AsyncLoadComponent<
     return R(
       "div",
       null,
-      R(
+      this.props.showExpr ? R(
         "div",
         null,
         R(ExprComponent, {
@@ -438,7 +443,7 @@ export default class AxisComponent extends AsyncLoadComponent<
           value: this.props.value ? this.props.value.expr : null,
           aggrStatuses
         })
-      ),
+      ): undefined,
       this.renderXform(axis),
       this.props.showFormat ? this.renderFormat(axis) : undefined,
       this.renderColorMap(axis),

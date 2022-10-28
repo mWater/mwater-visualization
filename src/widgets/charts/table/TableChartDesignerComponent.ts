@@ -15,6 +15,8 @@ import * as ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../../../valueFormatter"
 import { getDefaultFormat } from "../../../valueFormatter"
 import { TableChartColumn, TableChartDesign } from "./TableChart"
+import AxisComponent from "../../../axes/AxisComponent"
+import { Axis } from "../../../axes/Axis"
 
 export interface TableChartDesignerComponentProps {
   design: TableChartDesign
@@ -370,7 +372,52 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
       return null
     }
 
-    return R(ui.Checkbox, {value: column.summarize, onChange: (summarize) => this.updateColumn({ summarize })}, "Show total")
+    return R('div', null, 
+      R(ui.Checkbox, {value: column.summarize, inline: true, onChange: (summarize) => this.updateColumn({ summarize, summaryType: column.summaryType ?? 'sum' })}, "Summarize"),
+      column.summarize ? 
+      R('div', null, 
+        R("label", { className: "text-muted" }, "Summary Type"),
+        ": ",
+        R(ui.Select, {
+          inline: true,
+          value: column.summaryType,
+          onChange: (summaryType) => this.updateColumn({ summaryType }),
+          options: [{value: 'avg', label: 'Average'}, {value: 'sum', label: 'Sum'}, {value: 'min', label: 'Minimum'}, {value: 'max', label: 'Maximum'} ]
+        })
+      ) : undefined
+    ) 
+  }
+
+  renderBackgroundColorAxis() {
+    const column = this.props.design.columns[this.props.index]
+    const exprUtils = new ExprUtils(this.props.schema)
+
+    if(!column.textAxis) return null
+
+    const exprType = exprUtils.getExprType(column.textAxis.expr ?? null)
+
+    if (!exprType || exprType !== 'number') {
+      return null
+    }
+
+    return R(
+      ui.CollapsibleSection,
+      {
+        label: "Background color by data"
+      },
+      R(AxisComponent, {
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        table: this.props.design.table,
+        types: ["enum", "text", "boolean", "date"],
+        aggrNeed: "required",
+        value: column.backgroundColorAxis ?? column.textAxis,
+        onChange: (backgroundColorAxis: Axis | null) => this.updateColumn({ backgroundColorAxis }),
+        showColorMap: true,
+        showExpr: false
+      })
+      
+    )
   }
 
   render() {
@@ -387,7 +434,15 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
       this.props.connectDragSource(R("i", { className: "fa fa-bars", style: iconStyle })),
       this.renderRemove(),
       R("label", null, `Column ${this.props.index + 1}`),
-      R("div", { style: { marginLeft: 5 } }, this.renderExpr(), this.renderFormat(), this.renderHeader(), this.renderSummarize())
+      R(
+        "div", 
+        { style: { marginLeft: 5 } }, 
+        this.renderExpr(), 
+        this.renderFormat(), 
+        this.renderHeader(), 
+        this.renderSummarize(), 
+        this.renderBackgroundColorAxis()
+      )
     )
   }
 }
