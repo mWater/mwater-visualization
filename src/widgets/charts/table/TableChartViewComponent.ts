@@ -220,7 +220,7 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
   render() {
     return R(
       "table",
-      { className: "table table-sm table-hover", style: { fontSize: "10pt", marginBottom: 0 } },
+      { className: "mwater-visualization-table", style: { fontSize: "10pt", marginBottom: 0 } },
       this.renderHeader(),
       this.renderBody(),
       this.renderFooter()
