@@ -22,7 +22,16 @@ const chartTypes = {
 }
 
 const commaFormatter = d3Format.format(",")
-const compactFormatter = (d: any) => d3Format.format("~s")(d).replace('G', 'B')
+
+const compactFormatter = (d: number) => { 
+  // Only if large, otherwise use standard formatting
+  if (Math.abs(d) > 999) {
+    return d3Format.format("~s")(d).replace('G', 'B')
+  }
+  else {
+    return commaFormatter(d)
+  }
+}
 
 /** Data for a chart */
 type C3ChartData = { [key: string]: any[] }
