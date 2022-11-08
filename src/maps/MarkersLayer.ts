@@ -131,10 +131,10 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       maxZoom: design.maxZoom,
       mapLayers: mapLayers,
       mapLayersHandleClicks: [
-        `${sourceId}:polygons`,
-        `${sourceId}:polygon-outlines`,
+        `${sourceId}:points`,
         `${sourceId}:lines`,
-        `${sourceId}:points`
+        `${sourceId}:polygon-outlines`,
+        `${sourceId}:polygons`,
       ]
     }
   }
