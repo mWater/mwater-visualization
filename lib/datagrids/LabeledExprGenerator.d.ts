@@ -3,7 +3,9 @@ import { Column, Expr, Schema } from "mwater-expressions";
 export interface LabeledExpr {
     expr: Expr;
     label: string;
-    /** Which joins from the originating table to get to expression */
+    /** Which joins from the originating table to get to expression. Used for 1-n joins
+     * which are included (they are not by default). In most cases will be []
+     */
     joins: string[];
 }
 export interface LabeledExprGeneratorOptions {

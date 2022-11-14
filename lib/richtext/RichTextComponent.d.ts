@@ -43,7 +43,7 @@ export default class RichTextComponent extends React.Component<RichTextComponent
     createHtml(): string;
     renderPalette(): React.CElement<{
         style: {
-            zIndex: number;
+            zIndex: number | null;
         };
         edges: string;
         align: string;
@@ -54,7 +54,7 @@ export default class RichTextComponent extends React.Component<RichTextComponent
         }, HTMLElement>;
     }, React.Component<{
         style: {
-            zIndex: number;
+            zIndex: number | null;
         };
         edges: string;
         align: string;
