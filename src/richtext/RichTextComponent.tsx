@@ -161,8 +161,20 @@ export default class RichTextComponent extends React.Component<RichTextComponent
   }
 
   renderPalette() {
+    // Determine current z-index to be able to float above it
+    let zIndex: number | null = null
+    let elem: Element | null = this.entireComponent
+    while (elem != null) {
+      const elemZIndex = window.getComputedStyle(elem).zIndex
+      if (!isNaN(parseInt(elemZIndex))) {
+        zIndex = parseInt(elemZIndex)
+        break
+      }
+      elem = elem.parentElement
+    }
+
     return R(FloatAffixed, {
-      style: { zIndex: 9999 },
+      style: { zIndex },
       edges: "over,under,left,right",
       align: "center",
       render: this.renderPaletteContent,
