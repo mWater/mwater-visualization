@@ -681,7 +681,7 @@ export const languages: {
   {
       "code": "rw",
       "name": "Kinyarwanda",
-      "en": "Rwandi"
+      "en": "Kinyarwanda"
   },
   {
       "code": "sa",
