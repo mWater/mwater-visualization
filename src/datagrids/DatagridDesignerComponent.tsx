@@ -3,7 +3,7 @@ import _ from "lodash"
 import React, { useMemo } from "react"
 const R = React.createElement
 import { default as ReactSelect } from "react-select"
-import languages from "languages"
+import { languages } from "../languages"
 
 import { DataSource, ExprUtils, LiteralType, Schema } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
@@ -181,9 +181,9 @@ interface DatagridOptionsComponentProps {
 // Datagrid Options
 function DatagridOptionsComponent(props: DatagridOptionsComponentProps) {
   const localeOptions = useMemo<{ value: string, label: string }[]>(() => {
-    return _.sortBy(languages.getAllLanguageCode().map((code: string) => ({
-      value: code,
-      label: languages.getLanguageInfo(code).name + " (" + languages.getLanguageInfo(code).nativeName + ")"
+    return _.sortBy(languages.map(language => ({
+      value: language.code,
+      label: language.en + " (" + language.name + ")"
     })), "label")
   }, [])
 
