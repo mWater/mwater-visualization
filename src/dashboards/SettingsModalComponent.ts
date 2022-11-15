@@ -3,7 +3,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import update from "update-object"
-import languages from "languages"
+import { languages } from "../languages"
 import * as ui from "react-library/lib/bootstrap"
 import { default as ReactSelect } from "react-select"
 import * as DashboardUtils from "./DashboardUtils"
@@ -71,10 +71,10 @@ export default class SettingsModalComponent extends React.Component<
     // Get filterable tables
     const filterableTables = DashboardUtils.getFilterableTables(this.state.design, this.props.schema)
 
-    const localeOptions = _.map(languages.getAllLanguageCode(), (code) => {
+    const localeOptions = _.map(languages, (language) => {
       return {
-        value: code,
-        label: languages.getLanguageInfo(code).name + " (" + languages.getLanguageInfo(code).nativeName + ")"
+        value: language.code,
+        label: language.en + " (" + language.name + ")"
       }
     })
 

@@ -45,7 +45,6 @@
     "immutable-setter": "^1.1.1",
     "js-yaml": "^3.14.0",
     "jsonql": "github:mWater/jsonql",
-    "languages": "github:mWater/languages.js",
     "leaflet": "^1.8.0",
     "lodash": "^3.1.0",
     "lru-cache": "^6.0.0",

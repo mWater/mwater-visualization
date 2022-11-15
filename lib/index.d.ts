@@ -17,6 +17,7 @@ export { default as Widget } from "./widgets/Widget";
 export { default as DatagridUtils } from "./datagrids/DatagridUtils";
 export * from "./maps/MapViewComponent";
 export { MapScope } from "./maps/MapUtils";
+export { languages } from "./languages";
 export { default as MWaterLoaderComponent } from "./MWaterLoaderComponent";
 export { default as MWaterContextComponent } from "./MWaterContextComponent";
 export { default as mWaterLoader } from "./mWaterLoader";
