@@ -390,15 +390,8 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
 
   renderBackgroundColorAxis() {
     const column = this.props.design.columns[this.props.index]
-    const exprUtils = new ExprUtils(this.props.schema)
 
     if(!column.textAxis) return null
-
-    const exprType = exprUtils.getExprType(column.textAxis.expr ?? null)
-
-    if (!exprType || exprType !== 'number') {
-      return null
-    }
 
     return R(
       ui.CollapsibleSection,
@@ -410,11 +403,9 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
         dataSource: this.props.dataSource,
         table: this.props.design.table,
         types: ["enum", "text", "boolean", "date"],
-        aggrNeed: "required",
-        value: column.backgroundColorAxis ?? column.textAxis,
+        value: column.backgroundColorAxis,
         onChange: (backgroundColorAxis: Axis | null) => this.updateColumn({ backgroundColorAxis }),
         showColorMap: true,
-        showExpr: false
       })
       
     )

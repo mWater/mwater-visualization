@@ -204,7 +204,8 @@ export default class TableChart extends Chart {
     // Determine if any aggregate
     const isAggr =
       _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.textAxis)) ||
-      _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.axis))
+      _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.axis)) ||
+      _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.backgroundColorAxis))
 
     const totalColumns: string[] = []
 
@@ -234,14 +235,6 @@ export default class TableChart extends Chart {
         alias: `c${colNum}`
       })
 
-      if(column.backgroundColorAxis) {
-        query.selects.push({
-          type: "select",
-          expr: axisBuilder.compileAxis({ axis: column.backgroundColorAxis, tableAlias: "main" }),
-          alias: `bc${colNum}`
-        })
-      }
-
       if(exprType === 'number' && column.summarize) {
         totalColumns.push(`c${colNum}`)
       }
@@ -249,6 +242,23 @@ export default class TableChart extends Chart {
       // Add group by if not aggregate
       if (isAggr && !axisBuilder.isAxisAggr(column.textAxis)) {
         query.groupBy!.push(colNum + 1)
+      }
+    }
+
+    // const columnsWithBG = design.columns.filter(c => !!c.backgroundColorAxis)
+
+    for (let colNum = 0 ; colNum < design.columns.length ; colNum++) {
+      column = design.columns[colNum]
+      if(!column.backgroundColorAxis) continue
+
+      query.selects.push({
+        type: "select",
+        expr: axisBuilder.compileAxis({ axis: column.backgroundColorAxis!, tableAlias: "main" }),
+        alias: `bc${colNum}`
+      })
+
+      if (isAggr && !axisBuilder.isAxisAggr(column.backgroundColorAxis)) {
+        query.groupBy!.push(query.selects.length)
       }
     }
 
