@@ -396,7 +396,8 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
     return R(
       ui.CollapsibleSection,
       {
-        label: "Background color by data"
+        label: "Background color by data",
+        labelMuted: true
       },
       R(AxisComponent, {
         schema: this.props.schema,
@@ -406,6 +407,7 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
         value: column.backgroundColorAxis,
         onChange: (backgroundColorAxis: Axis | null) => this.updateColumn({ backgroundColorAxis }),
         showColorMap: true,
+        aggrNeed: "optional"
       })
       
     )
