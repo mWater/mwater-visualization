@@ -50,6 +50,11 @@ export interface TableChartColumn {
 
   /** Summarize in the table footer, only applicable for number type column expressions */
   summarize?: boolean
+
+  summaryType?: "sum" | "avg" | "min" | "max"
+
+  /** color axis for background of cells */
+  backgroundColorAxis?: Axis | null
 }
 
 export interface TableChartOrdering {
@@ -199,7 +204,8 @@ export default class TableChart extends Chart {
     // Determine if any aggregate
     const isAggr =
       _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.textAxis)) ||
-      _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.axis))
+      _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.axis)) ||
+      _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.backgroundColorAxis))
 
     const totalColumns: string[] = []
 
@@ -229,7 +235,6 @@ export default class TableChart extends Chart {
         alias: `c${colNum}`
       })
 
-
       if(exprType === 'number' && column.summarize) {
         totalColumns.push(`c${colNum}`)
       }
@@ -237,6 +242,23 @@ export default class TableChart extends Chart {
       // Add group by if not aggregate
       if (isAggr && !axisBuilder.isAxisAggr(column.textAxis)) {
         query.groupBy!.push(colNum + 1)
+      }
+    }
+
+    // const columnsWithBG = design.columns.filter(c => !!c.backgroundColorAxis)
+
+    for (let colNum = 0 ; colNum < design.columns.length ; colNum++) {
+      column = design.columns[colNum]
+      if(!column.backgroundColorAxis) continue
+
+      query.selects.push({
+        type: "select",
+        expr: axisBuilder.compileAxis({ axis: column.backgroundColorAxis!, tableAlias: "main" }),
+        alias: `bc${colNum}`
+      })
+
+      if (isAggr && !axisBuilder.isAxisAggr(column.backgroundColorAxis)) {
+        query.groupBy!.push(query.selects.length)
       }
     }
 
@@ -294,7 +316,7 @@ export default class TableChart extends Chart {
       type: "query",
       selects: design.columns.map((c: any, i) => {
         if(totalColumns.includes(`c${i}`))
-          return { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "t", column: `c${i}` }] }, alias: `c${i}` }
+          return { type: "select", expr: { type: "op", op: c.summaryType ?? 'sum', exprs: [{ type: "field", tableAlias: "t", column: `c${i}` }] }, alias: `c${i}` }
         else 
           return { type: 'select', expr: {type: 'literal', value: null} , alias: `c${i}` }
       }),

@@ -35,6 +35,7 @@ export interface AxisComponentProps {
   required?: boolean
   /** Shows the color map */
   showColorMap?: boolean
+
   /** Is the draw order reorderable */
   reorderable?: boolean
   /** Should a color map be automatically created from a default palette */

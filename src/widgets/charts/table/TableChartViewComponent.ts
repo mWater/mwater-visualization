@@ -8,6 +8,8 @@ import AxisBuilder from "../../../axes/AxisBuilder"
 import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { formatValue } from "../../../valueFormatter"
 import { Image } from "mwater-forms/lib/RotationAwareImageComponent"
+import { TableChartColumn } from "./TableChart"
+import Color from "color"
 
 export interface TableChartViewComponentProps {
   /** Design of chart */
@@ -55,7 +57,7 @@ export default class TableChartViewComponent extends React.Component<TableChartV
 
 interface TableContentsComponentProps {
   /** Columns of chart */
-  columns: any
+  columns: TableChartColumn[]
   /** Data that the table has requested */
   data: any
   /** Schema to use */
@@ -98,7 +100,7 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
     const column = this.props.columns[index]
 
-    const text = column.headerText || axisBuilder.summarizeAxis(column.textAxis, this.context.locale)
+    const text = column.headerText ?? (column.textAxis ? axisBuilder.summarizeAxis(column.textAxis, this.context.locale) : '')
     return R("th", { key: index }, text)
   }
 
@@ -117,14 +119,17 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
   renderFooterCell(index: number) {
     const exprUtils = new ExprUtils(this.props.schema)
     const column = this.props.columns[index]
+
+    if(!column.textAxis) return null
+
     const exprType = exprUtils.getExprType(column.textAxis?.expr)
     let node = null
 
     if(exprType && exprType == 'number') {
-      node = formatValue(exprType, this.props.data.summary[`c${index}`], column.format)
+      node = `${_.capitalize(column.summaryType)}: ${formatValue(exprType, this.props.data.summary[`c${index}`], column.format)}`
     }
 
-    return R("th", { key: index }, node)
+    return node
   }
 
   renderFooter() {
@@ -148,57 +153,76 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
   }
 
   renderCell(rowIndex: any, columnIndex: any) {
+    const axisBuilder = new AxisBuilder({ schema: this.props.schema })
     let node
     const row = this.props.data.main[rowIndex]
     const column = this.props.columns[columnIndex]
+    // Set background color
+    let backgroundColor = 'transparent'
+    let textColor = '#212529'
 
     const exprUtils = new ExprUtils(this.props.schema)
-    const exprType = exprUtils.getExprType(column.textAxis?.expr)
-
-    // Get value
-    let value = row[`c${columnIndex}`]
-
-    if (value == null) {
+    if(!column.textAxis) {
       node = null
     } else {
-      // Parse if should be JSON
-      if (["image", "imagelist", "geometry", "text[]"].includes(exprType || "") && _.isString(value)) {
-        value = JSON.parse(value)
-      }
+      const exprType = exprUtils.getExprType(column.textAxis.expr)
 
-      // Convert to node based on type
-      switch (exprType) {
-        case "text":
-          node = R(Linkify, { properties: { target: "_blank" } }, value)
-          break
-        case "number":
-        case "geometry":
-          node = formatValue(exprType, value, column.format)
-          break
-        case "boolean":
-        case "enum":
-        case "enumset":
-        case "text[]":
-          node = exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, this.context.locale)
-          break
-        case "date":
-          node = moment(value, "YYYY-MM-DD").format("ll")
-          break
-        case "datetime":
-          node = moment(value, moment.ISO_8601).format("lll")
-          break
-        case "image":
-          node = this.renderImage(value.id)
-          break
-        case "imagelist":
-          node = _.map(value, (v: Image) => this.renderImage(v.id))
-          break
-        default:
-          node = "" + value
+      // Get value
+      let value = row[`c${columnIndex}`]
+  
+      if (value == null) {
+        node = null
+      } else {
+        // Parse if should be JSON
+        if (["image", "imagelist", "geometry", "text[]"].includes(exprType || "") && _.isString(value)) {
+          value = JSON.parse(value)
+        }
+
+        if (column.backgroundColorAxis && row[`bc${columnIndex}`] != null) {
+          backgroundColor = axisBuilder.getValueColor(column.backgroundColorAxis, row[`bc${columnIndex}`]) ?? '#fff'
+        }
+  
+        // Convert to node based on type
+        switch (exprType) {
+          case "text":
+            node = R(Linkify, { properties: { target: "_blank" } }, value)
+            break
+          case "number":
+          case "geometry":
+            node = formatValue(exprType, value, column.format)
+            break
+          case "boolean":
+          case "enum":
+          case "enumset":
+          case "text[]":
+            node = exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, this.context.locale)
+            break
+          case "date":
+            node = moment(value, "YYYY-MM-DD").format("ll")
+            break
+          case "datetime":
+            node = moment(value, moment.ISO_8601).format("lll")
+            break
+          case "image":
+            node = this.renderImage(value.id)
+            break
+          case "imagelist":
+            node = _.map(value, (v: Image) => this.renderImage(v.id))
+            break
+          default:
+            node = "" + value
+        }
       }
     }
+    
+    if (backgroundColor) {
+      const c = Color(backgroundColor)
+      // Get lightness (taking into account alpha)
+      const lightness = 1 - ((1 - c.luminosity()) * c.alpha())
+      textColor = lightness < 0.3 ? "rgb(204,204,204)" : '#212529'
+    }
 
-    return R("td", { key: columnIndex }, node)
+    return R("td", { key: columnIndex, style: {backgroundColor, color: textColor} }, node)
   }
 
   renderRow(index: any) {

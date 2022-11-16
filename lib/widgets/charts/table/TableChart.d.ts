@@ -27,6 +27,9 @@ export interface TableChartColumn {
     format?: string | null;
     /** Summarize in the table footer, only applicable for number type column expressions */
     summarize?: boolean;
+    summaryType?: "sum" | "avg" | "min" | "max";
+    /** color axis for background of cells */
+    backgroundColorAxis?: Axis | null;
 }
 export interface TableChartOrdering {
     /** axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within! */
