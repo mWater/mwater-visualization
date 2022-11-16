@@ -64,7 +64,7 @@ export default class ExprItemEditorComponent extends React.Component<
   }
 
   handleFormatChange = (ev: any) => {
-    const exprItem = _.extend({}, this.props.exprItem, { format: ev.target.value || null }) as HtmlItemExpr
+    const exprItem = _.extend({}, this.props.exprItem, { format: ev.target.value }) as HtmlItemExpr
     this.props.onChange(exprItem)
   }
 
