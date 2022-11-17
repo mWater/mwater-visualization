@@ -14,7 +14,7 @@ import { MapDesign } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
 import { MapScope } from "./MapUtils"
 
-export interface OldMapViewComponentProps {
+export interface RasterMapViewComponentProps {
   schema: Schema
   dataSource: DataSource
   mapDataSource: MapDataSource
@@ -51,11 +51,14 @@ export interface OldMapViewComponentProps {
 
   /** Whether changes to zoom level should be persisted. Default false  */
   zoomLocked?: boolean
+
+  /** Called with underlying leaflet map component */
+  leafletMapRef?: (map: LeafletMapComponent | null) => void
 }
 
-// Component that displays just the map
-export default class OldMapViewComponent extends React.Component<
-  OldMapViewComponentProps,
+/** Component that displays just the map, using raster tile technology */
+export default class RasterMapViewComponent extends React.Component<
+  RasterMapViewComponentProps,
   {
     popupContents: ReactNode
     legendHidden: boolean
@@ -312,6 +315,9 @@ export default class OldMapViewComponent extends React.Component<
       R(LeafletMapComponent, {
         ref: (c: LeafletMapComponent | null) => {
           this.leafletMap = c
+          if (this.props.leafletMapRef) {
+            this.props.leafletMapRef(c)
+          }
         },
         initialBounds: this.props.design.bounds,
         baseLayerId: this.props.design.baseLayer,

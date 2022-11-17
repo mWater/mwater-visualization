@@ -4,9 +4,9 @@ import React from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
 import { MapDesign } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
-import { NewMapViewComponent } from "./NewMapViewComponent"
+import { VectorMapViewComponent } from "./VectorMapViewComponent"
 import { MapScope } from "./MapUtils"
-import OldMapViewComponent from "./OldMapViewComponent"
+import RasterMapViewComponent from "./RasterMapViewComponent"
 import { areVectorMapsEnabled } from "./vectorMaps"
 
 /** Component that displays just the map */
@@ -52,8 +52,8 @@ export function MapViewComponent(props: {
   locale: string
 }) {
   if (window.localStorage.getItem("maptech") == "mapnik" || !areVectorMapsEnabled()) {
-    return <OldMapViewComponent {...props} />
+    return <RasterMapViewComponent {...props} />
   } else {
-    return <NewMapViewComponent {...props} />
+    return <VectorMapViewComponent {...props} />
   }
 }

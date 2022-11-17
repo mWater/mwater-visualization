@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { LayerSpecification, MapLayerEventType, MapLayerMouseEvent } from "maplibre-gl"
+import { LayerSpecification, MapLayerMouseEvent } from "maplibre-gl"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties, ReactNode, useEffect, useMemo, useState } from "react"
 import { useRef } from "react"
@@ -19,14 +19,10 @@ import "maplibre-gl/dist/maplibre-gl.css"
 import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
-import { AttributionControl, VectorMapLogo, mergeBaseAndUserStyle, useBaseStyle, useHoverCursor, useStyleMap, useThrottledMapResize, useVectorMap } from "./vectorMaps"
+import { AttributionControl, VectorMapLogo, useHoverCursor, useStyleMap, useThrottledMapResize, useVectorMap } from "./vectorMaps"
 
-type LayerClickHandlerEvent = maplibregl.MapMouseEvent & {
-  features?: maplibregl.GeoJSONFeature[] | undefined
-} //& maplibregl.EEventData
-
-/** Component that displays just the map */
-export function NewMapViewComponent(props: {
+/** Component that displays just the map, using vector tile technology */
+export function VectorMapViewComponent(props: {
   schema: Schema
   dataSource: DataSource
   mapDataSource: MapDataSource

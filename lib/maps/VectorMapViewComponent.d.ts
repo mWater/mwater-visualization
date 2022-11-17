@@ -6,8 +6,8 @@ import { MapDataSource } from "./MapDataSource";
 import { MapScope } from "./MapUtils";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./NewMapViewComponent.css";
-/** Component that displays just the map */
-export declare function NewMapViewComponent(props: {
+/** Component that displays just the map, using vector tile technology */
+export declare function VectorMapViewComponent(props: {
     schema: Schema;
     dataSource: DataSource;
     mapDataSource: MapDataSource;
