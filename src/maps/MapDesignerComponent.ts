@@ -14,6 +14,8 @@ import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 import * as MapUtils from "./MapUtils"
 import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
+import { MapDesign } from "./MapDesign"
+import { JsonQLFilter } from "../JsonQLFilter"
 
 export interface MapDesignerComponentProps {
   /** Schema to use */
@@ -21,11 +23,11 @@ export interface MapDesignerComponentProps {
   /** Data source to use */
   dataSource: DataSource
   /** See Map Design.md */
-  design: any
+  design: MapDesign
   /** Called with new design */
-  onDesignChange: any
+  onDesignChange: (design: MapDesign) => void
   /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
-  filters?: any
+  filters?: JsonQLFilter[]
 }
 
 export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
@@ -39,17 +41,17 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
   }
 
   handleAttributionChange = (text: any) => {
-    const design = _.extend({}, this.props.design, { attribution: text })
+    const design = { ...this.props.design, attribution: text }
     return this.props.onDesignChange(design)
   }
 
   handleAutoBoundsChange = (value: any) => {
-    const design = _.extend({}, this.props.design, { autoBounds: value })
+    const design = { ...this.props.design, autoBounds: value }
     return this.props.onDesignChange(design)
   }
 
   handleShowLayerSwitcherChange = (value: any) => {
-    const design = _.extend({}, this.props.design, { showLayerSwitcher: value })
+    const design = { ...this.props.design, showLayerSwitcher: value }
     return this.props.onDesignChange(design)
   }
 
@@ -62,7 +64,7 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
   }
 
   handleInitialLegendDisplayChange = (value: any) => {
-    const design = _.extend({}, this.props.design, { initialLegendDisplay: value })
+    const design = { ...this.props.design, initialLegendDisplay: value }
     return this.props.onDesignChange(design)
   }
 

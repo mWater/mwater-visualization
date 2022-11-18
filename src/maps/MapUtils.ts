@@ -25,7 +25,7 @@ export function canConvertToMarkersMap(design: MapDesign) {
 }
 
 // Convert to a cluster map
-export function convertToClusterMap(design: MapDesign) {
+export function convertToClusterMap(design: MapDesign): MapDesign {
   const layerViews = _.map(design.layerViews, (lv) => {
     if (lv.type !== "Markers") {
       return lv
@@ -51,7 +51,7 @@ export function convertToClusterMap(design: MapDesign) {
 }
 
 // Convert to a markers map
-export function convertToMarkersMap(design: MapDesign) {
+export function convertToMarkersMap(design: MapDesign): MapDesign {
   const layerViews = _.map(design.layerViews, (lv) => {
     if (lv.type !== "Cluster") {
       return lv
