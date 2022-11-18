@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import { LngLatBoundsLike } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import "./NewMapViewComponent.css";
+import "./VectorMapViewComponent.css";
 /** This must be called to set the appropriate key before use. If it is not set, vector maps will not function.
  * Maps will fall back to leaflet if the key is not set or if set to ""
  */

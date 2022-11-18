@@ -16,7 +16,7 @@ import {
 } from "./MapUtils"
 
 import "maplibre-gl/dist/maplibre-gl.css"
-import "./NewMapViewComponent.css"
+import "./VectorMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
 import { AttributionControl, VectorMapLogo, useHoverCursor, useStyleMap, useThrottledMapResize, useVectorMap } from "./vectorMaps"

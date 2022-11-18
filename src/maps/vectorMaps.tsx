@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { mapSymbols } from "./mapSymbols"
 
 import "maplibre-gl/dist/maplibre-gl.css"
-import "./NewMapViewComponent.css"
+import "./VectorMapViewComponent.css"
 import React from "react"
 
 /* Hooks and functions related to displaying a vector map */
