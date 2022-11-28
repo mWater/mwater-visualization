@@ -245,23 +245,6 @@ export default class TableChart extends Chart {
       }
     }
 
-    // const columnsWithBG = design.columns.filter(c => !!c.backgroundColorAxis)
-
-    for (let colNum = 0 ; colNum < design.columns.length ; colNum++) {
-      column = design.columns[colNum]
-      if(!column.backgroundColorAxis) continue
-
-      query.selects.push({
-        type: "select",
-        expr: axisBuilder.compileAxis({ axis: column.backgroundColorAxis!, tableAlias: "main" }),
-        alias: `bc${colNum}`
-      })
-
-      if (isAggr && !axisBuilder.isAxisAggr(column.backgroundColorAxis)) {
-        query.groupBy!.push(query.selects.length)
-      }
-    }
-
     // Compile orderings
     const iterable = design.orderings || []
     for (let i = 0; i < iterable.length; i++) {
@@ -282,6 +265,21 @@ export default class TableChart extends Chart {
       // Add group by if non-aggregate
       if (isAggr && exprUtils.getExprAggrStatus(ordering.axis?.expr ?? null) === "individual") {
         query.groupBy!.push(design.columns.length + i + 1)
+      }
+    }
+
+    for (let colNum = 0 ; colNum < design.columns.length ; colNum++) {
+      column = design.columns[colNum]
+      if(!column.backgroundColorAxis) continue
+
+      query.selects.push({
+        type: "select",
+        expr: axisBuilder.compileAxis({ axis: column.backgroundColorAxis!, tableAlias: "main" }),
+        alias: `bc${colNum}`
+      })
+
+      if (isAggr && !axisBuilder.isAxisAggr(column.backgroundColorAxis)) {
+        query.groupBy!.push(query.selects.length)
       }
     }
 
