@@ -130,62 +130,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry!, tableAlias: "main" })
-
-    // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293)
-    const bufferAmountExpr: JsonQLExpr = {
-      type: "op",
-      op: "/",
-      exprs: [
-        design.radius,
-        {
-          type: "op",
-          op: "cos",
-          exprs: [
-            {
-              type: "op",
-              op: "*",
-              exprs: [
-                { type: "op", op: "ST_YMax", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] },
-                0.017453293
-              ]
-            }
-          ]
-        }
-      ]
-    }
-
-    const bufferExpr: JsonQLExpr = {
-      type: "op",
-      op: "ST_Buffer",
-      exprs: [geometryExpr, bufferAmountExpr]
-    }
-
-    const selects: JsonQLSelect[] = [
-      {
-        type: "select",
-        expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey },
-        alias: "id"
-      }, // main primary key as id
-      {
-        type: "select",
-        expr: { type: "op", op: "ST_AsMVTGeom", exprs: [bufferExpr, envelopeExpr] },
-        alias: "the_geom_webmercator"
-      }
-    ]
-
-    // Add color select if color axis
-    if (design.axes.color) {
-      colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "main" })
-      selects.push({ type: "select", expr: colorExpr, alias: "color" })
-    }
-
-    // Create select
-    const query: JsonQLQuery = {
-      type: "query",
-      selects,
-      from: exprCompiler.compileTable(design.table, "main")
-    }
+    const geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry!, tableAlias: "main" })
 
     // To prevent buffer from exceeding coordinates
     // ST_Transform(ST_Expand(
@@ -250,10 +195,84 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     whereClauses = _.compact(whereClauses)
 
     // Wrap if multiple
+    let whereExpr: JsonQLExpr
     if (whereClauses.length > 1) {
-      query.where = { type: "op", op: "and", exprs: whereClauses }
+      whereExpr = { type: "op", op: "and", exprs: whereClauses }
     } else {
-      query.where = whereClauses[0]
+      whereExpr = whereClauses[0]
+    }
+
+    // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293)
+    const bufferAmountExpr: JsonQLExpr = {
+      type: "op",
+      op: "/",
+      exprs: [
+        design.radius,
+        {
+          type: "op",
+          op: "cos",
+          exprs: [
+            {
+              type: "op",
+              op: "*",
+              exprs: [
+                { type: "op", op: "ST_YMax", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] },
+                0.017453293
+              ]
+            }
+          ]
+        }
+      ]
+    }
+
+    const bufferExpr: JsonQLExpr = {
+      type: "op",
+      op: "ST_Buffer",
+      exprs: [geometryExpr, bufferAmountExpr]
+    }
+
+    // Create select
+    const query: JsonQLQuery = {
+      type: "query",
+      selects: [],
+      from: exprCompiler.compileTable(design.table, "main"),
+      where: whereExpr
+    }
+    
+    // If unioning shapes
+    if (design.unionShapes) {
+      query.selects = [
+        {
+          type: "select",
+          expr: { type: "op", op: "ST_AsMVTGeom", exprs: [{ type: "op", op: "ST_Union", exprs: [bufferExpr] }, envelopeExpr] },
+          alias: "the_geom_webmercator"
+        }
+      ]
+    }
+    else {
+      query.selects = [
+        {
+          type: "select",
+          expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey },
+          alias: "id"
+        }, // main primary key as id
+        {
+          type: "select",
+          expr: { type: "op", op: "ST_AsMVTGeom", exprs: [bufferExpr, envelopeExpr] },
+          alias: "the_geom_webmercator"
+        }
+      ]
+    }
+
+    // Add color select if color axis
+    if (design.axes.color) {
+      colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "main" })
+      query.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+
+      // Group by needed if unioning
+      if (design.unionShapes) {
+        query.groupBy = [2]
+      }
     }
 
     // Sort order
@@ -273,15 +292,21 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       })
 
       if (cases.length > 0) {
+        const orderExpr: JsonQLExpr = {
+          type: "case",
+          cases
+        }
+
         query.orderBy = [
           {
-            expr: {
-              type: "case",
-              cases
-            },
+            expr: orderExpr,
             direction: "desc" // Reverse color map order
           }
         ]
+
+        if (design.unionShapes) {
+          query.groupBy!.push(orderExpr)
+        }
       }
     }
 
@@ -679,6 +704,10 @@ marker-fill: ` +
   }
 
   getMinZoom(design: BufferLayerDesign) {
+    // Don't allow zooming out too much if unioning shapes
+    if (design.unionShapes) {
+      return Math.max(9, design.minZoom || 0)
+    }
     return design.minZoom
   }
 

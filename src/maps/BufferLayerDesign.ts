@@ -33,6 +33,10 @@ export interface BufferLayerDesign {
   /** maximum zoom level */
   maxZoom?: number
 
+  /** True to union circles together. Makes ids unavailable as geometries are combined.
+   * Only implemented for vector tiles */
+  unionShapes?: boolean
+
   /** contains items: which is BlocksLayoutManager items. Will be displayed when the circle is clicked */
   popup: any
 

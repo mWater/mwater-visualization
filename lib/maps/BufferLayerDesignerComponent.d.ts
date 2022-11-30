@@ -1,26 +1,29 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import EditPopupComponent from "./EditPopupComponent";
-interface BufferLayerDesignerComponentProps {
+import { BufferLayerDesign } from "./BufferLayerDesign";
+import { JsonQLFilter } from "../JsonQLFilter";
+export interface BufferLayerDesignerComponentProps {
     /** Schema to use */
     schema: Schema;
     dataSource: DataSource;
     /** Design of the design */
-    design: any;
+    design: BufferLayerDesign;
     /** Called with new design */
-    onDesignChange: any;
-    filters?: any;
+    onDesignChange: (design: BufferLayerDesign) => void;
+    filters?: JsonQLFilter[];
 }
 export default class BufferLayerDesignerComponent extends React.Component<BufferLayerDesignerComponentProps> {
-    update(updates: any): any;
-    updateAxes(changes: any): any;
-    handleTableChange: (table: any) => any;
-    handleRadiusChange: (radius: any) => any;
-    handleGeometryAxisChange: (axis: any) => any;
-    handleFilterChange: (expr: any) => any;
-    handleColorChange: (color: any) => any;
-    handleColorAxisChange: (axis: any) => any;
-    handleFillOpacityChange: (fillOpacity: any) => any;
+    update(updates: any): void;
+    updateAxes(changes: any): void;
+    handleTableChange: (table: any) => void;
+    handleRadiusChange: (radius: any) => void;
+    handleGeometryAxisChange: (axis: any) => void;
+    handleFilterChange: (expr: any) => void;
+    handleColorChange: (color: any) => void;
+    handleColorAxisChange: (axis: any) => void;
+    handleFillOpacityChange: (fillOpacity: any) => void;
+    handleUnionShapesChange: (unionShapes: boolean) => void;
     renderTable(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement>;
@@ -30,6 +33,9 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
     renderRadius(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement>;
+    renderUnionShapes(): React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement> | null;
     renderColor(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | undefined;
     renderFillOpacity(): React.DetailedReactHTMLElement<{
         className: string;
@@ -40,4 +46,3 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
     renderPopup(): React.CElement<any, EditPopupComponent> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

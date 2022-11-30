@@ -24,7 +24,7 @@ export function getMapTilerApiKey(): string {
 
 /** Check if vector maps are enabled by setting API key */
 export function areVectorMapsEnabled() {
-  return mapTilerApiKey !== ""
+  return mapTilerApiKey !== "" && window.localStorage.getItem("maptech") != "mapnik"
 }
 
 export type BaseLayer = "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "blank"

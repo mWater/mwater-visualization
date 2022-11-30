@@ -4,7 +4,7 @@ import React from "react"
 const R = React.createElement
 
 import { FilterExprComponent } from "mwater-expressions-ui"
-import { DataSource, ExprUtils, Schema } from "mwater-expressions"
+import { DataSource, ExprUtils, OpExpr, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
 import AxisComponent from "./../axes/AxisComponent"
@@ -14,16 +14,20 @@ import { default as Rcslider } from "rc-slider"
 import EditPopupComponent from "./EditPopupComponent"
 import ZoomLevelsComponent from "./ZoomLevelsComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import { Checkbox } from "react-library/lib/bootstrap"
+import { BufferLayerDesign } from "./BufferLayerDesign"
+import { JsonQLFilter } from "../JsonQLFilter"
+import { areVectorMapsEnabled } from "./vectorMaps"
 
-interface BufferLayerDesignerComponentProps {
+export interface BufferLayerDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource
   /** Design of the design */
-  design: any
+  design: BufferLayerDesign
   /** Called with new design */
-  onDesignChange: any
-  filters?: any
+  onDesignChange: (design: BufferLayerDesign) => void
+  filters?: JsonQLFilter[]
 }
 
 export default class BufferLayerDesignerComponent extends React.Component<BufferLayerDesignerComponentProps> {
@@ -60,6 +64,10 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
     return this.update({ fillOpacity: fillOpacity / 100 })
   }
 
+  handleUnionShapesChange = (unionShapes: boolean) => {
+    this.props.onDesignChange({ ...this.props.design, unionShapes })
+  }
+
   renderTable() {
     return R(
       "div",
@@ -92,7 +100,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
       const exprCompiler = new ExprCompiler(this.props.schema)
       const jsonql = exprCompiler.compileExpr({ expr: this.props.design.filter, tableAlias: "{alias}" })
       if (jsonql) {
-        filters.push({ table: this.props.design.filter.table, jsonql })
+        filters.push({ table: (this.props.design.filter as OpExpr).table!, jsonql })
       }
     }
 
@@ -130,6 +138,22 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
     )
   }
 
+  renderUnionShapes() {
+    // Only implemented for vector maps
+    if (!areVectorMapsEnabled()) {
+      return null
+    }
+
+    return R(
+      "div",
+      { className: "mb-3" },
+      React.createElement(Checkbox, {
+        value: this.props.design.unionShapes,
+        onChange: this.handleUnionShapesChange
+      }, "Combine circles (advanced)")
+    )
+  }
+
   renderColor() {
     if (!this.props.design.axes.geometry) {
       return
@@ -141,7 +165,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
       const exprCompiler = new ExprCompiler(this.props.schema)
       const jsonql = exprCompiler.compileExpr({ expr: this.props.design.filter, tableAlias: "{alias}" })
       if (jsonql) {
-        filters.push({ table: this.props.design.filter.table, jsonql })
+        filters.push({ table: (this.props.design.filter as OpExpr).table!, jsonql })
       }
     }
 
@@ -181,6 +205,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
           showColorMap: true,
           onChange: this.handleColorAxisChange,
           allowExcludedValues: true,
+          reorderable: true,
           filters
         })
       )
@@ -251,6 +276,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
       this.renderTable(),
       this.renderGeometryAxis(),
       this.renderRadius(),
+      this.renderUnionShapes(),
       this.renderColor(),
       this.renderFillOpacity(),
       this.renderFilter(),

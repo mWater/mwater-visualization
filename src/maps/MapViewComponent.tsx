@@ -51,9 +51,9 @@ export function MapViewComponent(props: {
   /** Locale to use */
   locale: string
 }) {
-  if (window.localStorage.getItem("maptech") == "mapnik" || !areVectorMapsEnabled()) {
-    return <RasterMapViewComponent {...props} />
-  } else {
+  if (areVectorMapsEnabled()) {
     return <VectorMapViewComponent {...props} />
+  } else {
+    return <RasterMapViewComponent {...props} />
   }
 }
