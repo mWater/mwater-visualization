@@ -99,6 +99,13 @@ export default class TableChart extends Chart {
           table: design.table,
           aggrNeed: "optional"
         })
+
+        // Clean backgroundColorAxis
+        column.backgroundColorAxis = axisBuilder.cleanAxis({
+          axis: column.backgroundColorAxis ? original(column.backgroundColorAxis) : null,
+          table: design.table,
+          aggrNeed: "optional"
+        })
       }
 
       // Clean orderings
