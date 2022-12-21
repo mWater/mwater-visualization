@@ -62,7 +62,8 @@ export default class ExprInsertModalComponent extends React.Component<
         actionLabel: "Insert",
         onAction: this.handleInsert,
         onCancel: () => this.setState({ open: false }),
-        title: "Insert Field"
+        title: "Insert Field",
+        size: "x-large"
       },
       R(ExprItemEditorComponent, {
         schema: this.props.schema,

@@ -55,7 +55,8 @@ export default class ExprUpdateModalComponent extends React.Component<
           })
         },
         onCancel: () => this.setState({ open: false }),
-        title: "Update Field"
+        title: "Update Field",
+        size: "x-large"
       },
       R(ExprItemEditorComponent, {
         schema: this.props.schema,
