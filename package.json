@@ -106,7 +106,7 @@
     "esbuild": "^0.8.34",
     "husky": "^1.0.0-rc.13",
     "ignore-styles": "^5.0.1",
-    "jquery": "^2.2.4",
+    "jquery": "^3.5.0",
     "jsdom": "^15.2.1",
     "react-addons-test-utils": "^0.14.0",
     "react-test-renderer": "^16.14.0",
