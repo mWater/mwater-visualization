@@ -10,22 +10,26 @@ import querystring from "querystring"
 import { ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "./UIComponents"
 import * as formUtils from "mwater-forms/lib/formUtils" // TODO requireing this directly because of bizarre backbone issue
-import { Form } from "mwater-forms"
+import { AssetQuestion, Form, FormDesign } from "mwater-forms"
 
-interface MWaterAddRelatedFormComponentProps {
+export interface MWaterAddRelatedFormComponentProps {
+  /** Entities or assets table id */
   table: string
+
   apiUrl: string
   client?: string
+  
   /** User id */
   user?: string
   /** Called with table id e.g. responses:someid */
-  onSelect: any
+  onSelect: (tableId: string) => void
+
   schema: Schema
 }
 
 interface MWaterAddRelatedFormComponentState {
   waitingForTable: any
-  open: any
+  open: boolean
 }
 
 // Link that when clicked popup up a modal window allowing user to select a form
@@ -34,7 +38,7 @@ export default class MWaterAddRelatedFormComponent extends React.Component<
   MWaterAddRelatedFormComponentProps,
   MWaterAddRelatedFormComponentState
 > {
-  constructor(props: any) {
+  constructor(props: MWaterAddRelatedFormComponentProps) {
     super(props)
 
     this.state = {
@@ -87,15 +91,17 @@ export default class MWaterAddRelatedFormComponent extends React.Component<
 }
 
 interface AddRelatedFormModalComponentProps {
+  /** Entities or assets table id */
   table: string
+
   apiUrl: string
   client?: string
   /** User id */
   user?: string
   /** Called with table id e.g. responses:someid */
-  onSelect: any
+  onSelect: (tableId: string) => void
   /** When modal is closed */
-  onCancel: any
+  onCancel: () => void
 }
 
 interface AddRelatedFormModalComponentState {
@@ -104,7 +110,7 @@ interface AddRelatedFormModalComponentState {
   error?: any
 }
 
-// Actual modal that displays the
+/** Actual modal that displays the list of forms */
 class AddRelatedFormModalComponent extends React.Component<
   AddRelatedFormModalComponentProps,
   AddRelatedFormModalComponentState
@@ -137,7 +143,14 @@ class AddRelatedFormModalComponent extends React.Component<
       )
 
       // Filter by Entity and Site questions of tableId type
-      forms = _.filter(forms, (form) => formUtils.findEntityQuestion(form.design, this.props.table.split(".")[1]))
+      if (this.props.table.startsWith("entities.")) {
+        forms = _.filter(forms, (form) => formUtils.findEntityQuestion(form.design, this.props.table.split(".")[1]))
+      } else if (this.props.table.startsWith("assets:")) {
+        const assetSystemId = parseInt(this.props.table.split(":")[1])
+        forms = forms.filter((form) => {
+          return findAssetQuestion(form.design, assetSystemId) != null
+        })
+      }
 
       // Get _id, name, and description
       const items = _.map(forms, (form) => ({
@@ -197,4 +210,16 @@ class AddRelatedFormModalComponent extends React.Component<
 
 function escapeRegex(s: any) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+}
+
+/** Finds asset question in form */
+function findAssetQuestion(formDesign: FormDesign, assetSystemId: number): AssetQuestion | null {
+  const question = formUtils.allItems(formDesign).find((item) => {
+    if (item._type === "AssetQuestion" && item.assetSystemId === assetSystemId) {
+      return true
+    }
+    return false
+  })
+
+  return (question as AssetQuestion | null) ?? null
 }

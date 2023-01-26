@@ -66,7 +66,7 @@ export default class MWaterContextComponent extends React.Component<{
     }
 
     context.globalFiltersElementFactory = (props: any) => {
-      if (props.nullIfIrrelevant && !_.any(props.filterableTables, (t) => t.match(/^entities./))) {
+      if (props.nullIfIrrelevant && !_.any(props.filterableTables, (t: string) => t.match(/^entities./))) {
         return null
       }
 
@@ -74,8 +74,8 @@ export default class MWaterContextComponent extends React.Component<{
     }
 
     context.decorateScalarExprTreeSectionChildren = (options: any) => {
-      // If related forms section of entities table
-      if (options.tableId.match(/^entities\./) && options.section.id === "!related_forms") {
+      // If related forms section of entities table or assets table
+      if ((options.tableId.match(/^entities\./) || options.tableId.match(/^assets:/)) && options.section.id === "!related_forms") {
         return R(
           "div",
           { key: "_add_related_form_parent" },
@@ -134,7 +134,7 @@ export default class MWaterContextComponent extends React.Component<{
   }
 
   handleAddTable = (table: any) => {
-    const extraTables = _.union(this.props.extraTables, [table])
+    const extraTables = _.union(this.props.extraTables || [], [table])
     return this.props.onExtraTablesChange!(extraTables)
   }
 

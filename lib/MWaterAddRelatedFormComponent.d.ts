@@ -1,24 +1,25 @@
 import React from "react";
 import { Schema } from "mwater-expressions";
-interface MWaterAddRelatedFormComponentProps {
+export interface MWaterAddRelatedFormComponentProps {
+    /** Entities or assets table id */
     table: string;
     apiUrl: string;
     client?: string;
     /** User id */
     user?: string;
     /** Called with table id e.g. responses:someid */
-    onSelect: any;
+    onSelect: (tableId: string) => void;
     schema: Schema;
 }
 interface MWaterAddRelatedFormComponentState {
     waitingForTable: any;
-    open: any;
+    open: boolean;
 }
 export default class MWaterAddRelatedFormComponent extends React.Component<MWaterAddRelatedFormComponentProps, MWaterAddRelatedFormComponentState> {
-    constructor(props: any);
+    constructor(props: MWaterAddRelatedFormComponentProps);
     componentWillReceiveProps(nextProps: any): void;
     handleOpen: () => void;
-    handleSelect: (table: any) => any;
+    handleSelect: (table: any) => void;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};
