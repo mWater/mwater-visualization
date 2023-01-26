@@ -148,7 +148,7 @@ class AddRelatedFormModalComponent extends React.Component<
       } else if (this.props.table.startsWith("assets:")) {
         const assetSystemId = parseInt(this.props.table.split(":")[1])
         forms = forms.filter((form) => {
-          return findAssetQuestion(form.design, assetSystemId) != null
+          return formUtils.findAssetQuestion(form.design, assetSystemId) != null
         })
       }
 
@@ -210,16 +210,4 @@ class AddRelatedFormModalComponent extends React.Component<
 
 function escapeRegex(s: any) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
-}
-
-/** Finds asset question in form */
-function findAssetQuestion(formDesign: FormDesign, assetSystemId: number): AssetQuestion | null {
-  const question = formUtils.allItems(formDesign).find((item) => {
-    if (item._type === "AssetQuestion" && item.assetSystemId === assetSystemId) {
-      return true
-    }
-    return false
-  })
-
-  return (question as AssetQuestion | null) ?? null
 }
