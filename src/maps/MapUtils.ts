@@ -106,7 +106,11 @@ export function getCompiledFilters(
 
   // Compile filters to JsonQL expected by layers
   for (const table in design.filters || {}) {
-    const expr = design.filters[table]
+    let expr = design.filters[table]
+
+    // Clean expr
+    expr = exprCleaner.cleanExpr(expr, { table })
+
     const jsonql = exprCompiler.compileExpr({ expr, tableAlias: "{alias}" })
     if (jsonql) {
       compiledFilters.push({ table, jsonql })
