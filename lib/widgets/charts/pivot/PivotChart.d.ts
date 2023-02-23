@@ -6,7 +6,7 @@ import { PivotChartDesign } from "./PivotChartDesign";
 import { JsonQLFilter } from "../../../JsonQLFilter";
 export default class PivotChart extends Chart {
     cleanDesign(design: PivotChartDesign, schema: Schema): PivotChartDesign;
-    validateDesign(design: any, schema: Schema): string | null;
+    validateDesign(design: PivotChartDesign, schema: Schema): string | null;
     isAutoHeight(): boolean;
     isEmpty(design: any): boolean;
     hasDesignerPreview(): boolean;

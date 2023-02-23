@@ -162,12 +162,12 @@ export default class PivotChart extends Chart {
     return cleanedDesign
   }
 
-  validateDesign(design: any, schema: Schema) {
+  validateDesign(design: PivotChartDesign, schema: Schema) {
     let segment
     const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
-    if (!design.table) {
+    if (!design.table || !schema.getTable(design.table)) {
       return "Missing data source"
     }
 
