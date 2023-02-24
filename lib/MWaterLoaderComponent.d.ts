@@ -3,6 +3,11 @@ import { DataSource, Schema } from "mwater-expressions";
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent";
 import LoadingComponent from "react-library/lib/LoadingComponent";
 import MWaterContextComponent from "./MWaterContextComponent";
+/**
+ * Loads an mWater schema from the server and creates child with schema and dataSource
+ * Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
+ * and several other context items
+ */
 export default class MWaterLoaderComponent extends AsyncLoadComponent<{
     apiUrl: string;
     client?: string;
@@ -15,6 +20,8 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<{
     extraTables?: string[];
     /**  Called when extra tables are changed and schema will be reloaded */
     onExtraTablesChange?: (extraTables: string[]) => void;
+    /** Locales of the schema to load. Default is all. */
+    locales?: string[];
     /**  Override default add layer component. See AddLayerComponent for details */
     addLayerElementFactory?: any;
     children: (error: any, config?: {
@@ -37,9 +44,10 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<{
         apiUrl: string;
         client?: string | undefined;
         user?: string | undefined;
+        /**  user id of logged in user */
         schema: Schema;
         extraTables?: string[] | undefined;
-        onExtraTablesChange?: ((extraTables: string[]) => void) | undefined; /**  Called when extra tables are changed and schema will be reloaded */
+        onExtraTablesChange?: ((extraTables: string[]) => void) | undefined;
         addLayerElementFactory?: any;
     }, MWaterContextComponent>;
 }

@@ -19,6 +19,8 @@ export default function mWaterLoader(
     extraTables: string[]
     /** False to disable local caching of queries. Default true */
     localCaching?: boolean
+    /** Locales of the schema to load. Default is all. */
+    locales?: string[]
   },
   callback: (error: any, config?: { schema: Schema; dataSource: DataSource }) => void
 ): void {
@@ -35,6 +37,9 @@ export default function mWaterLoader(
   }
   if (options.extraTables && options.extraTables.length > 0) {
     query.extraTables = options.extraTables.join(",")
+  }
+  if (options.locales) {
+    query.locales = options.locales.join(",")
   }
 
   const url = options.apiUrl + "schema?" + querystring.stringify(query)

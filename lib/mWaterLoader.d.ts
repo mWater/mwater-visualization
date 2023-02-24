@@ -13,6 +13,8 @@ export default function mWaterLoader(options: {
     extraTables: string[];
     /** False to disable local caching of queries. Default true */
     localCaching?: boolean;
+    /** Locales of the schema to load. Default is all. */
+    locales?: string[];
 }, callback: (error: any, config?: {
     schema: Schema;
     dataSource: DataSource;

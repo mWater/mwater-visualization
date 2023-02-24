@@ -8,9 +8,11 @@ import LoadingComponent from "react-library/lib/LoadingComponent"
 import mWaterLoader from "./mWaterLoader"
 import MWaterContextComponent from "./MWaterContextComponent"
 
-// Loads an mWater schema from the server and creates child with schema and dataSource
-// Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
-// and several other context items
+/**
+ * Loads an mWater schema from the server and creates child with schema and dataSource
+ * Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
+ * and several other context items
+ */
 export default class MWaterLoaderComponent extends AsyncLoadComponent<
   {
     apiUrl: string
@@ -24,6 +26,8 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
     extraTables?: string[]
     /**  Called when extra tables are changed and schema will be reloaded */
     onExtraTablesChange?: (extraTables: string[]) => void
+    /** Locales of the schema to load. Default is all. */
+    locales?: string[]
     /**  Override default add layer component. See AddLayerComponent for details */
     addLayerElementFactory?: any
     children: (error: any, config?: { schema: Schema; dataSource: DataSource }) => ReactElement<any>
@@ -68,7 +72,8 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
         client: props.client,
         share: props.share,
         asUser: props.asUser,
-        extraTables: props.extraTables
+        extraTables: props.extraTables,
+        locales: props.locales
       },
       (error: any, config: any) => {
         if (error) {
