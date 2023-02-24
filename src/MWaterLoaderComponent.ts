@@ -58,8 +58,8 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<
   // Override to determine if a load is needed. Not called on mounting
   isLoadNeeded(newProps: any, oldProps: any) {
     return !_.isEqual(
-      _.pick(newProps, "apiUrl", "client", "user", "share", "asUser", "extraTables"),
-      _.pick(oldProps, "apiUrl", "client", "user", "share", "asUser", "extraTables")
+      _.pick(newProps, "apiUrl", "client", "user", "share", "asUser", "extraTables", "locales"),
+      _.pick(oldProps, "apiUrl", "client", "user", "share", "asUser", "extraTables", "locales")
     )
   }
 
