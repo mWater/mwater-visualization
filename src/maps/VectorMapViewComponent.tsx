@@ -228,7 +228,7 @@ export function VectorMapViewComponent(props: {
       }
 
       const defType = layer.getLayerDefinitionType()
-      console.log(defType, layerView.type)
+      // console.log(defType, layerView.type)
       const layerDataSource = props.mapDataSource.getLayerDataSource(layerView.id)
 
       if (defType == "VectorTile") {
