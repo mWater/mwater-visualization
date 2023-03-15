@@ -44,12 +44,12 @@ $(function () {
       R("style", null, "html, body, #main { height: 100% }"),
       // R(MWaterDirectMapPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
       // R(RichTextPane)
-      // R(MWaterMapPane, {apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1)})
+      R(MWaterMapPane, {apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1)})
       // R(TestPane, apiUrl: "https://api.mwater.co/v3/")
       // R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
       // R(MWaterDashboardPane, {apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "f99f206ddd4442a981761b8342c58058"})
       // R(MWaterDashboardPane, {apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "38d803820a7a4bf5a1d5ef19cf8c64f3"})
-      R(MWaterDirectDashboardPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
+      // R(MWaterDirectDashboardPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
       //R(MWaterDirectDashboardPane, { apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1) })
       //R(MWaterDatagridPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
       // R(MWaterDirectMapPane, { apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1) })
@@ -268,7 +268,7 @@ class MWaterDirectDashboardPane extends React.Component {
 }
 
 // mapId = "fb92ca9ca9a04bfd8dc156b5ac71380d"
-const mapId = "61bae239f1504cbb84dfdc9429083870"
+const mapId = "dec4923f684d4482922805556a013741"
 const share = "testshareid"
 
 class MWaterMapPane extends React.Component<any> {
@@ -284,14 +284,14 @@ class MWaterMapPane extends React.Component<any> {
   componentWillMount() {
     // Load map
     const url = this.props.apiUrl + `maps/${mapId}?` + querystring.stringify({ client: this.props.client })
-    return $.getJSON(url, (map) => {
-      return this.setState({ design: map.design, extraTables: map.extra_tables })
+    $.getJSON(url, (map) => {
+      this.setState({ design: map.design, extraTables: map.extra_tables })
     })
   }
 
   handleDesignChange = (design: any) => {
     this.setState({ design })
-    return console.log(JSON.stringify(design, null, 2))
+    // return console.log(JSON.stringify(design, null, 2))
   }
 
   render() {
@@ -305,7 +305,7 @@ class MWaterMapPane extends React.Component<any> {
         apiUrl: this.props.apiUrl,
         client: this.props.client,
         user: this.props.user,
-        extraTables: this.state.extraTables,
+        extraTables: ['responses:c08ef89fb9b642498e7db74674e84b55'],
         onExtraTablesChange: (extraTables: any) => this.setState({ extraTables })
       },
       (error: any, config: any) => {

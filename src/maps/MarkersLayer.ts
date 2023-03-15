@@ -13,7 +13,7 @@ import { MarkersLayerDesign } from "./MarkersLayerDesign"
 import { compileColorMapToMapbox, compileColorToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
-import { LayerSpecification } from "maplibre-gl"
+import { FilterSpecification, LayerSpecification } from "maplibre-gl"
 
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */
@@ -89,6 +89,16 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     })
 
     // Add markers
+    const libreFilters: FilterSpecification = [
+      "all",
+      ["==", ["get", "geometry_type"], "ST_Point"]
+    ]
+
+    const excludedValues = design.axes.color?.excludedValues ?? []
+    if(excludedValues.length > 0) {
+      libreFilters.push(["has", "color"])
+      libreFilters.push(["!", ["in", ["get", "color"], ['literal', excludedValues]]])
+    }
     if (!design.symbol) {
       mapLayers.push({
         id: `${sourceId}:points`,
@@ -103,7 +113,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           "circle-stroke-opacity": 0.5 * opacity,
           "circle-radius": (design.markerSize || 10) / 2
         },
-        filter: ["==", ["get", "geometry_type"], "ST_Point"]
+        filter: libreFilters
       })
     } else {
       mapLayers.push({
@@ -120,7 +130,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           "icon-color": color,
           "icon-opacity": opacity
         },
-        filter: ["==", ["get", "geometry_type"], "ST_Point"]
+        filter: libreFilters
       })
     }
 
