@@ -35,6 +35,24 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     // If color axes, add color conditions
     const color = compileColorMapToMapbox(design.axes.color, design.color || "#666666")
 
+    // Add markers
+    const libreFilters: FilterSpecification = []
+
+    const excludedValues = design.axes.color?.excludedValues ?? []
+    if(excludedValues.length > 0) {
+      libreFilters.push("all")
+      libreFilters.push(["has", "color"])
+      libreFilters.push(["!", ["in", ["get", "color"], ['literal', excludedValues]]])
+    }
+
+    const addFilter = (f: FilterSpecification) => {
+      if(libreFilters.length > 0) {
+        return libreFilters.concat([f])
+      } else {
+        return libreFilters.concat(f)
+      }
+    }
+
     // Add polygons
     mapLayers.push({
       id: `${sourceId}:polygons`,
@@ -45,11 +63,11 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         "fill-color": color,
         "fill-opacity": 0.25 * opacity
       },
-      filter: [
+      filter: addFilter([
         "any",
         ["==", ["get", "geometry_type"], "ST_Polygon"],
         ["==", ["get", "geometry_type"], "ST_MultiPolygon"]
-      ]
+      ])
     })
 
     // Add polygon outlines and lines
@@ -63,11 +81,11 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         "line-width": design.lineWidth != null ? design.lineWidth : 3,
         "line-opacity": opacity
       },
-      filter: [
+      filter: addFilter([
         "any",
         ["==", ["get", "geometry_type"], "ST_Polygon"],
         ["==", ["get", "geometry_type"], "ST_MultiPolygon"]
-      ]
+      ])
     })
 
     // Add lines
@@ -81,24 +99,13 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         "line-width": design.lineWidth != null ? design.lineWidth : 3,
         "line-opacity": opacity
       },
-      filter: [
+      filter: addFilter([
         "any",
         ["==", ["get", "geometry_type"], "ST_LineString"],
         ["==", ["get", "geometry_type"], "ST_MultiLineString"]
-      ]
+      ])
     })
 
-    // Add markers
-    const libreFilters: FilterSpecification = [
-      "all",
-      ["==", ["get", "geometry_type"], "ST_Point"]
-    ]
-
-    const excludedValues = design.axes.color?.excludedValues ?? []
-    if(excludedValues.length > 0) {
-      libreFilters.push(["has", "color"])
-      libreFilters.push(["!", ["in", ["get", "color"], ['literal', excludedValues]]])
-    }
     if (!design.symbol) {
       mapLayers.push({
         id: `${sourceId}:points`,
@@ -113,7 +120,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           "circle-stroke-opacity": 0.5 * opacity,
           "circle-radius": (design.markerSize || 10) / 2
         },
-        filter: libreFilters
+        filter: addFilter(["==", ["get", "geometry_type"], "ST_Point"])
       })
     } else {
       mapLayers.push({
@@ -130,7 +137,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           "icon-color": color,
           "icon-opacity": opacity
         },
-        filter: libreFilters
+        filter: addFilter(["==", ["get", "geometry_type"], "ST_Point"])
       })
     }
 
