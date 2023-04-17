@@ -14,7 +14,7 @@ export interface QuickfiltersDesignComponentProps {
 export default class QuickfiltersDesignComponent extends React.Component<QuickfiltersDesignComponentProps> {
     handleDesignChange: (design: any) => void;
     isMergeable(design: any, index: any): boolean;
-    renderQuickfilter: (item: any, index: any) => React.CElement<any, QuickfilterDesignComponent>;
+    renderQuickfilter: (item: any, index: any) => React.CElement<QuickfilterDesignComponentProps, QuickfilterDesignComponent>;
     handleAdd: () => void;
     handleRemove: (index: any) => void;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
@@ -35,7 +35,8 @@ interface QuickfilterDesignComponentState {
 }
 /** Single quickfilter design component */
 declare class QuickfilterDesignComponent extends React.Component<QuickfilterDesignComponentProps, QuickfilterDesignComponentState> {
-    constructor(props: any);
+    constructor(props: QuickfilterDesignComponentProps);
+    componentDidUpdate(prevProps: Readonly<QuickfilterDesignComponentProps>, prevState: Readonly<QuickfilterDesignComponentState>, snapshot?: any): void;
     handleTableChange: (table: any) => void;
     handleExprChange: (expr: any) => void;
     handleLabelChange: (ev: any) => void;
