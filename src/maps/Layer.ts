@@ -69,7 +69,7 @@ export interface VectorTileSourceLayer {
   id: string
 
   /** Query that produces the source layer, without the ST_AsMVT but with the ST_AsMVTGeom.
-   * References CTE called tile which has x, y, z, envelope and envelope_with_margin.
+   * References CTE called tile which has x, y, z, scale, envelope and envelope_with_margin.
    */
   jsonql: JsonQLQuery
 }

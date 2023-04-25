@@ -360,7 +360,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "innerquery" })
 
-    // row_number() over (partition by round(ST_XMin(location)/!pixel_width!*5), round(ST_YMin(location)/!pixel_height!*5)) AS r
+    // row_number() over (partition by round(ST_XMin(location)/!(pixel_width!*5)), round(ST_YMin(location)/(!pixel_height!*5))) AS r
     const cluster: JsonQLSelect = {
       type: "select",
       expr: {
