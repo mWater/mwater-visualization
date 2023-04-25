@@ -31,7 +31,6 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
       }
     }
 
-    console.log(design)
     return this.props.onDesignChange(design)
   }
 
@@ -147,18 +146,12 @@ class QuickfilterDesignComponent extends React.Component<
   QuickfilterDesignComponentProps,
   QuickfilterDesignComponentState
 > {
-  constructor(props: QuickfilterDesignComponentProps) {
+  constructor(props: any) {
     super(props)
 
     // Store table to allow selecting table first, then expression
     this.state = {
-      table: (props.design.expr?.type !== 'literal' && props.design.expr?.table) ? props.design.expr?.table: props.tables[0]
-    }
-  }
-
-  componentDidUpdate(prevProps: Readonly<QuickfilterDesignComponentProps>, prevState: Readonly<QuickfilterDesignComponentState>, snapshot?: any): void {
-    if(this.props.design.expr?.type !== 'literal' && prevState.table !== this.props.design.expr?.table ) {
-      this.setState({table: this.props.design.expr?.table})
+      table: props.design.expr?.table || props.tables[0]
     }
   }
 
