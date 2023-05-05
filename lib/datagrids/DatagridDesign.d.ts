@@ -1,4 +1,5 @@
 import { Expr, LiteralType } from "mwater-expressions";
+import { Quickfilter } from "../quickfilter/Quickfilter";
 /** Design of data grid */
 export interface DatagridDesign {
     /** table id of main table */
@@ -16,8 +17,8 @@ export interface DatagridDesign {
         expr: Expr;
         direction: "asc" | "desc";
     }[];
-    /** array of quick filters (user-selectable filters). See quickfilter/README.md TODO */
-    quickfilters?: any;
+    /** array of quick filters (user-selectable filters). See quickfilter/README.md */
+    quickfilters?: Quickfilter[];
     /** true to show row numbers */
     showRowNumbers?: boolean;
     /** array of global filters. See below. */

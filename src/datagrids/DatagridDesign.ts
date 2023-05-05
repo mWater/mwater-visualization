@@ -1,4 +1,5 @@
 import { Expr, LiteralType } from "mwater-expressions"
+import { Quickfilter } from "../quickfilter/Quickfilter"
 
 /** Design of data grid */
 export interface DatagridDesign {
@@ -20,8 +21,8 @@ export interface DatagridDesign {
   /** array of { expr: expression to order on, direction: "asc"/"desc" } */
   orderBys?: { expr: Expr; direction: "asc" | "desc" }[]
 
-  /** array of quick filters (user-selectable filters). See quickfilter/README.md TODO */
-  quickfilters?: any
+  /** array of quick filters (user-selectable filters). See quickfilter/README.md */
+  quickfilters?: Quickfilter[]
 
   /** true to show row numbers */
   showRowNumbers?: boolean
