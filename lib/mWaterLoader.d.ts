@@ -1,6 +1,5 @@
 import { DataSource, Schema } from "mwater-expressions";
-/** Loads a schema and data source that is specific to mWater server */
-export default function mWaterLoader(options: {
+export interface MWaterLoaderOptions {
     /** e.g. "https://api.mwater.co/v3/". required */
     apiUrl: string;
     /** client id if logged in. optional */
@@ -15,7 +14,13 @@ export default function mWaterLoader(options: {
     localCaching?: boolean;
     /** Locales of the schema to load. Default is all. */
     locales?: string[];
-}, callback: (error: any, config?: {
+}
+/** Loads a schema and data source that is specific to mWater server */
+export default function mWaterLoader(options: MWaterLoaderOptions, callback: (error: any, config?: {
     schema: Schema;
     dataSource: DataSource;
 }) => void): void;
+export default function mWaterLoader(options: MWaterLoaderOptions): Promise<{
+    schema: Schema;
+    dataSource: DataSource;
+}>;
