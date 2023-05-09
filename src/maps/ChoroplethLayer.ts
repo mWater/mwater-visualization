@@ -1385,8 +1385,19 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         table: regionsTable,
         jsonql: {
           type: "op",
-          op: "=",
-          exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }, design.scope]
+          op: "and",
+          exprs: [
+            {
+              type: "op",
+              op: "=",
+              exprs: [{ type: "field", tableAlias: "{alias}", column: `level${design.scopeLevel}` }, design.scope]
+            },
+            {
+              type: "op",
+              op: "=",
+              exprs: [{ type: "field", tableAlias: "{alias}", column: `level` }, design.detailLevel]
+            },
+          ]
         }
       })
     }
@@ -1462,11 +1473,18 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design: ChoroplethLayerDesign, schema: Schema): string[] {
+    const filterableTables: string[] = []
+
     if (design.table) {
-      return [design.table]
-    } else {
-      return []
+      filterableTables.push(design.table)
+    } 
+    
+    if (design.regionMode === "direct") {
+      const regionsTable = design.regionsTable || "admin_regions"
+      filterableTables.push(regionsTable)
     }
+
+    return filterableTables
   }
 
   /** True if layer can be edited */
