@@ -1464,7 +1464,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         axis: design.axes.color || null,
         table: axisTable,
         types: ["enum", "text", "boolean", "date"],
-        aggrNeed: "required"
+        aggrNeed: design.regionMode == "indirect" ? "required" : "none"
       }) || undefined,
       defaultColor: design.color || undefined,
       locale
