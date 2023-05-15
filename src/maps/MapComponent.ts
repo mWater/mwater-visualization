@@ -166,7 +166,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
       {
         style: {
           padding: 4,
-          borderBottom: "solid 2px #AAA",
+          borderBottom: "solid 1px #e8e8e8",
           gridArea: "header"
         }
       },
@@ -244,7 +244,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
   }
 
   renderQuickfilter() {
-    return R("div", { style: { gridArea: "quickfilters" } },
+    return R("div", { style: { gridArea: "quickfilters", borderBottom: "solid 1px #e8e8e8" } },
       R(QuickfiltersComponent, {
         design: this.props.design.quickfilters || [],
         schema: this.props.schema,
@@ -261,7 +261,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
   }
 
   renderDesigner() {
-    return R("div", { style: { gridArea: "designer", borderLeft: "solid 2px #AAA" } },
+    return R("div", { style: { gridArea: "designer", borderLeft: "solid 2px #e8e8e8" } },
       this.props.onDesignChange ?
         React.createElement(MapDesignerComponent, {
           schema: this.props.schema,

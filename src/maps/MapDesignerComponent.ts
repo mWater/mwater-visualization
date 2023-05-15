@@ -210,7 +210,7 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
     if (this.props.enableQuickFilters) {
       tabs.splice(2, 0, {
         id: "quickfilters",
-        label: T("Quickfilters"),
+        label: [R("i", { className: "fa fa-bolt" }), " ", T("Quickfilters")],
         elem: R(
           "div",
           { style: { marginBottom: 200 } },
