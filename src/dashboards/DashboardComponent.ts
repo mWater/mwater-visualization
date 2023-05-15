@@ -341,7 +341,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
             "a",
             { key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: this.handleShowQuickfilters },
             R("span", { className: "fa fa-filter" }),
-            R("span", { className: "hide-600px" }, " Show Filters")
+            R("span", { className: "hide-600px" }, " Show Quickfilters")
           )
         : undefined,
 

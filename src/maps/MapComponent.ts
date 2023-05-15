@@ -154,7 +154,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
           "a",
           { key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: this.handleShowQuickfilters },
           R("span", { className: "fa fa-filter" }),
-          R("span", { className: "hide-600px" }, " Show Filters")
+          R("span", { className: "hide-600px" }, " Show Quickfilters")
         )
         : undefined,
     )
