@@ -1,13 +1,16 @@
 /// <reference types="jquery" />
-import { Schema } from "mwater-expressions";
+import { DataSource, Expr, Schema } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign, MapLayerView } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
 import { MapLayerDataSource } from "./MapLayerDataSource";
 import { WidgetDataSource } from "../widgets/WidgetDataSource";
+import { QuickfiltersDataSource } from "../quickfilter/QuickfiltersDataSource";
 interface ServerMapDataSourceOptions {
     /** schema to use */
     schema: Schema;
+    /** data source to use */
+    dataSource: DataSource;
     /** design of entire map */
     design: MapDesign;
     /** share id to use for talking to mWater server */
@@ -35,6 +38,7 @@ export default class ServerMapDataSource implements MapDataSource {
         e: number;
         s: number;
     } | null) => void): void;
+    getQuickfiltersDataSource(): ServerQuickfilterDataSource;
 }
 declare class ServerLayerDataSource implements MapLayerDataSource {
     options: ServerMapLayerDataSourceOptions;
@@ -73,5 +77,10 @@ declare class ServerMapLayerPopupWidgetDataSource implements WidgetDataSource {
     constructor(options: ServerMapLayerPopupWidgetDataSourceOptions);
     getData(design: any, filters: JsonQLFilter[], callback: (error: any, data?: any) => void): JQuery.jqXHR<any>;
     getImageUrl(imageId: string, height?: number): string;
+}
+declare class ServerQuickfilterDataSource implements QuickfiltersDataSource {
+    options: ServerMapDataSourceOptions;
+    constructor(options: ServerMapDataSourceOptions);
+    getValues(index: number, expr: Expr, filters: JsonQLFilter[], offset: number, limit: number, callback: (error: any, values?: any[]) => void): void;
 }
 export {};

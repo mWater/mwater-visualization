@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React, { ReactNode } from "react";
-import MapControlComponent from "./MapControlComponent";
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
 import UndoStack from "../UndoStack";
 import { DataSource, Schema } from "mwater-expressions";
@@ -21,11 +20,23 @@ export interface MapComponentProps {
     titleElem?: ReactNode;
     /** Extra elements to add to right */
     extraTitleButtonsElem?: ReactNode;
+    /** True to enable quickfilters */
+    enableQuickFilters?: boolean;
+    /** Locked quickfilter values. See README in quickfilters */
+    quickfilterLocks?: any[];
+    /** Initial quickfilter values */
+    quickfiltersValues?: any[];
+    /** True to hide title bar and related controls */
+    hideTitleBar?: boolean;
 }
 interface MapComponentState {
     undoStack: UndoStack;
     transientDesign: MapDesign;
     zoomLocked: boolean;
+    /** Values of quickfilters */
+    quickfiltersValues: any[] | null;
+    /** True to hide quickfilters */
+    hideQuickfilters: boolean;
 }
 /** Map with designer on right */
 export default class MapComponent extends React.Component<MapComponentProps, MapComponentState> {
@@ -33,31 +44,47 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
         locale: PropTypes.Requireable<string>;
     };
     constructor(props: MapComponentProps);
-    componentWillReceiveProps(nextProps: any): void;
+    componentDidUpdate(prevProps: MapComponentProps): void;
     handleUndo: () => void;
     handleRedo: () => void;
+    handleShowQuickfilters: () => void;
     handleZoomLockClick: () => void;
     renderActionLinks(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     renderHeader(): React.DetailedReactHTMLElement<{
         style: {
-            position: "absolute";
-            top: number;
-            left: number;
-            right: number;
-            height: number;
             padding: number;
             borderBottom: string;
+            gridArea: "header";
         };
     }, HTMLElement>;
     handleDesignChange: (design: any) => void;
     getDesign(): MapDesign;
+    getQuickfilterValues: () => any[];
     renderView(): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent>;
-    renderDesigner(): React.CElement<import("./MapControlComponent").MapControlComponentProps, MapControlComponent>;
+    getCompiledFilters(): {
+        table: string;
+        jsonql: import("jsonql").JsonQLExpr;
+    }[];
+    renderQuickfilter(): React.DetailedReactHTMLElement<{
+        style: {
+            gridArea: "quickfilters";
+            borderBottom: string;
+        };
+    }, HTMLElement>;
+    renderDesigner(): React.DetailedReactHTMLElement<{
+        style: {
+            gridArea: "designer";
+            borderLeft: string;
+        };
+    }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<{
         style: {
             width: string;
             height: string;
-            position: "relative";
+            display: "grid";
+            gridTemplateColumns: string;
+            gridTemplateRows: string;
+            gridTemplateAreas: "\"header designer\" \"quickfilters designer\" \"view designer\"";
         };
     }, HTMLElement>;
 }

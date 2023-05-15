@@ -1,4 +1,5 @@
 import { Expr, LiteralType } from "mwater-expressions";
+import { Quickfilter } from "../quickfilter/Quickfilter";
 /** Maps are stored as a base layer, a series of layers and filters. */
 export interface MapDesign {
     /** "bing_road"/"bing_aerial"/"cartodb_positron"/"cartodb_dark_matter"/"blank" */
@@ -21,6 +22,10 @@ export interface MapDesign {
     maxZoom?: number | null;
     /** array of global filters. See below. */
     globalFilters?: GlobalFilter[];
+    /** array of quick filters (user-selectable filters). See quickfilter/README.md
+     * Note: these are not available when the map is a widget in a dashboard
+     */
+    quickfilters?: Quickfilter[];
     /** True to display layer switcher */
     showLayerSwitcher?: boolean;
     /** Mode of initial legend display. Default is "open" */

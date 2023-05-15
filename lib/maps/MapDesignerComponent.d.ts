@@ -14,6 +14,8 @@ export interface MapDesignerComponentProps {
     onDesignChange: (design: MapDesign) => void;
     /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
     filters?: JsonQLFilter[];
+    /** True to enable quickfilters */
+    enableQuickFilters?: boolean;
 }
 export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
     static childContextTypes: {

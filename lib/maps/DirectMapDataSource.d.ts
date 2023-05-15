@@ -1,4 +1,4 @@
-import { DataSource, Schema } from "mwater-expressions";
+import { DataSource, Expr, Schema } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
@@ -26,6 +26,10 @@ export default class DirectMapDataSource implements MapDataSource {
         e: number;
         s: number;
     } | null) => void): void;
+    /** Gets the quickfilters data source */
+    getQuickfiltersDataSource(): {
+        getValues: (index: any, expr: Expr, filters: any, offset: any, limit: any, callback: any) => void;
+    };
 }
 /** Interface for a request made to get a token for vector tiles.
  * The response is a token that can be used to get the actual tiles.
