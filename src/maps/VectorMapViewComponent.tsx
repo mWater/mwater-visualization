@@ -347,7 +347,7 @@ export function VectorMapViewComponent(props: {
   // Update user layers
   useEffect(() => {
     updateUserStyle()
-  }, [props.design.layerViews, props.scope, layersCreatedAfter, props.extraFilters, props.design.filters, props.design.globalFilters, props.refreshTrigger])
+  }, [props.design.layerViews, props.scope, layersCreatedAfter, JSON.stringify(props.extraFilters), props.design.filters, props.design.globalFilters, props.refreshTrigger])
 
   // Style map
   useStyleMap({
@@ -459,7 +459,7 @@ export function VectorMapViewComponent(props: {
     if (props.design.autoBounds) {
       performAutoZoom()
     }
-  }, [map, props.extraFilters, props.design.autoBounds])
+  }, [map, JSON.stringify(props.extraFilters), props.design.autoBounds])
 
   // Set initial bounds
   useEffect(() => {

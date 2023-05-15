@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import React, { ReactElement } from "react"
 const R = React.createElement
 
-import TabbedComponent from "react-library/lib/TabbedComponent"
+import TabbedComponent, { TabbedComponentTab } from "react-library/lib/TabbedComponent"
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
 import CheckboxComponent from "../CheckboxComponent"
 import ClickOutHandler from "react-onclickout"
@@ -16,6 +16,8 @@ import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
 import { MapDesign } from "./MapDesign"
 import { JsonQLFilter } from "../JsonQLFilter"
+import QuickfiltersDesignComponent from "../quickfilter/QuickfiltersDesignComponent"
+import produce from "immer"
 
 export interface MapDesignerComponentProps {
   /** Schema to use */
@@ -28,6 +30,9 @@ export interface MapDesignerComponentProps {
   onDesignChange: (design: MapDesign) => void
   /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
   filters?: JsonQLFilter[]
+
+  /** True to enable quickfilters */
+  enableQuickFilters?: boolean
 }
 
 export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
@@ -58,7 +63,7 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
   handleConvertToClusterMap = () => {
     return this.props.onDesignChange(MapUtils.convertToClusterMap(this.props.design))
   }
-  
+
   handleConvertToMarkersMap = () => {
     return this.props.onDesignChange(MapUtils.convertToMarkersMap(this.props.design))
   }
@@ -126,26 +131,26 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
 
       MapUtils.canConvertToClusterMap(this.props.design)
         ? R(
-            "div",
-            { key: "tocluster" },
-            R(
-              "a",
-              { onClick: this.handleConvertToClusterMap, className: "btn btn-link btn-sm" },
-              "Convert to cluster map"
-            )
+          "div",
+          { key: "tocluster" },
+          R(
+            "a",
+            { onClick: this.handleConvertToClusterMap, className: "btn btn-link btn-sm" },
+            "Convert to cluster map"
           )
+        )
         : undefined,
-      
+
       MapUtils.canConvertToMarkersMap(this.props.design)
         ? R(
-            "div",
-            { key: "toMarker" },
-            R(
-              "a",
-              { onClick: this.handleConvertToMarkersMap, className: "btn btn-link btn-sm" },
-              "Convert to markers map"
-            )
+          "div",
+          { key: "toMarker" },
+          R(
+            "a",
+            { onClick: this.handleConvertToMarkersMap, className: "btn btn-link btn-sm" },
+            "Convert to markers map"
           )
+        )
         : undefined,
 
       R(AttributionComponent, {
@@ -163,48 +168,74 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
   }
 
   render() {
+    const filterableTables = MapUtils.getFilterableTables(this.props.design, this.props.schema)
     const filters = (this.props.filters || []).concat(
       MapUtils.getCompiledFilters(
         this.props.design,
         this.props.schema,
-        MapUtils.getFilterableTables(this.props.design, this.props.schema)
+        filterableTables
       )
     )
+
+    const tabs: TabbedComponentTab[] = [
+      {
+        id: "layers",
+        label: [R("i", { className: "fa fa-bars" }), " Layers"],
+        elem: R(MapLayersDesignerComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.props.design,
+          onDesignChange: this.props.onDesignChange,
+          allowEditingLayers: true,
+          filters: _.compact(filters)
+        })
+      },
+      {
+        id: "filters",
+        label: [R("i", { className: "fa fa-filter" }), " Filters"],
+        elem: R(MapFiltersDesignerComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.props.design,
+          onDesignChange: this.props.onDesignChange
+        })
+      },
+      {
+        id: "options",
+        label: [R("i", { className: "fa fa-cog" }), " Options"],
+        elem: this.renderOptionsTab()
+      }
+    ]
+
+    if (this.props.enableQuickFilters) {
+      tabs.splice(2, 0, {
+        id: "quickfilters",
+        label: T("Quickfilters"),
+        elem: R(
+          "div",
+          { style: { marginBottom: 200 } },
+          R(QuickfiltersDesignComponent, {
+            design: this.props.design.quickfilters || [],
+            onDesignChange: (qfDesign) => {
+              this.props.onDesignChange(produce(this.props.design, (draft) => {
+                draft.quickfilters = qfDesign
+              }))
+            },
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            tables: filterableTables
+          })
+        )
+      })
+    }
+
 
     return R(
       "div",
       { style: { padding: 5 } },
       R(TabbedComponent, {
         initialTabId: "layers",
-        tabs: [
-          {
-            id: "layers",
-            label: [R("i", { className: "fa fa-bars" }), " Layers"],
-            elem: R(MapLayersDesignerComponent, {
-              schema: this.props.schema,
-              dataSource: this.props.dataSource,
-              design: this.props.design,
-              onDesignChange: this.props.onDesignChange,
-              allowEditingLayers: true,
-              filters: _.compact(filters)
-            })
-          },
-          {
-            id: "filters",
-            label: [R("i", { className: "fa fa-filter" }), " Filters"],
-            elem: R(MapFiltersDesignerComponent, {
-              schema: this.props.schema,
-              dataSource: this.props.dataSource,
-              design: this.props.design,
-              onDesignChange: this.props.onDesignChange
-            })
-          },
-          {
-            id: "options",
-            label: [R("i", { className: "fa fa-cog" }), " Options"],
-            elem: this.renderOptionsTab()
-          }
-        ]
+        tabs
       })
     )
   }
@@ -258,8 +289,8 @@ class AttributionComponent extends React.Component<AttributionComponentProps, At
       this.state.editing
         ? this.renderEditor()
         : this.props.text
-        ? R("span", { onClick: this.handleTextClick, style: { cursor: "pointer" } }, this.props.text)
-        : R("a", { onClick: this.handleTextClick, className: "btn btn-link btn-sm" }, "+ Add attribution")
+          ? R("span", { onClick: this.handleTextClick, style: { cursor: "pointer" } }, this.props.text)
+          : R("a", { onClick: this.handleTextClick, className: "btn btn-link btn-sm" }, "+ Add attribution")
     )
 
     if (this.props.text || this.state.editing) {

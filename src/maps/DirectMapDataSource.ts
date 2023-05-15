@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { DataSource, injectTableAlias, Schema } from "mwater-expressions"
+import { DataSource, Expr, injectTableAlias, Schema } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
 import BlocksLayoutManager from "../layouts/blocks/BlocksLayoutManager"
 import WidgetFactory from "../widgets/WidgetFactory"
@@ -13,6 +13,7 @@ import compressJson from "../compressJson"
 import querystring from "querystring"
 import { MapLayerDataSource } from "./MapLayerDataSource"
 import TileUrlLayer from "./TileUrlLayer"
+import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
 
 interface DirectMapDataSourceOptions {
   /** schema to use */
@@ -58,6 +59,24 @@ export default class DirectMapDataSource implements MapDataSource {
   ): void {
     return new MapBoundsCalculator(this.options.schema, this.options.dataSource).getBounds(design, filters, callback)
   }
+
+  /** Gets the quickfilters data source */
+  getQuickfiltersDataSource() {
+    return {
+      getValues: (index: any, expr: Expr, filters: any, offset: any, limit: any, callback: any) => {
+        // Perform query
+        return QuickfilterUtils.findExprValues(
+          expr,
+          this.options.schema,
+          this.options.dataSource,
+          filters,
+          offset,
+          limit,
+          callback
+        )
+      }
+    }
+  } 
 }
 
 interface DirectLayerDataSourceOptions {

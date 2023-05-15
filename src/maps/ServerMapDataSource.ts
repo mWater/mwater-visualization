@@ -1,4 +1,4 @@
-import { injectTableAlias, Schema } from "mwater-expressions"
+import { DataSource, Expr, injectTableAlias, Schema } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
 import compressJson from "../compressJson"
 import { MapDesign, MapLayerView } from "./MapDesign"
@@ -10,10 +10,14 @@ import { MapLayerDataSource } from "./MapLayerDataSource"
 import LayerFactory from "./LayerFactory"
 import { WidgetDataSource } from "../widgets/WidgetDataSource"
 import TileUrlLayer from "./TileUrlLayer"
+import { QuickfiltersDataSource } from "../quickfilter/QuickfiltersDataSource"
 
 interface ServerMapDataSourceOptions {
   /** schema to use */
   schema: Schema
+
+  /** data source to use */
+  dataSource: DataSource
 
   /** design of entire map */
   design: MapDesign
@@ -79,6 +83,10 @@ export default class ServerMapDataSource implements MapDataSource {
       console.log(xhr.responseText)
       return callback(new Error(xhr.responseText))
     })
+  }
+
+  getQuickfiltersDataSource() {
+    return new ServerQuickfilterDataSource(this.options)
   }
 }
 
@@ -328,3 +336,64 @@ class ServerMapLayerPopupWidgetDataSource implements WidgetDataSource {
     return url
   }
 }
+
+class ServerQuickfilterDataSource implements QuickfiltersDataSource {
+  options: ServerMapDataSourceOptions
+
+  // options:
+  //   apiUrl: API url to use for talking to mWater server
+  //   client: client id to use for talking to mWater server
+  //   share: share id to use for talking to mWater server
+  //   dashboardId: dashboard id to use on server
+  //   dataSource: data source that is used for determining cache expiry
+  //   rev: revision to use to allow caching
+  constructor(options: ServerMapDataSourceOptions) {
+    this.options = options
+  }
+
+  // Gets the values of the quickfilter at index
+  getValues(
+    index: number,
+    expr: Expr,
+    filters: JsonQLFilter[],
+    offset: number,
+    limit: number,
+    callback: (error: any, values?: any[]) => void
+  ): void {
+    const query = {
+      client: this.options.client,
+      share: this.options.share,
+      filters: compressJson(filters),
+      offset,
+      limit,
+      rev: this.options.rev
+    }
+
+    const url =
+      this.options.apiUrl +
+      `maps/${this.options.mapId}/quickfilters/${index}/values?` +
+      querystring.stringify(query)
+
+    const headers = {}
+    const cacheExpiry = this.options.dataSource.getCacheExpiry()
+    if (cacheExpiry) {
+      const seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
+      headers["Cache-Control"] = `max-age=${seconds}`
+    }
+
+    $.ajax({
+      dataType: "json",
+      method: "GET",
+      url,
+      headers
+    })
+      .done((data) => {
+        return callback(null, data)
+      })
+      .fail((xhr) => {
+        console.log(xhr.responseText)
+        return callback(new Error(xhr.responseText))
+      })
+  }
+}
+

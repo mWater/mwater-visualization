@@ -1,6 +1,5 @@
 import WidgetFactory from "../widgets/WidgetFactory"
 import DirectWidgetDataSource from "../widgets/DirectWidgetDataSource"
-import LayoutManager from "../layouts/LayoutManager"
 import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
 import DashboardDataSource from "./DashboardDataSource"
 import { Schema, DataSource } from "mwater-expressions"

@@ -13,6 +13,9 @@ import { DataSource, Schema } from "mwater-expressions"
 import { MapDataSource } from "./MapDataSource"
 import { MapDesign } from "./MapDesign"
 import { JsonQLFilter } from "../JsonQLFilter"
+import QuickfilterCompiler from "../quickfilter/QuickfilterCompiler"
+import QuickfiltersComponent from "../quickfilter/QuickfiltersComponent"
+import { getCompiledFilters, getFilterableTables } from "./MapUtils"
 
 export interface MapComponentProps {
   schema: Schema
@@ -34,34 +37,29 @@ export interface MapComponentProps {
   /** Extra elements to add to right */
   extraTitleButtonsElem?: ReactNode 
 
+  /** True to enable quickfilters */
+  enableQuickFilters?: boolean
 
-  // /** scope of the map (when a layer self-selects a particular scope) */
-  // scope?: MapScope
+  /** Locked quickfilter values. See README in quickfilters */
+  quickfilterLocks?: any[]
 
-  // /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  // onScopeChange: (scope: MapScope | null) => void
+  /** Initial quickfilter values */
+  quickfiltersValues?: any[]
 
-  // /** Whether the map be draggable with mouse/touch or not. Default true */
-  // dragging?: boolean
-
-  // /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
-  // touchZoom?: boolean
-
-  // /** Whether the map can be zoomed by using the mouse wheel. Default true */
-  // scrollWheelZoom?: boolean
-
-  // /** Whether changes to zoom level should be persisted. Default false  */
-  // zoomLocked?: boolean
-
-  // /** Locale to use */
-  // locale: string
-
+  /** True to hide title bar and related controls */
+  hideTitleBar?: boolean
 }
 
 interface MapComponentState {
   undoStack: UndoStack
   transientDesign: MapDesign
   zoomLocked: boolean
+
+  /** Values of quickfilters */
+  quickfiltersValues: any[] | null
+
+  /** True to hide quickfilters */
+  hideQuickfilters: boolean
 }
 
 /** Map with designer on right */
@@ -73,16 +71,20 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
     this.state = {
       undoStack: new UndoStack().push(props.design),
       transientDesign: props.design, // Temporary design for read-only maps
-      zoomLocked: true
+      zoomLocked: true,
+      quickfiltersValues: props.quickfiltersValues ?? null,
+      hideQuickfilters: false
     }
   }
 
-  componentWillReceiveProps(nextProps: any) {
-    // Save on stack
-    this.setState({ undoStack: this.state.undoStack.push(nextProps.design) })
+  componentDidUpdate(prevProps: MapComponentProps) {
+    // If design changes, save on stack and update transient design
+    if (!_.isEqual(prevProps.design, this.props.design)) {
+      // Save on stack
+      this.setState({ undoStack: this.state.undoStack.push(this.props.design) })
 
-    if (!_.isEqual(nextProps.design, this.props.design)) {
-      return this.setState({ transientDesign: nextProps.design })
+      // Update transient design
+      this.setState({ transientDesign: this.props.design })
     }
   }
 
@@ -98,6 +100,10 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
 
     // We need to use callback as state is applied later
     return this.setState({ undoStack }, () => this.props.onDesignChange!(undoStack.getValue()))
+  }
+
+  handleShowQuickfilters = () => {
+    return this.setState({ hideQuickfilters: false })
   }
 
   handleZoomLockClick = () => {
@@ -142,7 +148,15 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
             )
           ]
         : undefined,
-      this.props.extraTitleButtonsElem
+      this.props.extraTitleButtonsElem,
+      this.state.hideQuickfilters && this.props.design.quickfilters && this.props.design.quickfilters.length > 0
+        ? R(
+            "a",
+            { key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: this.handleShowQuickfilters },
+            R("span", { className: "fa fa-filter" }),
+            R("span", { className: "hide-600px" }, " Show Filters")
+          )
+        : undefined,
     )
   }
 
@@ -181,7 +195,23 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
     }
   }
 
+  // Get the values of the quick filters
+  getQuickfilterValues = () => {
+    return this.state.quickfiltersValues || []
+  }
+
   renderView() {
+    let filters = this.props.extraFilters || []
+
+    // Compile quickfilters
+    filters = filters.concat(
+      new QuickfilterCompiler(this.props.schema).compile(
+        this.props.design.quickfilters || [],
+        this.state.quickfiltersValues,
+        this.props.quickfilterLocks
+      )
+    )
+
     return React.createElement(
       AutoSizeComponent,
       { injectWidth: true, injectHeight: true },
@@ -197,7 +227,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
           onDesignChange: this.handleDesignChange,
           zoomLocked: this.state.zoomLocked,
           onRowClick: this.props.onRowClick,
-          extraFilters: this.props.extraFilters,
+          extraFilters: filters,
           locale: this.context.locale,
           width: size.width!,
           height: size.height!
@@ -206,13 +236,40 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
     )
   }
 
+  // Get filters from props filters combined with maps filters
+  getCompiledFilters() {
+    let compiledFilters = getCompiledFilters(
+      this.props.design,
+      this.props.schema,
+      getFilterableTables(this.props.design, this.props.schema)
+    )
+    compiledFilters = compiledFilters.concat(this.props.extraFilters || [])
+    return compiledFilters
+  }
+  
+  renderQuickfilter() {
+    return R(QuickfiltersComponent, {
+      design: this.props.design.quickfilters || [],
+      schema: this.props.schema,
+      dataSource: this.props.dataSource,
+      quickfiltersDataSource: this.props.mapDataSource.getQuickfiltersDataSource(),
+      values: this.state.quickfiltersValues || undefined,
+      onValuesChange: (values: any) => this.setState({ quickfiltersValues: values }),
+      locks: this.props.quickfilterLocks,
+      filters: this.getCompiledFilters(),
+      hideTopBorder: this.props.hideTitleBar,
+      onHide: () => this.setState({ hideQuickfilters: true })
+    })
+  }
+
   renderDesigner() {
     if (this.props.onDesignChange) {
       return React.createElement(MapDesignerComponent, {
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         design: this.getDesign(),
-        onDesignChange: this.handleDesignChange
+        onDesignChange: this.handleDesignChange,
+        enableQuickFilters: this.props.enableQuickFilters
       })
     } else {
       return React.createElement(MapControlComponent, {
@@ -232,6 +289,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
         "div",
         { style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 } },
         this.renderHeader(),
+        this.state.hideQuickfilters ? null : this.renderQuickfilter(),
         R("div", { style: { width: "100%", height: "100%" } }, this.renderView())
       ),
       R(
