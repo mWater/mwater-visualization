@@ -32,10 +32,10 @@ export interface MapComponentProps {
   extraFilters?: JsonQLFilter[]
 
   /** Extra element to include in title at left */
-  titleElem?: ReactNode 
+  titleElem?: ReactNode
 
   /** Extra elements to add to right */
-  extraTitleButtonsElem?: ReactNode 
+  extraTitleButtonsElem?: ReactNode
 
   /** True to enable quickfilters */
   enableQuickFilters?: boolean
@@ -116,46 +116,46 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
       null,
       this.props.onDesignChange != null
         ? [
-            R(
-              "a",
-              { key: "lock", className: "btn btn-link btn-sm", onClick: this.handleZoomLockClick },
-              R("span", {
-                className: `fa ${this.state.zoomLocked ? "fa-lock red" : "fa-unlock green"}`,
-                style: { marginRight: 5 }
-              }),
-              R(PopoverHelpComponent, { placement: "bottom" }, "Changes to zoom level wont be saved in locked mode")
-            ),
-            R(
-              "a",
-              {
-                key: "undo",
-                className: `btn btn-link btn-sm ${!this.state.undoStack.canUndo() ? "disabled" : ""}`,
-                onClick: this.handleUndo
-              },
-              R("span", { className: "fas fa-caret-left" }),
-              R("span", { className: "hide-600px" }, " Undo")
-            ),
-            " ",
-            R(
-              "a",
-              {
-                key: "redo",
-                className: `btn btn-link btn-sm ${!this.state.undoStack.canRedo() ? "disabled" : ""}`,
-                onClick: this.handleRedo
-              },
-              R("span", { className: "fas fa-caret-right" }),
-              R("span", { className: "hide-600px" }, " Redo")
-            )
-          ]
+          R(
+            "a",
+            { key: "lock", className: "btn btn-link btn-sm", onClick: this.handleZoomLockClick },
+            R("span", {
+              className: `fa ${this.state.zoomLocked ? "fa-lock red" : "fa-unlock green"}`,
+              style: { marginRight: 5 }
+            }),
+            R(PopoverHelpComponent, { placement: "bottom" }, "Changes to zoom level wont be saved in locked mode")
+          ),
+          R(
+            "a",
+            {
+              key: "undo",
+              className: `btn btn-link btn-sm ${!this.state.undoStack.canUndo() ? "disabled" : ""}`,
+              onClick: this.handleUndo
+            },
+            R("span", { className: "fas fa-caret-left" }),
+            R("span", { className: "hide-600px" }, " Undo")
+          ),
+          " ",
+          R(
+            "a",
+            {
+              key: "redo",
+              className: `btn btn-link btn-sm ${!this.state.undoStack.canRedo() ? "disabled" : ""}`,
+              onClick: this.handleRedo
+            },
+            R("span", { className: "fas fa-caret-right" }),
+            R("span", { className: "hide-600px" }, " Redo")
+          )
+        ]
         : undefined,
       this.props.extraTitleButtonsElem,
       this.state.hideQuickfilters && this.props.design.quickfilters && this.props.design.quickfilters.length > 0
         ? R(
-            "a",
-            { key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: this.handleShowQuickfilters },
-            R("span", { className: "fa fa-filter" }),
-            R("span", { className: "hide-600px" }, " Show Filters")
-          )
+          "a",
+          { key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: this.handleShowQuickfilters },
+          R("span", { className: "fa fa-filter" }),
+          R("span", { className: "hide-600px" }, " Show Filters")
+        )
         : undefined,
     )
   }
@@ -165,13 +165,9 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
       "div",
       {
         style: {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 40,
           padding: 4,
-          borderBottom: "solid 2px #AAA"
+          borderBottom: "solid 2px #AAA",
+          gridArea: "header"
         }
       },
       R("div", { style: { float: "right" } }, this.renderActionLinks()),
@@ -216,8 +212,8 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
       AutoSizeComponent,
       { injectWidth: true, injectHeight: true },
       (size: {
-          width?: number;
-          height?: number;
+        width?: number;
+        height?: number;
       }) => {
         return React.createElement(MapViewComponent, {
           mapDataSource: this.props.mapDataSource,
@@ -246,66 +242,61 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
     compiledFilters = compiledFilters.concat(this.props.extraFilters || [])
     return compiledFilters
   }
-  
+
   renderQuickfilter() {
-    return R(QuickfiltersComponent, {
-      design: this.props.design.quickfilters || [],
-      schema: this.props.schema,
-      dataSource: this.props.dataSource,
-      quickfiltersDataSource: this.props.mapDataSource.getQuickfiltersDataSource(),
-      values: this.state.quickfiltersValues || undefined,
-      onValuesChange: (values: any) => this.setState({ quickfiltersValues: values }),
-      locks: this.props.quickfilterLocks,
-      filters: this.getCompiledFilters(),
-      hideTopBorder: this.props.hideTitleBar,
-      onHide: () => this.setState({ hideQuickfilters: true })
-    })
+    return R("div", { style: { gridArea: "quickfilters" } },
+      R(QuickfiltersComponent, {
+        design: this.props.design.quickfilters || [],
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        quickfiltersDataSource: this.props.mapDataSource.getQuickfiltersDataSource(),
+        values: this.state.quickfiltersValues || undefined,
+        onValuesChange: (values: any) => this.setState({ quickfiltersValues: values }),
+        locks: this.props.quickfilterLocks,
+        filters: this.getCompiledFilters(),
+        hideTopBorder: this.props.hideTitleBar,
+        onHide: () => this.setState({ hideQuickfilters: true })
+      })
+    )
   }
 
   renderDesigner() {
-    if (this.props.onDesignChange) {
-      return React.createElement(MapDesignerComponent, {
-        schema: this.props.schema,
-        dataSource: this.props.dataSource,
-        design: this.getDesign(),
-        onDesignChange: this.handleDesignChange,
-        enableQuickFilters: this.props.enableQuickFilters
-      })
-    } else {
-      return React.createElement(MapControlComponent, {
-        schema: this.props.schema,
-        dataSource: this.props.dataSource,
-        design: this.getDesign(),
-        onDesignChange: this.handleDesignChange
-      })
-    }
+    return R("div", { style: { gridArea: "designer", borderLeft: "solid 2px #AAA" } },
+      this.props.onDesignChange ?
+        React.createElement(MapDesignerComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.getDesign(),
+          onDesignChange: this.handleDesignChange,
+          enableQuickFilters: this.props.enableQuickFilters
+        })
+        :
+        React.createElement(MapControlComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.getDesign(),
+          onDesignChange: this.handleDesignChange
+        })
+    )
   }
 
   render() {
     return R(
       "div",
-      { style: { width: "100%", height: "100%", position: "relative" } },
-      R(
-        "div",
-        { style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 } },
-        this.renderHeader(),
-        this.state.hideQuickfilters ? null : this.renderQuickfilter(),
-        R("div", { style: { width: "100%", height: "100%" } }, this.renderView())
-      ),
-      R(
-        "div",
-        {
-          style: {
-            position: "absolute",
-            left: "70%",
-            width: "30%",
-            height: "100%",
-            borderLeft: "solid 3px #AAA",
-            overflowY: "auto"
-          }
-        },
-        this.renderDesigner()
-      )
+      {
+        style: {
+          width: "100%",
+          height: "100%",
+          display: "grid",
+          gridTemplateColumns: "70% 30%",
+          gridTemplateRows: "auto auto 1fr",
+          gridTemplateAreas: `"header designer" "quickfilters designer" "view designer"`
+        }
+      },
+      this.renderHeader(),
+      this.state.hideQuickfilters ? null : this.renderQuickfilter(),
+      R("div", { style: { width: "100%", height: "100%", gridArea: "view", overflow: "hidden" } }, this.renderView()),
+      this.renderDesigner()
     )
   }
 }
