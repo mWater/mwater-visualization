@@ -105,8 +105,8 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
     otherDesign.splice(index, 1)
     otherValues.splice(index, 1)
     otherLocks.splice(index, 1)
-    const otherQuickFilterFilters = compiler.compile(otherDesign, otherValues, otherLocks)
-    const filters = (this.props.filters || []).concat(otherQuickFilterFilters)
+    const otherQuickfilterFilters = compiler.compile(otherDesign, otherValues, otherLocks)
+    const filters = (this.props.filters || []).concat(otherQuickfilterFilters)
 
     if (["enum", "enumset"].includes(type)) {
       return R(EnumQuickfilterComponent, {

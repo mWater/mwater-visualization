@@ -393,7 +393,7 @@ class MWaterDirectMapPane extends React.Component {
             onDesignChange: this.handleDesignChange,
             onRowClick: (tableId: any, rowId: any) => console.log(`Click ${tableId}:${rowId}`),
             titleElem: "Sample",
-            enableQuickFilters: true,
+            enableQuickfilters: true,
           })
         )
       }

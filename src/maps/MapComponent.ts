@@ -38,7 +38,7 @@ export interface MapComponentProps {
   extraTitleButtonsElem?: ReactNode
 
   /** True to enable quickfilters */
-  enableQuickFilters?: boolean
+  enableQuickfilters?: boolean
 
   /** Locked quickfilter values. See README in quickfilters */
   quickfilterLocks?: any[]
@@ -268,7 +268,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
           dataSource: this.props.dataSource,
           design: this.getDesign(),
           onDesignChange: this.handleDesignChange,
-          enableQuickFilters: this.props.enableQuickFilters
+          enableQuickfilters: this.props.enableQuickfilters
         })
         :
         React.createElement(MapControlComponent, {

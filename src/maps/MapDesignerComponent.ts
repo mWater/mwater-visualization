@@ -32,7 +32,7 @@ export interface MapDesignerComponentProps {
   filters?: JsonQLFilter[]
 
   /** True to enable quickfilters */
-  enableQuickFilters?: boolean
+  enableQuickfilters?: boolean
 }
 
 export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
@@ -207,7 +207,7 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
       }
     ]
 
-    if (this.props.enableQuickFilters) {
+    if (this.props.enableQuickfilters) {
       tabs.splice(2, 0, {
         id: "quickfilters",
         label: [R("i", { className: "fa fa-bolt" }), " ", T("Quickfilters")],

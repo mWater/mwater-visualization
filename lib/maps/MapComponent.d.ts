@@ -21,7 +21,7 @@ export interface MapComponentProps {
     /** Extra elements to add to right */
     extraTitleButtonsElem?: ReactNode;
     /** True to enable quickfilters */
-    enableQuickFilters?: boolean;
+    enableQuickfilters?: boolean;
     /** Locked quickfilter values. See README in quickfilters */
     quickfilterLocks?: any[];
     /** Initial quickfilter values */
