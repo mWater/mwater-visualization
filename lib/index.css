@@ -505,6 +505,16 @@
   z-index: 900;
 }
 
+
+/* Hide zoom control except on hover */
+.leaflet-control-zoom {
+  visibility: hidden;
+}
+
+.leaflet-container:hover .leaflet-control-zoom {
+  visibility: visible;
+}
+
 /* Apply styles to allow tables to have sticky headers */
 .mwater-visualization-table {
   border-collapse: collapse;

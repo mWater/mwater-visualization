@@ -11,3 +11,11 @@
 .newmap-attribution-control a {
   color: rgba(0, 0, 0, 0.75);
 }
+
+.maplibregl-ctrl {
+  visibility: hidden;
+}
+
+.maplibregl-map:hover .maplibregl-ctrl {
+  visibility: visible;
+}
