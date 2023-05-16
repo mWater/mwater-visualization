@@ -48,8 +48,8 @@ export function MapViewComponent(props: {
   /** Whether changes to zoom level should be persisted. Default false  */
   zoomLocked?: boolean
 
-  /** Locale to use */
-  locale: string
+  /** Locale to use. Overrides map design locale */
+  locale?: string
 }) {
   if (areVectorMapsEnabled()) {
     return <VectorMapViewComponent {...props} />

@@ -30,6 +30,8 @@ export interface MapDesign {
     showLayerSwitcher?: boolean;
     /** Mode of initial legend display. Default is "open" */
     initialLegendDisplay?: "open" | "closed" | "closedIfSmall";
+    /** optional locale (e.g. "fr") to use for display */
+    locale?: string;
 }
 /** bounds as { w:, n:, e:, s: } */
 export interface MapBounds {

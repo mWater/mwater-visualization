@@ -60,8 +60,8 @@ export function VectorMapViewComponent(props: {
   /** Whether changes to zoom level should be persisted. Default false  */
   zoomLocked?: boolean
 
-  /** Locale to use */
-  locale: string
+  /** Locale to use. Overrides map design locale */
+  locale?: string
 
   /** Increment to force refresh */
   refreshTrigger?: number
@@ -528,7 +528,7 @@ export function VectorMapViewComponent(props: {
           filters={getCompiledFilters()}
           zoom={map ? map.getZoom() : null}
           dataSource={props.dataSource}
-          locale={props.locale}
+          locale={props.locale || props.design.locale || "en"}
           onHide={() => setLegendHidden(true)}
         />
       )

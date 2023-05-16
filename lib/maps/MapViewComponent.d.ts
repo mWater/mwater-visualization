@@ -31,6 +31,6 @@ export declare function MapViewComponent(props: {
     scrollWheelZoom?: boolean;
     /** Whether changes to zoom level should be persisted. Default false  */
     zoomLocked?: boolean;
-    /** Locale to use */
-    locale: string;
+    /** Locale to use. Overrides map design locale */
+    locale?: string;
 }): JSX.Element;

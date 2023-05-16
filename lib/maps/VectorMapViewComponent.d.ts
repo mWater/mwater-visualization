@@ -33,8 +33,8 @@ export declare function VectorMapViewComponent(props: {
     scrollWheelZoom?: boolean;
     /** Whether changes to zoom level should be persisted. Default false  */
     zoomLocked?: boolean;
-    /** Locale to use */
-    locale: string;
+    /** Locale to use. Overrides map design locale */
+    locale?: string;
     /** Increment to force refresh */
     refreshTrigger?: number;
     /** Optional callback that gets updated MapLibre map each render. Used to allow
