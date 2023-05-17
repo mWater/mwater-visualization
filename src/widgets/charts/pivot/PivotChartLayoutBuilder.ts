@@ -30,11 +30,8 @@ export default class PivotChartLayoutBuilder {
 
   buildLayout(design: PivotChartDesign, data: PivotChartData, locale: string): PivotChartLayout {
     // Create empty layout
-    let cell, cells, column, columnIndex, depth: any, i, layoutRow, refCell, rowIndex, segment
-    let asc, end
-    let asc6, end6
-    let asc8, end8
-    let asc10, end10
+    let cell, cells, column, i, layoutRow, segment
+
     const layout: any = {
       rows: [],
       striping: design.striping
@@ -74,16 +71,12 @@ export default class PivotChartLayoutBuilder {
     )
 
     // Emit column headers, leaving blank space at left for row headers
-    for (depth = 0, end = columnsDepth, asc = 0 <= end; asc ? depth < end : depth > end; asc ? depth++ : depth--) {
+    for (let depth = 0; depth < columnsDepth; depth++) {
       // If any segment has label and axis, add a special row of just labels
-      var asc2, end2
-      if (_.any(columns, (column) => column[depth] && column[depth].segment.label && column[depth].segment.valueAxis)) {
-        var asc1, end1
-        cells = []
-        for (i = 1, end1 = rowsDepth, asc1 = 1 <= end1; asc1 ? i <= end1 : i >= end1; asc1 ? i++ : i--) {
-          cells.push({ type: "blank", text: null })
-        }
-        for (column of columns) {
+      const hasValueAxisLabel = columns.some(column => column[depth]?.segment.label && column[depth]?.segment.valueAxis)
+      if (hasValueAxisLabel) {
+        const cells = Array(rowsDepth).fill({ type: "blank", text: null })
+        for (const column of columns) {
           cells.push({
             type: "column",
             subtype: "valueLabel",
@@ -92,8 +85,7 @@ export default class PivotChartLayoutBuilder {
             text: column[depth]?.segment.label,
             align: "center",
             // Unconfigured if segment has no label or value
-            unconfigured:
-              column[depth]?.segment && column[depth]?.segment.label == null && !column[depth]?.segment.valueAxis,
+            unconfigured: !column[depth]?.segment?.label && !column[depth]?.segment?.valueAxis,
             bold: column[depth]?.segment.bold || column[depth]?.segment.valueLabelBold,
             italic: column[depth]?.segment.italic
           })
@@ -102,11 +94,8 @@ export default class PivotChartLayoutBuilder {
       }
 
       // Emit column labels
-      cells = []
-      for (i = 1, end2 = rowsDepth, asc2 = 1 <= end2; asc2 ? i <= end2 : i >= end2; asc2 ? i++ : i--) {
-        cells.push({ type: "blank", text: null })
-      }
-      for (column of columns) {
+      const cells = Array(rowsDepth).fill({ type: "blank", text: null })
+      for (const column of columns) {
         cells.push({
           type: "column",
           subtype: column[depth]?.segment?.valueAxis ? "value" : "label",
@@ -115,13 +104,11 @@ export default class PivotChartLayoutBuilder {
           text: column[depth]?.label,
           align: "center",
           // Unconfigured if segment has no label or value
-          unconfigured:
-            column[depth]?.segment && column[depth]?.segment.label == null && !column[depth]?.segment.valueAxis,
+          unconfigured: !column[depth]?.segment?.label && !column[depth]?.segment?.valueAxis,
           bold: column[depth]?.segment.bold,
           italic: column[depth]?.segment.italic
         })
       }
-
       layout.rows.push({ cells })
     }
 
@@ -130,14 +117,8 @@ export default class PivotChartLayoutBuilder {
     let rowSegments = []
     for (let row of rows) {
       // Emit special row header for any segments that have changed and have both axis and label
-      var asc3, end3
-      var asc5, end5
       const needsSpecialRowHeader = []
-      for (
-        depth = 0, end3 = rowsDepth, asc3 = 0 <= end3;
-        asc3 ? depth < end3 : depth > end3;
-        asc3 ? depth++ : depth--
-      ) {
+      for (let depth = 0; depth < rowsDepth; depth++) {      
         if (
           row[depth] &&
           rowSegments[depth] !== row[depth].segment &&
@@ -151,13 +132,8 @@ export default class PivotChartLayoutBuilder {
       }
 
       if (_.any(needsSpecialRowHeader)) {
-        var asc4, end4
         cells = []
-        for (
-          depth = 0, end4 = rowsDepth, asc4 = 0 <= end4;
-          asc4 ? depth < end4 : depth > end4;
-          asc4 ? depth++ : depth--
-        ) {
+        for (let depth = 0; depth < rowsDepth; depth++) {
           if (needsSpecialRowHeader[depth]) {
             cells.push({
               type: "row",
@@ -208,11 +184,7 @@ export default class PivotChartLayoutBuilder {
 
       // Emit normal row headers
       cells = []
-      for (
-        depth = 0, end5 = rowsDepth, asc5 = 0 <= end5;
-        asc5 ? depth < end5 : depth > end5;
-        asc5 ? depth++ : depth--
-      ) {
+      for (let depth = 0; depth < rowsDepth; depth++) {
         cells.push({
           type: "row",
           subtype: row[depth]?.segment?.valueAxis ? "value" : "label",
@@ -237,17 +209,8 @@ export default class PivotChartLayoutBuilder {
     }
 
     // Set up section top/left/bottom/right info
-    for (
-      columnIndex = 0, end6 = layout.rows[0].cells.length, asc6 = 0 <= end6;
-      asc6 ? columnIndex < end6 : columnIndex > end6;
-      asc6 ? columnIndex++ : columnIndex--
-    ) {
-      var asc7, end7
-      for (
-        rowIndex = 0, end7 = layout.rows.length, asc7 = 0 <= end7;
-        asc7 ? rowIndex < end7 : rowIndex > end7;
-        asc7 ? rowIndex++ : rowIndex--
-      ) {
+    for (let columnIndex = 0; columnIndex < layout.rows[0].cells.length; columnIndex++) {
+      for (let rowIndex = 0; rowIndex < layout.rows.length; rowIndex++) {    
         cell = layout.rows[rowIndex].cells[columnIndex]
 
         cell.sectionTop =
@@ -271,7 +234,7 @@ export default class PivotChartLayoutBuilder {
 
     // Span column headers and column segments that have same segment and value (TODO: uses text right now)
     for (layoutRow of layout.rows) {
-      refCell = null
+      let refCell = null
       for (i = 0; i < layoutRow.cells.length; i++) {
         cell = layoutRow.cells[i]
         if (i === 0) {
@@ -298,7 +261,7 @@ export default class PivotChartLayoutBuilder {
 
     // Span intersections that are fillers
     for (layoutRow of layout.rows) {
-      refCell = null
+      let refCell = null
       for (i = 0; i < layoutRow.cells.length; i++) {
         cell = layoutRow.cells[i]
         if (i === 0) {
@@ -324,18 +287,9 @@ export default class PivotChartLayoutBuilder {
     }
 
     // Span row headers and row segments that have same segment and value (TODO: uses text right now)
-    for (
-      columnIndex = 0, end8 = layout.rows[0].cells.length, asc8 = 0 <= end8;
-      asc8 ? columnIndex < end8 : columnIndex > end8;
-      asc8 ? columnIndex++ : columnIndex--
-    ) {
-      var asc9, end9
-      refCell = null
-      for (
-        rowIndex = 0, end9 = layout.rows.length, asc9 = 0 <= end9;
-        asc9 ? rowIndex < end9 : rowIndex > end9;
-        asc9 ? rowIndex++ : rowIndex--
-      ) {
+    for (let columnIndex = 0; columnIndex < layout.rows[0].cells.length; columnIndex++) {
+      let refCell = null
+      for (let rowIndex = 0; rowIndex < layout.rows.length; rowIndex++) {
         cell = layout.rows[rowIndex].cells[columnIndex]
 
         if (rowIndex === 0) {
@@ -361,18 +315,9 @@ export default class PivotChartLayoutBuilder {
     }
 
     // Span column headers that have the same segment and value (TODO: uses text right now)
-    for (
-      columnIndex = 0, end10 = layout.rows[0].cells.length, asc10 = 0 <= end10;
-      asc10 ? columnIndex < end10 : columnIndex > end10;
-      asc10 ? columnIndex++ : columnIndex--
-    ) {
-      var asc11, end11
-      refCell = null
-      for (
-        rowIndex = 0, end11 = layout.rows.length, asc11 = 0 <= end11;
-        asc11 ? rowIndex < end11 : rowIndex > end11;
-        asc11 ? rowIndex++ : rowIndex--
-      ) {
+    for (let columnIndex = 0; columnIndex < layout.rows[0].cells.length; columnIndex++) {
+      let refCell = null
+      for (let rowIndex = 0; rowIndex < layout.rows.length; rowIndex++) {
         cell = layout.rows[rowIndex].cells[columnIndex]
 
         if (rowIndex === 0) {
