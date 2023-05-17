@@ -6,7 +6,8 @@ import { injectTableAlias } from "mwater-expressions"
 import * as PivotChartUtils from "./PivotChartUtils"
 import { PivotChartDesign } from "./PivotChartDesign"
 import { JsonQLFilter } from "../../../JsonQLFilter"
-import { JsonQLSelectQuery } from "jsonql"
+import { JsonQLExpr, JsonQLQuery, JsonQLSelectQuery } from "jsonql"
+import { Axis } from "../../../axes/Axis"
 
 /** Builds pivot table queries.
  * Result is flat list for each intersection with each row being data for a single cell
@@ -42,7 +43,7 @@ export default class PivotChartQueryBuilder {
     let filter, intersectionId, relevantFilters, whereClauses
     const exprCompiler = new ExprCompiler(this.schema)
 
-    const queries = {}
+    const queries: { [intersectionId: string]: JsonQLQuery } = {}
 
     // For each intersection
     for (let rowPath of PivotChartUtils.getSegmentPaths(design.rows)) {
@@ -66,12 +67,35 @@ export default class PivotChartQueryBuilder {
         // Filters to add (not yet compiled)
         const filters = []
 
+        const compileSegmentAxis = (axis: Axis | null | undefined): JsonQLExpr => {
+          // Get axis type
+          const axisType = this.axisBuilder.getAxisType(axis)
+
+          // Enumset needs to be unwrapped
+          if (axisType === "enumset") {
+            // Use to_jsonb(x) to convert to jsonb then jsonb_array_elements_text to convert to unnested array
+            return {
+              type: "op",
+              op: "jsonb_array_elements_text",
+              exprs: [
+                {
+                  type: "op",
+                  op: "to_jsonb",
+                  exprs: [this.axisBuilder.compileAxis({ axis, tableAlias: "main" })]
+                }
+              ]
+            }
+          } else {
+            return this.axisBuilder.compileAxis({ axis, tableAlias: "main" })
+          }
+        }
+
         // Add segments
         for (i = 0; i < rowPath.length; i++) {
           const rowSegment = rowPath[i]
           query.selects.push({
             type: "select",
-            expr: this.axisBuilder.compileAxis({ axis: rowSegment.valueAxis!, tableAlias: "main" }),
+            expr: compileSegmentAxis(rowSegment.valueAxis),
             alias: `r${i}`
           })
           query.groupBy!.push(i + 1)
@@ -84,7 +108,7 @@ export default class PivotChartQueryBuilder {
           const columnSegment = columnPath[i]
           query.selects.push({
             type: "select",
-            expr: this.axisBuilder.compileAxis({ axis: columnSegment.valueAxis!, tableAlias: "main" }),
+            expr: this.axisBuilder.compileAxis({ axis: columnSegment.valueAxis, tableAlias: "main" }),
             alias: `c${i}`
           })
           query.groupBy!.push(i + 1 + rowPath.length)
@@ -96,7 +120,7 @@ export default class PivotChartQueryBuilder {
         // Add value
         query.selects.push({
           type: "select",
-          expr: this.axisBuilder.compileAxis({ axis: intersection?.valueAxis!, tableAlias: "main" }),
+          expr: this.axisBuilder.compileAxis({ axis: intersection?.valueAxis, tableAlias: "main" }),
           alias: "value"
         })
         if (intersection?.filter) {

@@ -140,7 +140,7 @@ export default class SegmentDesignerComponent extends React.Component<
             schema: this.props.schema,
             dataSource: this.props.dataSource,
             table: this.props.table,
-            types: ["enum", "text", "boolean", "date"],
+            types: ["enum", "enumset", "text", "boolean", "date"],
             aggrNeed: "none",
             value: this.props.segment.valueAxis,
             onChange: this.handleValueAxisChange,

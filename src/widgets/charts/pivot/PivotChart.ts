@@ -56,7 +56,7 @@ export default class PivotChart extends Chart {
               axis: segment.valueAxis ? original(segment.valueAxis) : null,
               table: design.table,
               aggrNeed: "none",
-              types: ["enum", "text", "boolean", "date"]
+              types: ["enum", "enumset", "text", "boolean", "date"]
             })
           }
 
@@ -250,56 +250,68 @@ export default class PivotChart extends Chart {
     return React.createElement(PivotChartDesignerComponent, props)
   }
 
-  // Get data for the chart asynchronously
-  // design: design of the chart
-  // schema: schema to use
-  // dataSource: data source to get data from
-  // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
-  // callback: (error, data)
-  getData(design: PivotChartDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (error: any, data?: any) => void) {
-    const queryBuilder = new PivotChartQueryBuilder({ schema })
-    const queries = queryBuilder.createQueries(design, filters)
+  /**
+   * Get data for the chart asynchronously.
+   *
+   * @param design - Design of the chart.
+   * @param schema - Schema to use.
+   * @param dataSource - Data source to get data from.
+   * @param filters - Array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }.
+   * @param callback - Callback function to handle the result or error.
+   */
+  async getData(design: PivotChartDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (error: any, data?: any) => void) {
+    try {
+      const queryBuilder = new PivotChartQueryBuilder({ schema })
+      const queries = queryBuilder.createQueries(design, filters)
 
-    // Run queries in parallel
-    async.map(
-      _.pairs(queries),
-      (item, cb) => {
-        dataSource.performQuery(item[1], (err: any, rows: any) => {
-          cb(err, [item[0], rows])
-        })
-      },
-      (err, items: any[]) => {
-        if (err) {
-          callback(err)
-          return
-        }
+      // Get a list of intersection ids
+      const intersectionIds = Object.keys(queries)
 
-        const data: any = _.object(items)
+      // Get a list of all queries
+      const queriesList = intersectionIds.map(intersectionId => queries[intersectionId])
 
-        // Add header and footer data
-        const textWidget = new TextWidget()
+      // Run queries in parallel
+      const results = await Promise.all(queriesList.map((query) => {
+        return dataSource.performQuery(query)
+      }))
+
+      const data: any = {}
+
+      // Add results to data
+      for (let i = 0; i < queriesList.length; i++) {
+        data[intersectionIds[i]] = results[i]
+      }
+
+      // Add header and footer data
+      const textWidget = new TextWidget()
+
+      data.header = await new Promise((resolve, reject) => {
         textWidget.getData(design.header, schema, dataSource, filters, (error: any, headerData: any) => {
           if (error) {
-            callback(error)
-            return
+            reject(error)
           }
-
-          data.header = headerData
-
-          textWidget.getData(design.footer, schema, dataSource, filters, (error: any, footerData: any) => {
-            if (error) {
-              callback(error)
-              return
-            }
-
-            data.footer = footerData
-
-            callback(null, data)
-            return
-          })
+          else {
+            resolve(headerData)
+          }
         })
-      }
-    )
+      })
+
+      data.footer = await new Promise((resolve, reject) => {
+        textWidget.getData(design.footer, schema, dataSource, filters, (error: any, footerData: any) => {
+          if (error) {
+            reject(error)
+          }
+          else {
+            resolve(footerData)
+          }
+        })
+      })
+
+      callback(null, data)
+    }
+    catch (error) {
+      callback(error)
+    }
   }
 
   // Create a view element for the chart

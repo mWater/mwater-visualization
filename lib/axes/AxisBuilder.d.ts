@@ -37,7 +37,7 @@ export default class AxisBuilder {
      * Compile an axis to JsonQL
      */
     compileAxis(options: {
-        axis: Axis;
+        axis: Axis | null | undefined;
         tableAlias: string;
     }): JsonQLExpr;
     compileBinMinMax(expr: any, table: any, filterExpr: any, numBins: any): JsonQLSelectQuery | null;

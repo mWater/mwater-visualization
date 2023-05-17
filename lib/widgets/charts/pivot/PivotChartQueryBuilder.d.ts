@@ -3,6 +3,7 @@ import { ExprUtils } from "mwater-expressions";
 import AxisBuilder from "../../../axes/AxisBuilder";
 import { PivotChartDesign } from "./PivotChartDesign";
 import { JsonQLFilter } from "../../../JsonQLFilter";
+import { JsonQLQuery } from "jsonql";
 /** Builds pivot table queries.
  * Result is flat list for each intersection with each row being data for a single cell
  * columns of result are:
@@ -24,5 +25,7 @@ export default class PivotChartQueryBuilder {
     constructor(options: {
         schema: Schema;
     });
-    createQueries(design: PivotChartDesign, extraFilters: JsonQLFilter[]): {};
+    createQueries(design: PivotChartDesign, extraFilters: JsonQLFilter[]): {
+        [intersectionId: string]: JsonQLQuery;
+    };
 }

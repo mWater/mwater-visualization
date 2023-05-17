@@ -216,7 +216,7 @@ export default class AxisBuilder {
   /**
    * Compile an axis to JsonQL
    */
-  compileAxis(options: { axis: Axis; tableAlias: string }): JsonQLExpr {
+  compileAxis(options: { axis: Axis | null | undefined; tableAlias: string }): JsonQLExpr {
     if (!options.axis) {
       return null
     }
