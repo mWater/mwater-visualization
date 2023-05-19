@@ -76,6 +76,8 @@ export interface Props {
     scrollWheelZoom?: boolean;
     /** Whether the map responds to keyboard. Default true */
     keyboard?: boolean;
+    /** True to hide zoom control except when hovering */
+    showZoomControlOnHover?: boolean;
     /** Maximum zoom level */
     maxZoom?: number;
     /** Minimum zoom level */
@@ -130,6 +132,8 @@ export default class LeafletMapComponent extends Component<Props> {
     componentWillUnmount(): L.Map;
     openPopup(options: any): Element;
     updateMap(prevProps?: Props): any;
-    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+    render(): React.DetailedReactHTMLElement<{
+        className: string | undefined;
+    }, HTMLElement>;
 }
 export {};

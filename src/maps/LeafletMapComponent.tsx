@@ -107,6 +107,9 @@ export interface Props {
   /** Whether the map responds to keyboard. Default true */
   keyboard?: boolean
 
+  /** True to hide zoom control except when hovering */
+  showZoomControlOnHover?: boolean
+
   /** Maximum zoom level */
   maxZoom?: number
 
@@ -565,7 +568,7 @@ export default class LeafletMapComponent extends Component<Props> {
   render() {
     return R(
       "div",
-      null,
+      { className: this.props.showZoomControlOnHover ? "show-zoom-control-on-hover" : undefined },
       this.props.legend && this.loaded
         ? // Inject zoom
           React.cloneElement(this.props.legend, { zoom: this.map.getZoom() })

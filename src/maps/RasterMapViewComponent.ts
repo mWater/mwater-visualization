@@ -332,7 +332,8 @@ export default class RasterMapViewComponent extends React.Component<
         onBoundsChange: this.handleBoundsChange,
         extraAttribution: this.props.design.attribution,
         loadingSpinner: true,
-        maxZoom: this.props.design.maxZoom ?? undefined
+        maxZoom: this.props.design.maxZoom ?? undefined,
+        showZoomControlOnHover: true
       })
     )
   }

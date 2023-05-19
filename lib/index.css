@@ -507,11 +507,11 @@
 
 
 /* Hide zoom control except on hover */
-.leaflet-control-zoom {
+.show-zoom-control-on-hover .leaflet-control-zoom {
   visibility: hidden;
 }
 
-.leaflet-container:hover .leaflet-control-zoom {
+.show-zoom-control-on-hover .leaflet-container:hover .leaflet-control-zoom {
   visibility: visible;
 }
 
