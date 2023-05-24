@@ -93,7 +93,11 @@ export function useVectorMap(options: {
         layers: [],
         sources: {}
       },
-      renderWorldCopies: false,
+      // Prevent scrolling outside of world bounds
+      maxBounds: [
+        [-179.9, -85], // Southwest coordinates
+        [179.9, 85] // Northeast coordinates
+      ],
     })
 
     setHasWebGLContext(true)
