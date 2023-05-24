@@ -148,15 +148,19 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
           )
         ]
         : undefined,
-      this.props.extraTitleButtonsElem,
       this.state.hideQuickfilters && this.props.design.quickfilters && this.props.design.quickfilters.length > 0
-        ? R(
-          "a",
-          { key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: this.handleShowQuickfilters },
-          R("span", { className: "fa fa-filter" }),
-          R("span", { className: "hide-600px" }, " Show Quickfilters")
-        )
-        : undefined,
+      ? R(
+        "a",
+        { key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: this.handleShowQuickfilters },
+        R("span", { className: "fa fa-filter" }),
+        R("span", { className: "hide-600px" }, " Show Quickfilters")
+      )
+      : undefined,
+      this.props.extraTitleButtonsElem,
+      R("a", { key: "toggleDesign", className: "btn btn-link btn-sm", onClick: this.handleToggleDesignPanel, alt: "Toggle design panel" },
+        this.getDesign().hideDesignPanel ?
+          R("span", { className: "fas fa-angle-double-left" })
+        : R("span", { className: "fas fa-angle-double-right" }))
     )
   }
 
@@ -189,6 +193,10 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
     } else {
       return this.state.transientDesign || this.props.design
     }
+  }
+
+  handleToggleDesignPanel = () => {
+    this.handleDesignChange({ ...this.getDesign(), hideDesignPanel: !this.getDesign().hideDesignPanel })
   }
 
   // Get the values of the quick filters
@@ -281,6 +289,8 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
   }
 
   render() {
+    const designerVisible = !this.getDesign().hideDesignPanel
+    console.log("designerVisible", designerVisible)
     return R(
       "div",
       {
@@ -288,7 +298,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
           width: "100%",
           height: "100%",
           display: "grid",
-          gridTemplateColumns: "70% 30%",
+          gridTemplateColumns: designerVisible ? "70% 30%" : "100%",
           gridTemplateRows: "auto auto 1fr",
           gridTemplateAreas: `"header designer" "quickfilters designer" "view designer"`
         }
@@ -296,7 +306,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
       this.renderHeader(),
       this.state.hideQuickfilters ? null : this.renderQuickfilter(),
       R("div", { style: { width: "100%", height: "100%", gridArea: "view", overflow: "hidden" } }, this.renderView()),
-      this.renderDesigner()
+      designerVisible ? this.renderDesigner() : null
     )
   }
 }

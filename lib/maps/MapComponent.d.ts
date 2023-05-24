@@ -59,6 +59,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
     }, HTMLElement>;
     handleDesignChange: (design: any) => void;
     getDesign(): MapDesign;
+    handleToggleDesignPanel: () => void;
     getQuickfilterValues: () => any[];
     renderView(): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent>;
     getCompiledFilters(): {

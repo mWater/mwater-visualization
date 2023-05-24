@@ -32,6 +32,8 @@ export interface MapDesign {
     initialLegendDisplay?: "open" | "closed" | "closedIfSmall";
     /** optional locale (e.g. "fr") to use for display */
     locale?: string;
+    /** True if design panel is hidden */
+    hideDesignPanel?: boolean;
 }
 /** bounds as { w:, n:, e:, s: } */
 export interface MapBounds {

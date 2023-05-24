@@ -397,6 +397,22 @@ export function VectorMapViewComponent(props: {
   // Setup hover effect
   useHoverCursor(map, userLayerIds)
 
+  // Callback to set bounds on map on current design
+  const setBounds = useStableCallback((mapBounds: MapBounds) => {
+    // Ignore if readonly
+    if (props.onDesignChange == null) {
+      return
+    }
+
+    const design = {
+      ...props.design,
+      bounds: mapBounds
+    }
+    // Record bounds to prevent repeated application
+    boundsRef.current = mapBounds
+    props.onDesignChange(design)
+  })
+
   // Capture movements on map to update bounds
   useEffect(() => {
     if (!map) {
@@ -418,13 +434,7 @@ export function VectorMapViewComponent(props: {
       const bounds = map!.getBounds()
       const mapBounds = { n: bounds.getNorth(), e: bounds.getEast(), s: bounds.getSouth(), w: bounds.getWest() }
 
-      const design = {
-        ...props.design,
-        bounds: mapBounds
-      }
-      // Record bounds to prevent repeated application
-      boundsRef.current = mapBounds
-      props.onDesignChange(design)
+      setBounds(mapBounds)
     }
 
     map.on("moveend", onMoveEnd)
@@ -442,9 +452,7 @@ export function VectorMapViewComponent(props: {
         map!.fitBounds([bounds.w, bounds.s, bounds.e, bounds.n], { padding: 20 })
 
         // Also record if editable as part of bounds
-        if (props.onDesignChange) {
-          props.onDesignChange({ ...props.design, bounds })
-        }
+        setBounds(bounds)
       }
     })
   }
