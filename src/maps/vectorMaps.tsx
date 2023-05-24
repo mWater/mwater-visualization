@@ -92,7 +92,8 @@ export function useVectorMap(options: {
         version: 8,
         layers: [],
         sources: {}
-      }
+      },
+      renderWorldCopies: false,
     })
 
     setHasWebGLContext(true)
