@@ -538,7 +538,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
     const elem = R(
       "div",
       { className: "row" },
-      R("div", { className: "col-1" }, this.props.connectDragSource(R("span", { className: "text-muted fa fa-bars" }))),
+      R("div", { className: "col-1" }, this.props.connectDragSource(R("span", { className: "text-muted fa fa-bars _mviz-move" }))),
 
       R(
         "div",
