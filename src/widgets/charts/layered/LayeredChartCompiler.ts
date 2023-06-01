@@ -114,6 +114,8 @@ function labelValueFormatter(format: any) {
   }
 }
 
+const d3Round = d3Format.format(".2f")
+
 const defaultColors = [
   "#1f77b4",
   "#ff7f0e",
@@ -382,7 +384,7 @@ export default class LayeredChartCompiler {
       chartDesign.data!.type = this.getLayerType(options.design, 0)
     }
 
-    if (options.design.labels) {
+    if (!_.isEmpty(c3Data.format)) {
       if (options.design.type === "pie" || options.design.type === "donut") {
         chartDesign.tooltip = {
           format: {
@@ -390,11 +392,9 @@ export default class LayeredChartCompiler {
           }
         }
       } else {
-        if (!_.isEmpty(c3Data.format)) {
-          chartDesign.tooltip = {
-            format: {
-              value: labelValueFormatter(c3Data.format)
-            }
+        chartDesign.tooltip = {
+          format: {
+            value: labelValueFormatter(c3Data.format)
           }
         }
       }
@@ -662,7 +662,7 @@ export default class LayeredChartCompiler {
           colors[trendlineSeries] = layer.color || defaultColors[layerIndex]
           legendHide.push(trendlineSeries) // Hide in legend
           format[trendlineSeries] = (value: any) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y!, value, locale, true) : ""
+            value != null ? this.axisBuilder.formatValue(layer.axes.y!, d3Round(value), locale, true) : ""
           // Set dots as invisible in CSS and line as dashed
           classes[trendlineSeries] = "trendline"
         }
@@ -942,13 +942,14 @@ export default class LayeredChartCompiler {
             trendYs = _.initial(trendYs)
           }
           columns.push([trendlineSeries].concat(calculateLinearRegression(trendYs, trendXs)))
-          types[trendlineSeries] = "line"
+          types[trendlineSeries] = line()
           names[trendlineSeries] = names[series] + " Trendline"
           xs[trendlineSeries] = "x"
           colors[trendlineSeries] = layer.color || defaultColors[layerIndex]
           legendHide.push(trendlineSeries) // Hide in legend
-          format[trendlineSeries] = (value: any) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y!, value, locale, true) : ""
+          format[trendlineSeries] = (value: any) => 
+            value != null ? this.axisBuilder.formatValue(layer.axes.y!, d3Round(value), locale, true) : ""
+            
           // Set dots as invisible in CSS and line as dashed
           classes[trendlineSeries] = "trendline"
         }
@@ -1007,7 +1008,6 @@ export default class LayeredChartCompiler {
       }
     }
 
-    // console.log(format)
     return {
       columns,
       types,
