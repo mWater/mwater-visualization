@@ -40,15 +40,16 @@ export default function LegendComponent(props: {
       }
 
       // Ignore if zoom out of range
-      const minZoom = layer.getMinZoom(design)
-      const maxZoom = layer.getMaxZoom(design)
-      if (minZoom != null && props.zoom != null && props.zoom < minZoom) {
-        return null
-      }
+      // Disabled as of https://github.com/mWater/mwater-portal/issues/1593
+      // const minZoom = layer.getMinZoom(design)
+      // const maxZoom = layer.getMaxZoom(design)
+      // if (minZoom != null && props.zoom != null && props.zoom < minZoom) {
+      //   return null
+      // }
 
-      if (maxZoom != null && props.zoom != null && props.zoom > maxZoom) {
-        return null
-      }
+      // if (maxZoom != null && props.zoom != null && props.zoom > maxZoom) {
+      //   return null
+      // }
 
       return {
         key: layerView.id,
