@@ -50,6 +50,9 @@ export function MapViewComponent(props: {
 
   /** Locale to use. Overrides map design locale */
   locale?: string
+
+  /** Whether to disable interaction or not. Default false (implemented for printing to reduce number of tiles request) */
+  disableInteraction?: boolean
 }) {
   if (areVectorMapsEnabled()) {
     return <VectorMapViewComponent {...props} />

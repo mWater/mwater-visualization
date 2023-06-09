@@ -35,6 +35,8 @@ export interface RasterMapViewComponentProps {
     zoomLocked?: boolean;
     /** Called with underlying leaflet map component */
     leafletMapRef?: (map: LeafletMapComponent | null) => void;
+    /** Whether to disable interaction or not. Default false (implemented for printing to reduce number of tiles request) */
+    disableInteraction?: boolean;
 }
 /** Component that displays just the map, using raster tile technology */
 export default class RasterMapViewComponent extends React.Component<RasterMapViewComponentProps, {

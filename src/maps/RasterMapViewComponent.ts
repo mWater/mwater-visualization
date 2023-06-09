@@ -13,6 +13,7 @@ import { JsonQLFilter } from "../JsonQLFilter"
 import { MapDesign } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
 import { MapScope } from "./MapUtils"
+import { defaultProps } from "react-select/src/Select"
 
 export interface RasterMapViewComponentProps {
   schema: Schema
@@ -54,6 +55,9 @@ export interface RasterMapViewComponentProps {
 
   /** Called with underlying leaflet map component */
   leafletMapRef?: (map: LeafletMapComponent | null) => void
+
+  /** Whether to disable interaction or not. Default false (implemented for printing to reduce number of tiles request) */
+  disableInteraction?: boolean
 }
 
 /** Component that displays just the map, using raster tile technology */
@@ -276,7 +280,7 @@ export default class RasterMapViewComponent extends React.Component<
       // Create leafletLayer
       let leafletLayer: TileLayer = {
         tileUrl: layerDataSource.getTileUrl(design, isScoping ? compiledFilters : scopedCompiledFilters)!,
-        utfGridUrl: layerDataSource.getUtfGridUrl(design, isScoping ? compiledFilters : scopedCompiledFilters) ?? undefined,
+        utfGridUrl: this.props.disableInteraction ? undefined : layerDataSource.getUtfGridUrl(design, isScoping ? compiledFilters : scopedCompiledFilters) ?? undefined,
         visible: layerView.visible,
         opacity: isScoping ? layerView.opacity * 0.3 : layerView.opacity,
         minZoom: layer.getMinZoom(design) ?? undefined,
@@ -290,7 +294,7 @@ export default class RasterMapViewComponent extends React.Component<
       if (isScoping) {
         leafletLayer = {
           tileUrl: layerDataSource.getTileUrl(design, scopedCompiledFilters)!,
-          utfGridUrl: layerDataSource.getUtfGridUrl(design, scopedCompiledFilters) ?? undefined,
+          utfGridUrl: this.props.disableInteraction ? undefined : layerDataSource.getUtfGridUrl(design, scopedCompiledFilters) ?? undefined,
           visible: layerView.visible,
           opacity: layerView.opacity,
           minZoom: layer.getMinZoom(design) ?? undefined,
