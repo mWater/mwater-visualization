@@ -942,7 +942,7 @@ export default class LayeredChartCompiler {
             trendYs = _.initial(trendYs)
           }
           columns.push([trendlineSeries].concat(calculateLinearRegression(trendYs, trendXs)))
-          types[trendlineSeries] = line()
+          types[trendlineSeries] = "line"
           names[trendlineSeries] = names[series] + " Trendline"
           xs[trendlineSeries] = "x"
           colors[trendlineSeries] = layer.color || defaultColors[layerIndex]
