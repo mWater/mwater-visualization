@@ -80,18 +80,13 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
         values[index] = v
 
         // Also set any subsequent merged ones
-        for (
-          let start = index + 1, i = start, end = this.props.design.length, asc = start <= end;
-          asc ? i < end : i > end;
-          asc ? i++ : i--
-        ) {
+        for (let i = index + 1; i < this.props.design.length; i++) {
           if (this.props.design[i].merged) {
             values[i] = v
           } else {
             break
           }
         }
-
         return this.props.onValuesChange(values)
       }
     }
@@ -196,10 +191,10 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
       _.map(this.props.design, (item, i) => this.renderQuickfilter(item, i)),
       this.props.onHide
         ? R(
-            "button",
-            { className: "btn btn-sm btn-link", onClick: this.props.onHide },
-            R("i", { className: "fa fa-angle-double-up" })
-          )
+          "button",
+          { className: "btn btn-sm btn-link", onClick: this.props.onHide },
+          R("i", { className: "fa fa-angle-double-up" })
+        )
         : undefined
     )
   }
