@@ -3,8 +3,8 @@ import { DataSource, Schema } from "mwater-expressions";
 import React from "react";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { BufferLayerDesign } from "./BufferLayerDesign";
-import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer";
-import { OnGridClickResults } from "./maps";
+import Layer, { OnGridClickOptions, OnGridHoverOptions, VectorTileDef } from "./Layer";
+import { OnGridClickResults, OnGridHoverResults } from "./maps";
 import LayerLegendComponent from "./LayerLegendComponent";
 export default class BufferLayer extends Layer<BufferLayerDesign> {
     /** Gets the type of layer definition */
@@ -28,6 +28,10 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         data: any;
         event: any;
     }, clickOptions: OnGridClickOptions<BufferLayerDesign>): OnGridClickResults;
+    onGridHoverOver(ev: {
+        data: any;
+        event: any;
+    }, hoverOptions: OnGridHoverOptions<BufferLayerDesign>): OnGridHoverResults;
     getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: BufferLayerDesign): number | undefined;
     getMaxZoom(design: BufferLayerDesign): number;

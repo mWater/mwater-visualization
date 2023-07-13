@@ -1,7 +1,7 @@
 import React from "react";
-import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer";
+import Layer, { OnGridClickOptions, OnGridHoverOptions, VectorTileDef } from "./Layer";
 import { Schema, DataSource } from "mwater-expressions";
-import { OnGridClickResults } from "./maps";
+import { OnGridClickResults, OnGridHoverResults } from "./maps";
 import { JsonQLFilter } from "../index";
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql";
 import { MarkersLayerDesign } from "./MarkersLayerDesign";
@@ -24,6 +24,10 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     };
     createMapnikJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
     createCss(design: MarkersLayerDesign): string;
+    onGridHoverOver(ev: {
+        data: any;
+        event: any;
+    }, hoverOptions: OnGridHoverOptions<MarkersLayerDesign>): OnGridHoverResults;
     onGridClick(ev: {
         data: any;
         event: any;

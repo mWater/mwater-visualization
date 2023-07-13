@@ -13,6 +13,7 @@ import ZoomLevelsComponent from "./ZoomLevelsComponent"
 import MarkerSymbolSelectComponent from "./MarkerSymbolSelectComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import * as ui from "react-library/lib/bootstrap"
+import EditHoverOver from "./EditHoverOver"
 
 export interface MarkersLayerDesignerComponentProps {
   /** Schema to use */
@@ -276,6 +277,22 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
     })
   }
 
+  renderHoverOver() {
+    if (!this.props.design.table) {
+      return null
+    }
+
+    return R(EditHoverOver, {
+      design: this.props.design,
+      onDesignChange: this.props.onDesignChange,
+      schema: this.props.schema,
+      dataSource: this.props.dataSource,
+      table: this.props.design.table,
+      idTable: this.props.design.table,
+      defaultPopupFilterJoins: PopupFilterJoinsUtils.createDefaultPopupFilterJoins(this.props.design.table)
+    })
+  }
+
   render() {
     return R(
       "div",
@@ -288,6 +305,7 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
       this.renderLineWidth(),
       this.renderFilter(),
       this.renderPopup(),
+      this.renderHoverOver(),
       this.props.design.table
         ? R(ZoomLevelsComponent, { design: this.props.design, onDesignChange: this.props.onDesignChange })
         : undefined

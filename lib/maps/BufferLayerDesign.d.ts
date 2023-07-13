@@ -1,5 +1,6 @@
 import { Expr } from "mwater-expressions";
 import { Axis } from "../axes/Axis";
+import { HoverOverItem } from "./maps";
 /** Layer which draws a buffer around geometries (i.e. a radius circle around points) */
 export interface BufferLayerDesign {
     /** table to get data from */
@@ -28,6 +29,9 @@ export interface BufferLayerDesign {
     unionShapes?: boolean;
     /** contains items: which is BlocksLayoutManager items. Will be displayed when the circle is clicked */
     popup: any;
+    hoverOver: {
+        items: HoverOverItem[];
+    };
     /** customizable filtering for popup. See PopupFilterJoins.md */
     popupFilterJoins: any;
 }

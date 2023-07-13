@@ -269,7 +269,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
   }
 
   renderDesigner() {
-    return R("div", { style: { gridArea: "designer", borderLeft: "solid 2px #e8e8e8" } },
+    return R("div", { style: { gridArea: "designer", borderLeft: "solid 2px #e8e8e8", overflowY: 'scroll' } },
       this.props.onDesignChange ?
         React.createElement(MapDesignerComponent, {
           schema: this.props.schema,

@@ -18,6 +18,7 @@ import { Axis } from "../axes/Axis"
 
 import AdminScopeAndDetailLevelComponent from "./AdminScopeAndDetailLevelComponent"
 import ScopeAndDetailLevelComponent from "./ScopeAndDetailLevelComponent"
+import EditHoverOver from "./EditHoverOver"
 
 // Designer for a choropleth layer
 export default class ChoroplethLayerDesigner extends React.Component<{
@@ -33,7 +34,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
   }
 
   handleScopeAndDetailLevelChange = (scope: string | number | null, scopeLevel: number | null, detailLevel: number) => {
-    this.update((d) => {
+    this.update(d => {
       d.scope = scope
       d.scopeLevel = scopeLevel
       d.detailLevel = detailLevel
@@ -65,38 +66,38 @@ export default class ChoroplethLayerDesigner extends React.Component<{
       adminRegionExpr = this.autoselectAdminRegionExpr(table, regionsTable)
     }
 
-    this.update((d) => {
+    this.update(d => {
       d.table = table
       d.adminRegionExpr = adminRegionExpr
     })
   }
 
   handleColorChange = (color: string | null) => {
-    this.update((d) => {
+    this.update(d => {
       d.color = color
     })
   }
 
   handleBorderColorChange = (color: string | null) => {
-    this.update((d) => {
+    this.update(d => {
       d.borderColor = color
     })
   }
 
   handleFilterChange = (filter: Expr) => {
-    this.update((d) => {
+    this.update(d => {
       d.filter = filter
     })
   }
 
   handleColorAxisChange = (axis: Axis) => {
-    this.update((d) => {
+    this.update(d => {
       d.axes.color = axis
     })
   }
 
   handleRegionsTableChange = (regionsTable: string) => {
-    this.update((d) => {
+    this.update(d => {
       d.regionsTable = regionsTable == "admin_regions" ? null : regionsTable
       d.scope = null
       d.scopeLevel = null
@@ -108,25 +109,25 @@ export default class ChoroplethLayerDesigner extends React.Component<{
   }
 
   handleAdminRegionExprChange = (expr: Expr) => {
-    this.update((d) => {
+    this.update(d => {
       d.adminRegionExpr = expr
     })
   }
 
   handleRegionModeChange = (regionMode: "plain" | "indirect" | "direct") => {
-    this.update((d) => {
+    this.update(d => {
       d.regionMode = regionMode
     })
   }
 
   handleFillOpacityChange = (fillOpacity: number) => {
-    this.update((d) => {
+    this.update(d => {
       d.fillOpacity = fillOpacity
     })
   }
 
   handleDisplayNamesChange = (displayNames: boolean) => {
-    this.update((d) => {
+    this.update(d => {
       d.displayNames = displayNames
     })
   }
@@ -140,24 +141,21 @@ export default class ChoroplethLayerDesigner extends React.Component<{
             inline
             radioValue="plain"
             value={this.props.design.regionMode}
-            onChange={this.handleRegionModeChange}
-          >
+            onChange={this.handleRegionModeChange}>
             Single Color
           </ui.Radio>
           <ui.Radio
             inline
             radioValue="indirect"
             value={this.props.design.regionMode}
-            onChange={this.handleRegionModeChange}
-          >
+            onChange={this.handleRegionModeChange}>
             Color By Data
           </ui.Radio>
           <ui.Radio
             inline
             radioValue="direct"
             value={this.props.design.regionMode}
-            onChange={this.handleRegionModeChange}
-          >
+            onChange={this.handleRegionModeChange}>
             Advanced
           </ui.Radio>
         </div>
@@ -190,8 +188,8 @@ export default class ChoroplethLayerDesigner extends React.Component<{
 
   renderRegionsTable() {
     let options = _.map(
-      _.filter(this.props.schema.getTables(), (table) => table.id.startsWith("regions.")),
-      (table) => ({ value: table.id, label: table.name.en })
+      _.filter(this.props.schema.getTables(), table => table.id.startsWith("regions.")),
+      table => ({ value: table.id, label: table.name.en })
     )
 
     const regionsTable = this.props.design.regionsTable || "admin_regions"
@@ -202,12 +200,11 @@ export default class ChoroplethLayerDesigner extends React.Component<{
         <div style={{ marginLeft: 8 }}>
           <select
             value={regionsTable}
-            onChange={(ev) => this.handleRegionsTableChange(ev.target.value)}
-            className="form-select"
-          >
+            onChange={ev => this.handleRegionsTableChange(ev.target.value)}
+            className="form-select">
             <option value="admin_regions">Administrative Regions (from mWater global database)</option>
             <option disabled>── Custom regions (special regions uploaded for specific purposes) ──</option>
-            {options.map((opt) => (
+            {options.map(opt => (
               <option value={opt.value}>{opt.label}</option>
             ))}
           </select>
@@ -279,7 +276,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     return R(
       "div",
       { className: "mb-3" },
-      <ui.Checkbox value={this.props.design.displayNames} onChange={(value) => this.handleDisplayNamesChange(value)}>
+      <ui.Checkbox value={this.props.design.displayNames} onChange={value => this.handleDisplayNamesChange(value)}>
         Display Region Names
       </ui.Checkbox>
     )
@@ -514,6 +511,30 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     })
   }
 
+  renderHoverOver() {
+    // If not in indirect mode with table, hide
+    if (this.props.design.regionMode !== "indirect" || !this.props.design.table) {
+      return null
+    }
+
+    const regionsTable = this.props.design.regionsTable || "admin_regions"
+
+    const defaultPopupFilterJoins = {}
+    if (this.props.design.adminRegionExpr) {
+      defaultPopupFilterJoins[this.props.design.table] = this.props.design.adminRegionExpr
+    }
+
+    return R(EditHoverOver, {
+      design: this.props.design,
+      onDesignChange: this.props.onDesignChange,
+      schema: this.props.schema,
+      dataSource: this.props.dataSource,
+      table: this.props.design.table,
+      idTable: regionsTable,
+      defaultPopupFilterJoins
+    })
+  }
+
   render() {
     return R(
       "div",
@@ -530,6 +551,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
       this.renderBorderColor(),
       this.renderFilter(),
       this.renderPopup(),
+      this.renderHoverOver(),
       R(ZoomLevelsComponent, { design: this.props.design, onDesignChange: this.props.onDesignChange })
     )
   }

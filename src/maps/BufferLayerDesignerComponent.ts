@@ -18,6 +18,7 @@ import { Checkbox } from "react-library/lib/bootstrap"
 import { BufferLayerDesign } from "./BufferLayerDesign"
 import { JsonQLFilter } from "../JsonQLFilter"
 import { areVectorMapsEnabled } from "./vectorMaps"
+import EditHoverOver from "./EditHoverOver"
 
 export interface BufferLayerDesignerComponentProps {
   /** Schema to use */
@@ -147,10 +148,14 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
     return R(
       "div",
       { className: "mb-3" },
-      React.createElement(Checkbox, {
-        value: this.props.design.unionShapes,
-        onChange: this.handleUnionShapesChange
-      }, "Combine circles (advanced)")
+      React.createElement(
+        Checkbox,
+        {
+          value: this.props.design.unionShapes,
+          onChange: this.handleUnionShapesChange
+        },
+        "Combine circles (advanced)"
+      )
     )
   }
 
@@ -269,6 +274,22 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
     })
   }
 
+  renderHoverOver() {
+    if (!this.props.design.table) {
+      return null
+    }
+
+    return R(EditHoverOver, {
+      design: this.props.design,
+      onDesignChange: this.props.onDesignChange,
+      schema: this.props.schema,
+      dataSource: this.props.dataSource,
+      table: this.props.design.table,
+      idTable: this.props.design.table,
+      defaultPopupFilterJoins: PopupFilterJoinsUtils.createDefaultPopupFilterJoins(this.props.design.table)
+    })
+  }
+
   render() {
     return R(
       "div",
@@ -281,6 +302,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
       this.renderFillOpacity(),
       this.renderFilter(),
       this.renderPopup(),
+      this.renderHoverOver(),
       this.props.design.table
         ? R(ZoomLevelsComponent, { design: this.props.design, onDesignChange: this.props.onDesignChange })
         : undefined

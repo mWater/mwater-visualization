@@ -5,7 +5,7 @@ import { default as bbox } from "@turf/bbox"
 
 import { Schema, DataSource, Expr } from "mwater-expressions"
 import { JsonQLFilter } from "../index"
-import { OnGridClickResults } from "./maps"
+import { OnGridClickResults, OnGridHoverResults } from "./maps"
 import { ReactNode } from "react"
 import { JsonQLExpr, JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 import { LayerSpecification } from "maplibre-gl"
@@ -30,6 +30,21 @@ export interface JsonQLCssLayerDefinition {
 }
 
 export interface OnGridClickOptions<LayerDesign> {
+  /** design of layer */
+  design: LayerDesign
+  /** schema to use */
+  schema: Schema
+  /** data source to use */
+  dataSource: DataSource
+  /** layer data source */
+  layerDataSource: any // TODO
+  /** current scope data if layer is scoping */
+  scopeData: any
+  /** compiled filters to apply to the popup */
+  filters: JsonQLFilter[]
+}
+
+export interface OnGridHoverOptions<LayerDesign> {
   /** design of layer */
   design: LayerDesign
   /** schema to use */
@@ -142,6 +157,10 @@ export default class Layer<LayerDesign> {
    *     popup: React element to put into a popup
    */
   onGridClick(ev: { data: any; event: any }, options: OnGridClickOptions<LayerDesign>): OnGridClickResults {
+    return null
+  }
+
+  onGridHoverOver(ev: { data: any; event: any }, options: OnGridHoverOptions<LayerDesign>): OnGridHoverResults {
     return null
   }
 

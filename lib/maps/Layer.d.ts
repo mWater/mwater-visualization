@@ -1,6 +1,6 @@
 import { Schema, DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
-import { OnGridClickResults } from "./maps";
+import { OnGridClickResults, OnGridHoverResults } from "./maps";
 import { ReactNode } from "react";
 import { JsonQLQuery } from "jsonql";
 import { LayerSpecification } from "maplibre-gl";
@@ -21,6 +21,20 @@ export interface JsonQLCssLayerDefinition {
     };
 }
 export interface OnGridClickOptions<LayerDesign> {
+    /** design of layer */
+    design: LayerDesign;
+    /** schema to use */
+    schema: Schema;
+    /** data source to use */
+    dataSource: DataSource;
+    /** layer data source */
+    layerDataSource: any;
+    /** current scope data if layer is scoping */
+    scopeData: any;
+    /** compiled filters to apply to the popup */
+    filters: JsonQLFilter[];
+}
+export interface OnGridHoverOptions<LayerDesign> {
     /** design of layer */
     design: LayerDesign;
     /** schema to use */
@@ -107,6 +121,10 @@ export default class Layer<LayerDesign> {
         data: any;
         event: any;
     }, options: OnGridClickOptions<LayerDesign>): OnGridClickResults;
+    onGridHoverOver(ev: {
+        data: any;
+        event: any;
+    }, options: OnGridHoverOptions<LayerDesign>): OnGridHoverResults;
     /** Gets the bounds of the layer as GeoJSON */
     getBounds(design: LayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (err: any, bounds?: {
         n: number;

@@ -23,13 +23,13 @@ export function LayerSwitcherComponent(props: { design: MapDesign; onDesignChang
   }
 
   function toggleDropdown() {
-    setDropdownOpen((ddo) => !ddo)
+    setDropdownOpen(ddo => !ddo)
   }
 
   function renderLayerView(lv: MapLayerView, index: number) {
     function handleClick() {
       props.onDesignChange(
-        produce(props.design, (draft) => {
+        produce(props.design, draft => {
           draft.layerViews[index].visible = !lv.visible
 
           // Unselect any in same group if selected
@@ -54,11 +54,10 @@ export function LayerSwitcherComponent(props: { design: MapDesign; onDesignChang
 
   return (
     <div
-      style={{ position: "absolute", top: 20, right: 20, zIndex: 1000, userSelect: "none" }}
+      style={{ position: "absolute", top: 10, right: 10, zIndex: 999, userSelect: "none" }}
       ref={useClickOutside(() => {
         setDropdownOpen(false)
-      })}
-    >
+      })}>
       <div style={iconStyle} onClick={toggleDropdown}>
         <i className="fas fa-layer-group fa-fw" />
       </div>
