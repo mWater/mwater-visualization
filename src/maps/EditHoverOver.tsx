@@ -54,13 +54,11 @@ const EditHoverOver: React.FC<EditHoverOverProps> = props => {
   return (
     <>
       <button className="btn btn-link" onClick={() => setEditing(true)}>
-        <span className="fa fa-pencil" />
-        Customize Hover over
+        <span className="fa fa-pencil" /> Customize Hoverover
       </button>
       {props.design.hoverOver && (
         <button className="btn btn-link" onClick={handleRemovePopup}>
-          <span className="fa fa-times" />
-          Remove Hover over
+          <span className="fa fa-times" /> Remove Hover over
         </button>
       )}
 

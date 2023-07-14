@@ -581,6 +581,7 @@ export function VectorMapViewComponent(props: {
     }
   }, [map])
 
+  // setup hover overs
   useEffect(() => {
     if (!map) {
       return
@@ -602,6 +603,7 @@ export function VectorMapViewComponent(props: {
       const onLeave = (ev: MapLayerMouseEvent) => {
         setHoverContents(null)
       }
+      // todo:  https://github.com/mapbox/mapbox-gl-js/issues/5539#issuecomment-340311798
       map.on("mouseenter", clickHandler.mapLayerId, onEnter)
       map.on("mouseleave", clickHandler.mapLayerId, onLeave)
       removes.push(() => {
@@ -661,11 +663,6 @@ export function VectorMapViewComponent(props: {
     if (!hoverContents) return null
 
     const style: CSSProperties = {
-      position: "absolute",
-      top: 45,
-      right: 10,
-      zIndex: 999,
-      userSelect: "none",
       backgroundColor: "white",
       fontSize: 12,
       padding: 4,
@@ -674,17 +671,23 @@ export function VectorMapViewComponent(props: {
       maxWidth: 250
     }
 
-    return <div style={style}>{hoverContents}</div>
+    return <div style={style}>{hoverContents ?? "asdksjdbfskajf"}</div>
   }
 
   // Overflow hidden because of problem of exceeding div
   return (
     <div style={{ width: props.width, height: props.height, position: "relative" }}>
       {renderPopup()}
-      {renderHoverContent()}
-      {props.onDesignChange != null && props.design.showLayerSwitcher ? (
-        <LayerSwitcherComponent design={props.design} onDesignChange={props.onDesignChange} />
-      ) : null}
+
+      <div style={{ position: "absolute", maxWidth: 250, top: 10, right: 10, zIndex: 999, userSelect: "none" }}>
+        <div style={{ display: "flex", gap: 6, position: "relative", flexDirection: "column", alignItems: "right" }}>
+          {props.onDesignChange != null && props.design.showLayerSwitcher ? (
+            <LayerSwitcherComponent design={props.design} onDesignChange={props.onDesignChange} />
+          ) : null}
+          {renderHoverContent()}
+        </div>
+      </div>
+
       <div style={{ width: props.width, height: props.height }} ref={setMapDiv} />
       {renderLegend()}
       {renderBusy()}
@@ -719,43 +722,4 @@ function HiddenLegend(props: { onShow: () => void }) {
       <i className="fa fa-angle-double-left" />
     </div>
   )
-}
-
-// from https://stackoverflow.com/a/42375010/876117
-const getPointByDistance = (points: number[][]) => {
-  const tl = totalLen(points)
-  const distance = tl / 2
-  let cl = 0
-  let ol
-  let result
-  points.forEach(function (point, i, points) {
-    ol = cl
-    cl += i ? lineLen([points[i - 1], point]) : 0
-    if (distance <= cl && distance > ol) {
-      var dd = distance - ol
-      result = pntOnLine([points[i - 1], point], dd)
-    }
-  })
-  return result
-}
-
-const pntOnLine = (line: number[][], distance: number) => {
-  let t = distance / lineLen(line)
-  const xt = (1 - t) * line[0][0] + t * line[1][0]
-  const yt = (1 - t) * line[0][1] + t * line[1][1]
-  return [xt, yt]
-}
-
-const totalLen = (pnts: number[][]) => {
-  var tl = 0
-  pnts.forEach(function (point, i, points) {
-    tl += i ? lineLen([points[i - 1], point]) : 0
-  })
-  return tl
-}
-
-const lineLen = (line: number[][]) => {
-  var xd = line[0][0] - line[1][0]
-  var yd = line[0][1] - line[1][1]
-  return Math.sqrt(xd * xd + yd * yd)
 }

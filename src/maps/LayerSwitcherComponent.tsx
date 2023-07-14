@@ -15,11 +15,9 @@ export function LayerSwitcherComponent(props: { design: MapDesign; onDesignChang
     borderRadius: 4,
     border: "solid 1px #AAA",
     color: "#666",
-    position: "absolute",
-    right: 0,
-    top: 0,
     cursor: "pointer",
-    fontSize: 14
+    fontSize: 14,
+    display: "inline-block"
   }
 
   function toggleDropdown() {
@@ -54,7 +52,7 @@ export function LayerSwitcherComponent(props: { design: MapDesign; onDesignChang
 
   return (
     <div
-      style={{ position: "absolute", top: 10, right: 10, zIndex: 999, userSelect: "none" }}
+      style={{ textAlign: "right" }}
       ref={useClickOutside(() => {
         setDropdownOpen(false)
       })}>
@@ -62,9 +60,7 @@ export function LayerSwitcherComponent(props: { design: MapDesign; onDesignChang
         <i className="fas fa-layer-group fa-fw" />
       </div>
       {dropdownOpen ? (
-        <div style={{ backgroundColor: "white", position: "absolute", top: 28, right: 0, padding: 5 }}>
-          {props.design.layerViews.map(renderLayerView)}
-        </div>
+        <div style={{ backgroundColor: "white", padding: 5 }}>{props.design.layerViews.map(renderLayerView)}</div>
       ) : null}
     </div>
   )
