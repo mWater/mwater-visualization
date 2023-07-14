@@ -1,4 +1,5 @@
 import { JsonQLQuery } from "jsonql"
+import { Expr } from "mwater-expressions"
 
 export interface LayerDefinition {
   layers: Array<{
@@ -24,3 +25,14 @@ export type OnGridClickResults = {
   row?: { tableId: string; primaryKey: any }
   popup?: React.ReactElement<{}>
 } | null
+
+export type OnGridHoverResults = {
+  scope?: any
+  hoverOver?: React.ReactElement<{}>
+} | null
+
+export interface HoverOverItem {
+  id: string
+  label: string
+  value?: Expr
+}

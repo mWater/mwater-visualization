@@ -280,7 +280,9 @@ export default class RasterMapViewComponent extends React.Component<
       // Create leafletLayer
       let leafletLayer: TileLayer = {
         tileUrl: layerDataSource.getTileUrl(design, isScoping ? compiledFilters : scopedCompiledFilters)!,
-        utfGridUrl: this.props.disableInteraction ? undefined : layerDataSource.getUtfGridUrl(design, isScoping ? compiledFilters : scopedCompiledFilters) ?? undefined,
+        utfGridUrl: this.props.disableInteraction
+          ? undefined
+          : layerDataSource.getUtfGridUrl(design, isScoping ? compiledFilters : scopedCompiledFilters) ?? undefined,
         visible: layerView.visible,
         opacity: isScoping ? layerView.opacity * 0.3 : layerView.opacity,
         minZoom: layer.getMinZoom(design) ?? undefined,
@@ -294,7 +296,9 @@ export default class RasterMapViewComponent extends React.Component<
       if (isScoping) {
         leafletLayer = {
           tileUrl: layerDataSource.getTileUrl(design, scopedCompiledFilters)!,
-          utfGridUrl: this.props.disableInteraction ? undefined : layerDataSource.getUtfGridUrl(design, scopedCompiledFilters) ?? undefined,
+          utfGridUrl: this.props.disableInteraction
+            ? undefined
+            : layerDataSource.getUtfGridUrl(design, scopedCompiledFilters) ?? undefined,
           visible: layerView.visible,
           opacity: layerView.opacity,
           minZoom: layer.getMinZoom(design) ?? undefined,
@@ -310,12 +314,21 @@ export default class RasterMapViewComponent extends React.Component<
       "div",
       { style: { width: this.props.width, height: this.props.height, position: "relative" } },
       this.renderPopup(),
-      this.props.onDesignChange && this.props.design.showLayerSwitcher
-        ? R(LayerSwitcherComponent, {
-            design: this.props.design,
-            onDesignChange: this.props.onDesignChange
-          })
-        : undefined,
+      R(
+        "div",
+        { style: { position: "absolute", maxWidth: 250, top: 10, right: 10, zIndex: 999, userSelect: "none" } },
+        R(
+          "div",
+          { style: { display: "flex", gap: 6, position: "relative", flexDirection: "column", alignItems: "right" } },
+          this.props.onDesignChange && this.props.design.showLayerSwitcher
+            ? R(LayerSwitcherComponent, {
+                design: this.props.design,
+                onDesignChange: this.props.onDesignChange
+              })
+            : undefined
+        )
+      ),
+
       R(LeafletMapComponent, {
         ref: (c: LeafletMapComponent | null) => {
           this.leafletMap = c

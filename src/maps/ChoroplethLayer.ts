@@ -3,7 +3,7 @@ import React from "react"
 
 import { original, produce } from "immer"
 
-import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
+import Layer, { OnGridClickOptions, OnGridHoverOptions, VectorTileDef } from "./Layer"
 import {
   ExprUtils,
   ExprCompiler,
@@ -16,7 +16,7 @@ import {
   ExprValidator
 } from "mwater-expressions"
 import AxisBuilder from "../axes/AxisBuilder"
-import { LayerDefinition, OnGridClickResults } from "./maps"
+import { LayerDefinition, OnGridClickResults, OnGridHoverResults } from "./maps"
 import { JsonQLFilter } from "../index"
 import ChoroplethLayerDesign from "./ChoroplethLayerDesign"
 import { JsonQLExpr, JsonQLOp, JsonQLQuery, JsonQLScalar } from "jsonql"
@@ -24,6 +24,7 @@ import { compileColorMapToMapbox, compileColorToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import { LayerSpecification } from "maplibre-gl"
+import HoverContent from "./HoverContent"
 
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   /** Gets the type of layer definition */
@@ -1367,6 +1368,62 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
   }
 
+  // same as onGridClick but handles hover over
+  onGridHoverOver(
+    ev: { data: any; event: any },
+    hoverOptions: OnGridHoverOptions<ChoroplethLayerDesign>
+  ): OnGridHoverResults {
+    const regionsTable = hoverOptions.design.regionsTable || "admin_regions"
+
+    // Row only if mode is "plain" or "direct"
+    if (hoverOptions.design.regionMode == "plain" || hoverOptions.design.regionMode == "direct") {
+      if (!ev.data || !ev.data.id) {
+        return null
+      }
+    }
+
+    // Ignore if indirect with no table
+    if (!hoverOptions.design.table) {
+      return null
+    }
+
+    if (ev.data && ev.data.id) {
+      const { table } = hoverOptions.design
+      const results: OnGridHoverResults = {}
+
+      // Popup
+      if (hoverOptions.design.hoverOver) {
+        // Create default popup filter joins
+        const defaultPopupFilterJoins = {}
+        if (hoverOptions.design.adminRegionExpr) {
+          defaultPopupFilterJoins[hoverOptions.design.table] = hoverOptions.design.adminRegionExpr
+        }
+
+        // Create filter using popupFilterJoins
+        const popupFilterJoins = hoverOptions.design.popupFilterJoins || defaultPopupFilterJoins
+        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(
+          popupFilterJoins,
+          hoverOptions.schema,
+          table,
+          ev.data.id,
+          true
+        )
+
+        results.hoverOver = React.createElement(HoverContent, {
+          key: ev.data.id,
+          schema: hoverOptions.schema,
+          dataSource: hoverOptions.dataSource,
+          design: hoverOptions.design,
+          filters: popupFilters
+        })
+      }
+
+      return results
+    } else {
+      return null
+    }
+  }
+
   // Gets the bounds of the layer as GeoJSON
   getBounds(
     design: ChoroplethLayerDesign,
@@ -1396,7 +1453,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
               type: "op",
               op: "=",
               exprs: [{ type: "field", tableAlias: "{alias}", column: `level` }, design.detailLevel]
-            },
+            }
           ]
         }
       })
@@ -1460,12 +1517,13 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       schema,
       name,
       filters: _.compact(_filters),
-      axis: axisBuilder.cleanAxis({
-        axis: design.axes.color || null,
-        table: axisTable,
-        types: ["enum", "text", "boolean", "date"],
-        aggrNeed: design.regionMode == "indirect" ? "required" : "none"
-      }) || undefined,
+      axis:
+        axisBuilder.cleanAxis({
+          axis: design.axes.color || null,
+          table: axisTable,
+          types: ["enum", "text", "boolean", "date"],
+          aggrNeed: design.regionMode == "indirect" ? "required" : "none"
+        }) || undefined,
       defaultColor: design.color || undefined,
       locale
     })
@@ -1477,8 +1535,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
     if (design.table) {
       filterableTables.push(design.table)
-    } 
-    
+    }
+
     if (design.regionMode === "direct") {
       const regionsTable = design.regionsTable || "admin_regions"
       filterableTables.push(regionsTable)
@@ -1498,7 +1556,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, (draft) => {
+    design = produce(design, draft => {
       draft.axes = design.axes || {}
 
       // Default region mode

@@ -1,5 +1,6 @@
 import { Expr } from "mwater-expressions"
 import { Axis } from "../axes/Axis"
+import { HoverOverItem } from "./maps"
 
 /**
  * Layer that is composed of regions colored. Now extended to any other regions as well, so name
@@ -58,6 +59,8 @@ export default interface ChoroplethLayerDesign {
 
   /** contains items: which is BlocksLayoutManager items. Will be displayed when the region is clicked. Only when region mode is "indirect" */
   popup: any
+
+  hoverOver: { items: HoverOverItem[] }
 
   /** customizable filtering for popup. See PopupFilterJoins.md. Only when region mode is "indirect"  */
   popupFilterJoins: any

@@ -3,10 +3,10 @@ import React from "react"
 
 import { original, produce } from "immer"
 
-import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
+import Layer, { OnGridClickOptions, OnGridHoverOptions, VectorTileDef } from "./Layer"
 import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource, ExprValidator } from "mwater-expressions"
 import AxisBuilder from "../axes/AxisBuilder"
-import { OnGridClickResults } from "./maps"
+import { OnGridClickResults, OnGridHoverResults } from "./maps"
 import { JsonQLFilter } from "../index"
 import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect, JsonQLSelectQuery } from "jsonql"
 import { MarkersLayerDesign } from "./MarkersLayerDesign"
@@ -14,6 +14,7 @@ import { compileColorMapToMapbox, compileColorToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import { FilterSpecification, LayerSpecification } from "maplibre-gl"
+import HoverContent from "./HoverContent"
 
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */
@@ -39,14 +40,14 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const libreFilters: FilterSpecification = []
 
     const excludedValues = design.axes.color?.excludedValues ?? []
-    if(excludedValues.length > 0) {
+    if (excludedValues.length > 0) {
       libreFilters.push("all")
       libreFilters.push(["has", "color"])
-      libreFilters.push(["!", ["in", ["get", "color"], ['literal', excludedValues]]])
+      libreFilters.push(["!", ["in", ["get", "color"], ["literal", excludedValues]]])
     }
 
     const addFilter = (f: FilterSpecification) => {
-      if(libreFilters.length > 0) {
+      if (libreFilters.length > 0) {
         return libreFilters.concat([f])
       } else {
         return libreFilters.concat(f)
@@ -151,7 +152,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         `${sourceId}:points`,
         `${sourceId}:lines`,
         `${sourceId}:polygon-outlines`,
-        `${sourceId}:polygons`,
+        `${sourceId}:polygons`
       ]
     }
   }
@@ -290,9 +291,11 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
             type: "op",
             op: "ST_AsMVTGeom",
             exprs: [
-              { type: "op", op: "ST_Force2D", exprs: [
-                { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }
-              ]}, 
+              {
+                type: "op",
+                op: "ST_Force2D",
+                exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]
+              },
               envelopeExpr
             ]
           },
@@ -586,6 +589,42 @@ polygon-fill: ` +
     return css
   }
 
+  // same as onGridClick but handles hover over
+  onGridHoverOver(
+    ev: { data: any; event: any },
+    hoverOptions: OnGridHoverOptions<MarkersLayerDesign>
+  ): OnGridHoverResults {
+    if (ev.data && ev.data.id) {
+      const { table } = hoverOptions.design
+      const results: OnGridHoverResults = {}
+
+      // Popup
+      if (hoverOptions.design.hoverOver) {
+        // Create filter using popupFilterJoins
+        const popupFilterJoins =
+          hoverOptions.design.popupFilterJoins || PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
+        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(
+          popupFilterJoins,
+          hoverOptions.schema,
+          table,
+          ev.data.id
+        )
+
+        results.hoverOver = React.createElement(HoverContent, {
+          key: ev.data.id,
+          schema: hoverOptions.schema,
+          dataSource: hoverOptions.dataSource,
+          design: hoverOptions.design,
+          filters: popupFilters
+        })
+      }
+
+      return results
+    } else {
+      return null
+    }
+  }
+
   // Called when the interactivity grid is clicked.
   // arguments:
   //   ev: { data: interactivty data e.g. `{ id: 123 }` }
@@ -817,7 +856,7 @@ polygon-fill: ` +
       delete design.sublayers
     }
 
-    design = produce(design, (draft) => {
+    design = produce(design, draft => {
       draft.axes = design.axes || {}
       draft.color = design.color || "#0088FF"
 

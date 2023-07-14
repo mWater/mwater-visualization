@@ -76,6 +76,7 @@ export default class MapComponent extends React.Component<MapComponentProps, Map
         style: {
             gridArea: "designer";
             borderLeft: string;
+            overflowY: "scroll";
         };
     }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<{

@@ -49,5 +49,6 @@ export default class ChoroplethLayerDesigner extends React.Component<{
         className: string;
     }, HTMLElement> | null;
     renderPopup(): React.CElement<any, EditPopupComponent> | null;
+    renderHoverOver(): React.FunctionComponentElement<import("./EditHoverOver").EditHoverOverProps> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }

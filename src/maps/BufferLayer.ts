@@ -6,14 +6,15 @@ import React from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
 import AxisBuilder from "../axes/AxisBuilder"
 import { BufferLayerDesign } from "./BufferLayerDesign"
-import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
-import { OnGridClickResults } from "./maps"
+import Layer, { OnGridClickOptions, OnGridHoverOptions, VectorTileDef } from "./Layer"
+import { OnGridClickResults, OnGridHoverResults } from "./maps"
 import { compileColorMapToMapbox } from "./mapboxUtils"
 
 import LegendGroup from "./LegendGroup"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import { LayerSpecification } from "maplibre-gl"
+import HoverContent from "./HoverContent"
 
 /*
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -238,18 +239,21 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       from: exprCompiler.compileTable(design.table, "main"),
       where: whereExpr
     }
-    
+
     // If unioning shapes
     if (design.unionShapes) {
       query.selects = [
         {
           type: "select",
-          expr: { type: "op", op: "ST_AsMVTGeom", exprs: [{ type: "op", op: "ST_Union", exprs: [bufferExpr] }, envelopeExpr] },
+          expr: {
+            type: "op",
+            op: "ST_AsMVTGeom",
+            exprs: [{ type: "op", op: "ST_Union", exprs: [bufferExpr] }, envelopeExpr]
+          },
           alias: "the_geom_webmercator"
         }
       ]
-    }
-    else {
+    } else {
       query.selects = [
         {
           type: "select",
@@ -689,6 +693,42 @@ marker-fill: ` +
     }
   }
 
+  // same as onGridClick but handles hover over
+  onGridHoverOver(
+    ev: { data: any; event: any },
+    hoverOptions: OnGridHoverOptions<BufferLayerDesign>
+  ): OnGridHoverResults {
+    if (ev.data && ev.data.id) {
+      const { table } = hoverOptions.design
+      const results: OnGridHoverResults = {}
+
+      // Popup
+      if (hoverOptions.design.hoverOver) {
+        // Create filter using popupFilterJoins
+        const popupFilterJoins =
+          hoverOptions.design.popupFilterJoins || PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
+        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(
+          popupFilterJoins,
+          hoverOptions.schema,
+          table,
+          ev.data.id
+        )
+
+        results.hoverOver = React.createElement(HoverContent, {
+          key: ev.data.id,
+          schema: hoverOptions.schema,
+          dataSource: hoverOptions.dataSource,
+          design: hoverOptions.design,
+          filters: popupFilters
+        })
+      }
+
+      return results
+    } else {
+      return null
+    }
+  }
+
   // Gets the bounds of the layer as GeoJSON
   getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     // TODO technically should pad for the radius, but we always pad by 20% anyway so it should be fine
@@ -817,7 +857,7 @@ marker-fill: ` +
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, (draft) => {
+    design = produce(design, draft => {
       // Default color
       draft.color = design.color || "#0088FF"
 

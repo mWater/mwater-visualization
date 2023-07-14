@@ -1,5 +1,6 @@
 import { Expr } from "mwater-expressions";
 import { Axis } from "../axes/Axis";
+import { HoverOverItem } from "./maps";
 /** Design for a markers layer */
 export interface MarkersLayerDesign {
     /** table to get data from */
@@ -24,6 +25,9 @@ export interface MarkersLayerDesign {
     /** contains items: which is BlocksLayoutManager items. Will be displayed when the marker is clicked TODO */
     popup: {
         items: any;
+    };
+    hoverOver: {
+        items: HoverOverItem[];
     };
     /** customizable filtering for popup. See PopupFilterJoins.md TODO */
     popupFilterJoins: any;

@@ -1,5 +1,6 @@
 import _ from "lodash"
-import { LayerSpecification, MapLayerMouseEvent } from "maplibre-gl"
+import ReactDOM from "react-dom"
+import { LayerSpecification, MapLayerMouseEvent, Popup } from "maplibre-gl"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties, ReactNode, useEffect, useMemo, useState } from "react"
 import { useRef } from "react"
@@ -19,7 +20,14 @@ import "maplibre-gl/dist/maplibre-gl.css"
 import "./VectorMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
-import { AttributionControl, VectorMapLogo, useHoverCursor, useStyleMap, useThrottledMapResize, useVectorMap } from "./vectorMaps"
+import {
+  AttributionControl,
+  VectorMapLogo,
+  useHoverCursor,
+  useStyleMap,
+  useThrottledMapResize,
+  useVectorMap
+} from "./vectorMaps"
 
 /** Component that displays just the map, using vector tile technology */
 export function VectorMapViewComponent(props: {
@@ -93,6 +101,8 @@ export function VectorMapViewComponent(props: {
   /** Contents of popup if open */
   const [popupContents, setPopupContents] = useState<ReactNode>()
 
+  const [hoverContents, setHoverContents] = useState<ReactNode>()
+
   /** Date-time layers must have been created after on server. Used to support refreshing */
   const [layersCreatedAfter, setLayersCreatedAfter] = useState(new Date().toISOString())
 
@@ -111,9 +121,9 @@ export function VectorMapViewComponent(props: {
     bounds: props.design.bounds
       ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n]
       : undefined,
-      scrollZoom: props.scrollWheelZoom,
-      dragPan: props.dragging,
-      touchZoomRotate: props.touchZoom,
+    scrollZoom: props.scrollWheelZoom,
+    dragPan: props.dragging,
+    touchZoomRotate: props.touchZoom
   })
 
   // Pass map upwards
@@ -123,9 +133,45 @@ export function VectorMapViewComponent(props: {
 
   useThrottledMapResize(map, props.width, props.height)
 
+  const handleLayerHover = useStableCallback((layerViewId: string, ev: { data: any; event: any }) => {
+    const layerView = props.design.layerViews.find(lv => lv.id == layerViewId)!
+
+    // Create layer
+    const layer = LayerFactory.createLayer(layerView.type)
+
+    // Clean design (prevent ever displaying invalid/legacy designs)
+    const design = layer.cleanDesign(layerView.design, props.schema)
+
+    // Handle click of layer
+    const results = layer.onGridHoverOver(ev, {
+      design: design,
+      schema: props.schema,
+      dataSource: props.dataSource,
+      layerDataSource: props.mapDataSource.getLayerDataSource(layerViewId),
+      scopeData:
+        props.scope && props.scope.data && props.scope.data.layerViewId == layerViewId
+          ? props.scope.data.data
+          : undefined,
+      filters: getCompiledFilters()
+    })
+
+    if (!results) {
+      return
+    }
+
+    // Handle popup first
+    if (results.hoverOver && map) {
+      setHoverContents(results.hoverOver)
+    }
+  })
+
+  const handleLayerHoverDebounced = useMemo(() => {
+    return _.debounce(handleLayerHover, 250, { leading: true, trailing: false })
+  }, [handleLayerHover])
+
   /** Handle a click on a layer */
   const handleLayerClick = useStableCallback((layerViewId: string, ev: { data: any; event: any }) => {
-    const layerView = props.design.layerViews.find((lv) => lv.id == layerViewId)!
+    const layerView = props.design.layerViews.find(lv => lv.id == layerViewId)!
 
     // Create layer
     const layer = LayerFactory.createLayer(layerView.type)
@@ -182,7 +228,7 @@ export function VectorMapViewComponent(props: {
   const handleLayerClickDebounced = useMemo(() => {
     return _.debounce(handleLayerClick, 250, { leading: true, trailing: false })
   }, [handleLayerClick])
-  
+
   /** Get filters from extraFilters combined with map filters */
   function getCompiledFilters() {
     return (props.extraFilters || []).concat(
@@ -251,12 +297,12 @@ export function VectorMapViewComponent(props: {
         for (const mapLayer of vectorTileDef.mapLayers) {
           newLayers.push({ layerViewId: layerView.id, layer: mapLayer })
         }
-        newClickHandlers = 
-          vectorTileDef.mapLayersHandleClicks.map((mlid: any) => ({
+        newClickHandlers = vectorTileDef.mapLayersHandleClicks
+          .map((mlid: any) => ({
             layerViewId: layerView.id,
             mapLayerId: mlid
-          })).concat(newClickHandlers)
-        
+          }))
+          .concat(newClickHandlers)
       } else {
         const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(design, [])
         if (tileUrl) {
@@ -290,7 +336,7 @@ export function VectorMapViewComponent(props: {
       }
     }
 
-    setBusy((b) => b + 1)
+    setBusy(b => b + 1)
 
     try {
       for (const layerView of props.design.layerViews) {
@@ -322,10 +368,10 @@ export function VectorMapViewComponent(props: {
       setUserStyle({
         version: 8,
         sources: newSources,
-        layers: newLayers.map((nl) => nl.layer)
+        layers: newLayers.map(nl => nl.layer)
       })
     } finally {
-      setBusy((b) => b - 1)
+      setBusy(b => b - 1)
     }
   }
 
@@ -347,14 +393,22 @@ export function VectorMapViewComponent(props: {
   // Update user layers
   useEffect(() => {
     updateUserStyle()
-  }, [props.design.layerViews, props.scope, layersCreatedAfter, JSON.stringify(props.extraFilters), props.design.filters, props.design.globalFilters, props.refreshTrigger])
+  }, [
+    props.design.layerViews,
+    props.scope,
+    layersCreatedAfter,
+    JSON.stringify(props.extraFilters),
+    props.design.filters,
+    props.design.globalFilters,
+    props.refreshTrigger
+  ])
 
   // Style map
   useStyleMap({
     map,
     userStyle,
     baseLayer: props.design.baseLayer,
-    baseLayerOpacity: props.design.baseLayerOpacity,
+    baseLayerOpacity: props.design.baseLayerOpacity
   })
 
   // Setup click handlers
@@ -391,7 +445,7 @@ export function VectorMapViewComponent(props: {
     if (!userStyle) {
       return []
     }
-    return userStyle.layers.map((l) => l.id)
+    return userStyle.layers.map(l => l.id)
   }, [userStyle])
 
   // Setup hover effect
@@ -444,9 +498,9 @@ export function VectorMapViewComponent(props: {
   }, [props.onDesignChange, props.zoomLocked, props.design, map])
 
   function performAutoZoom() {
-    setBusy((b) => b + 1)
+    setBusy(b => b + 1)
     props.mapDataSource.getBounds(props.design, getCompiledFilters(), (error, bounds) => {
-      setBusy((b) => b - 1)
+      setBusy(b => b - 1)
 
       if (bounds) {
         map!.fitBounds([bounds.w, bounds.s, bounds.e, bounds.n], { padding: 20 })
@@ -477,11 +531,13 @@ export function VectorMapViewComponent(props: {
 
     if (!props.design.autoBounds && props.design.bounds) {
       // If we set the new bounds, do not update map bounds
-      if (boundsRef.current == null || 
+      if (
+        boundsRef.current == null ||
         props.design.bounds.n != boundsRef.current.n ||
         props.design.bounds.e != boundsRef.current.e ||
         props.design.bounds.s != boundsRef.current.s ||
-        props.design.bounds.w != boundsRef.current.w) {
+        props.design.bounds.w != boundsRef.current.w
+      ) {
         map.fitBounds([props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n])
       }
     }
@@ -514,16 +570,53 @@ export function VectorMapViewComponent(props: {
 
   const [zoom, setZoom] = useState(map?.getZoom())
 
-  useEffect(() =>  {
+  useEffect(() => {
     const handleZoom = () => setZoom(map?.getZoom())
-    if(map) {
-      map.on('zoomend', handleZoom)
+    if (map) {
+      map.on("zoomend", handleZoom)
     }
 
     return () => {
-      map?.off('zoomend', handleZoom)
+      map?.off("zoomend", handleZoom)
     }
   }, [map])
+
+  // setup hover overs
+  useEffect(() => {
+    if (!map) {
+      return
+    }
+
+    const removes: { (): void }[] = []
+
+    for (const clickHandler of layerClickHandlers) {
+      const onEnter = (ev: MapLayerMouseEvent) => {
+        if (!ev.features || !ev.features[0].properties) {
+          return
+        }
+
+        handleLayerHoverDebounced(clickHandler.layerViewId, {
+          data: ev.features![0].properties,
+          event: ev
+        })
+      }
+      const onLeave = (ev: MapLayerMouseEvent) => {
+        setHoverContents(null)
+      }
+      // todo:  https://github.com/mapbox/mapbox-gl-js/issues/5539#issuecomment-340311798
+      map.on("mouseenter", clickHandler.mapLayerId, onEnter)
+      map.on("mouseleave", clickHandler.mapLayerId, onLeave)
+      removes.push(() => {
+        map.off("mouseenter", clickHandler.mapLayerId, onEnter)
+        map.off("mouseleave", clickHandler.mapLayerId, onLeave)
+      })
+    }
+    return () => {
+      for (const remove of removes) {
+        remove()
+      }
+    }
+  }, [map, layerClickHandlers])
 
   function renderLegend() {
     if (legendHidden) {
@@ -560,29 +653,46 @@ export function VectorMapViewComponent(props: {
           border: "solid 1px #CCC",
           padding: 7,
           borderRadius: 5
-        }}
-      >
+        }}>
         <i className="fa fa-spinner fa-spin" />
       </div>
     )
+  }
+
+  const renderHoverContent = () => {
+    if (!hoverContents) return null
+
+    const style: CSSProperties = {
+      backgroundColor: "white",
+      fontSize: 12,
+      padding: 4,
+      borderRadius: 4,
+      border: "solid 1px #AAA",
+      maxWidth: 250
+    }
+
+    return <div style={style}>{hoverContents ?? "asdksjdbfskajf"}</div>
   }
 
   // Overflow hidden because of problem of exceeding div
   return (
     <div style={{ width: props.width, height: props.height, position: "relative" }}>
       {renderPopup()}
-      {props.onDesignChange != null && props.design.showLayerSwitcher ? (
-        <LayerSwitcherComponent design={props.design} onDesignChange={props.onDesignChange} />
-      ) : null}
+
+      <div style={{ position: "absolute", maxWidth: 250, top: 10, right: 10, zIndex: 999, userSelect: "none" }}>
+        <div style={{ display: "flex", gap: 6, position: "relative", flexDirection: "column", alignItems: "right" }}>
+          {props.onDesignChange != null && props.design.showLayerSwitcher ? (
+            <LayerSwitcherComponent design={props.design} onDesignChange={props.onDesignChange} />
+          ) : null}
+          {renderHoverContent()}
+        </div>
+      </div>
+
       <div style={{ width: props.width, height: props.height }} ref={setMapDiv} />
       {renderLegend()}
       {renderBusy()}
-      <AttributionControl 
-        baseLayer={props.design.baseLayer}
-        extraText={props.design.attribution} />
-      <VectorMapLogo 
-        baseLayer={props.design.baseLayer}
-      />
+      <AttributionControl baseLayer={props.design.baseLayer} extraText={props.design.attribution} />
+      <VectorMapLogo baseLayer={props.design.baseLayer} />
     </div>
   )
 }

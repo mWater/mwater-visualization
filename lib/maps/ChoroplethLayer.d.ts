@@ -1,7 +1,7 @@
 import React from "react";
-import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer";
+import Layer, { OnGridClickOptions, OnGridHoverOptions, VectorTileDef } from "./Layer";
 import { Schema, DataSource } from "mwater-expressions";
-import { LayerDefinition, OnGridClickResults } from "./maps";
+import { LayerDefinition, OnGridClickResults, OnGridHoverResults } from "./maps";
 import { JsonQLFilter } from "../index";
 import ChoroplethLayerDesign from "./ChoroplethLayerDesign";
 import { JsonQLQuery } from "jsonql";
@@ -51,6 +51,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         data: any;
         event: any;
     }, clickOptions: OnGridClickOptions<ChoroplethLayerDesign>): OnGridClickResults;
+    onGridHoverOver(ev: {
+        data: any;
+        event: any;
+    }, hoverOptions: OnGridHoverOptions<ChoroplethLayerDesign>): OnGridHoverResults;
     getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: ChoroplethLayerDesign): number | undefined;
     getMaxZoom(design: ChoroplethLayerDesign): number;
