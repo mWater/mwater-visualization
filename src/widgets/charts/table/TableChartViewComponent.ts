@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import _ from "lodash"
+import _, { sortBy } from "lodash"
 import React from "react"
 const R = React.createElement
 import moment from "moment"
@@ -69,19 +69,65 @@ interface TableContentsComponentProps {
   onRowClick?: any
 }
 
-class TableContentsComponent extends React.Component<TableContentsComponentProps> {
+interface TableContentsComponentState {
+  sort: {
+    column: number
+    direction: "asc" | "desc"
+  } | null
+  data: any
+}
+
+class TableContentsComponent extends React.Component<TableContentsComponentProps, TableContentsComponentState> {
   static contextTypes = { locale: PropTypes.string }
 
-  shouldComponentUpdate(prevProps: any) {
-    if (prevProps.columns !== this.props.columns && !_.isEqual(prevProps.columns, this.props.columns)) {
+  constructor(props: TableContentsComponentProps) {
+    super(props)
+    this.state = {
+      sort: null,
+      data: props.data.main
+    }
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<TableContentsComponentProps>,
+    prevState: Readonly<TableContentsComponentState>,
+    snapshot?: any
+  ): void {
+    if (this.state.sort !== prevState.sort) {
+      this.setState({ data: this.sortData() })
+    }
+  }
+
+  sortData = () => {
+    if (!this.state.sort) return this.props.data.main
+    return _.sortByOrder(this.props.data.main, [`c${this.state.sort.column}`], [this.state.sort.direction])
+  }
+
+  shouldComponentUpdate(
+    nextProps: Readonly<TableContentsComponentProps>,
+    nextState: Readonly<TableContentsComponentState>,
+    nextContext: any
+  ): boolean {
+    if (nextProps.columns !== this.props.columns && !_.isEqual(nextProps.columns, this.props.columns)) {
       return true
     }
 
-    if (prevProps.data !== this.props.data && !_.isEqual(prevProps.data, this.props.data)) {
+    if (nextProps.data !== this.props.data && !_.isEqual(nextProps.data, this.props.data)) {
       return true
     }
 
-    if (prevProps.schema !== this.props.schema) {
+    if (nextProps.schema !== this.props.schema) {
+      return true
+    }
+
+    if (nextProps.schema !== this.props.schema) {
+      return true
+    }
+    if (nextState.sort !== this.state.sort) {
+      return true
+    }
+
+    if (nextState.data !== this.state.data && !_.isEqual(nextState.data, this.state.data)) {
       return true
     }
 
@@ -96,12 +142,37 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
     }
   }
 
+  handleSort = (colIndex: number) => {
+    const currentSort = this.state.sort?.column === colIndex ? this.state.sort?.direction : null
+    this.setState({
+      sort: {
+        column: colIndex,
+        direction: currentSort === "asc" ? "desc" : "asc"
+      }
+    })
+  }
+
   renderHeaderCell(index: any) {
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
     const column = this.props.columns[index]
-
-    const text = column.headerText ?? (column.textAxis ? axisBuilder.summarizeAxis(column.textAxis, this.context.locale) : '')
-    return R("th", { key: index }, text)
+    //(this.state.sort?.direction === 'asc' ? "":"")
+    const text =
+      column.headerText ?? (column.textAxis ? axisBuilder.summarizeAxis(column.textAxis, this.context.locale) : "")
+    return R(
+      "th",
+      {
+        key: index,
+        style: { cursor: "pointer" },
+        onClick: () => this.handleSort(index)
+      },
+      text,
+      this.state.sort?.column === index
+        ? R("span", {
+            style: { marginLeft: 10 },
+            className: `fa ${this.state.sort?.direction === "asc" ? "fa-sort-asc" : "fa-sort-desc"}`
+          })
+        : undefined
+    )
   }
 
   renderHeader() {
@@ -120,28 +191,33 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
     const exprUtils = new ExprUtils(this.props.schema)
     const column = this.props.columns[index]
 
-    if(!column.textAxis) return null
+    if (!column.textAxis) return null
 
     const exprType = exprUtils.getExprType(column.textAxis?.expr)
     let node = null
 
-    if(exprType && exprType == 'number') {
-      node = `${_.capitalize(column.summaryType)}: ${formatValue(exprType, this.props.data.summary[`c${index}`], column.format)}`
+    if (exprType && exprType == "number") {
+      node = `${_.capitalize(column.summaryType)}: ${formatValue(
+        exprType,
+        this.props.data.summary[`c${index}`],
+        column.format
+      )}`
     }
 
     return node
   }
 
   renderFooter() {
-    if(!this.props.data.summary) {
+    if (!this.props.data.summary) {
       return null
     }
 
-    return R('tfoot', 
-      {key: 'foot'},
+    return R(
+      "tfoot",
+      { key: "foot" },
       R(
-        'tr',
-        {key: 'foot'},
+        "tr",
+        { key: "foot" },
         _.map(this.props.columns, (column, i) => R("th", { key: i }, this.renderFooterCell(i)))
       )
     )
@@ -155,21 +231,21 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
   renderCell(rowIndex: any, columnIndex: any) {
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
     let node
-    const row = this.props.data.main[rowIndex]
+    const row = this.state.data[rowIndex]
     const column = this.props.columns[columnIndex]
     // Set background color
-    let backgroundColor = 'transparent'
-    let textColor = '#212529'
+    let backgroundColor = "transparent"
+    let textColor = "#212529"
 
     const exprUtils = new ExprUtils(this.props.schema)
-    if(!column.textAxis) {
+    if (!column.textAxis) {
       node = null
     } else {
       const exprType = exprUtils.getExprType(column.textAxis.expr)
 
       // Get value
       let value = row[`c${columnIndex}`]
-  
+
       if (value == null) {
         node = null
       } else {
@@ -179,9 +255,9 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
         }
 
         if (column.backgroundColorAxis && row[`bc${columnIndex}`] != null) {
-          backgroundColor = axisBuilder.getValueColor(column.backgroundColorAxis, row[`bc${columnIndex}`]) ?? '#fff'
+          backgroundColor = axisBuilder.getValueColor(column.backgroundColorAxis, row[`bc${columnIndex}`]) ?? "#fff"
         }
-  
+
         // Convert to node based on type
         switch (exprType) {
           case "text":
@@ -214,15 +290,15 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
         }
       }
     }
-    
+
     if (backgroundColor) {
       const c = Color(backgroundColor)
       // Get lightness (taking into account alpha)
-      const lightness = 1 - ((1 - c.luminosity()) * c.alpha())
-      textColor = lightness < 0.3 ? "rgb(204,204,204)" : '#212529'
+      const lightness = 1 - (1 - c.luminosity()) * c.alpha()
+      textColor = lightness < 0.3 ? "rgb(204,204,204)" : "#212529"
     }
 
-    return R("td", { key: columnIndex, style: {backgroundColor, color: textColor} }, node)
+    return R("td", { key: columnIndex, style: { backgroundColor, color: textColor } }, node)
   }
 
   renderRow(index: any) {
@@ -237,7 +313,7 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
     return R(
       "tbody",
       { key: "body" },
-      _.map(this.props.data.main, (row, i) => this.renderRow(i))
+      _.map(this.state.data, (row, i) => this.renderRow(i))
     )
   }
 
