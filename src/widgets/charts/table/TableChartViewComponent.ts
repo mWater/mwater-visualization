@@ -135,7 +135,7 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
   }
 
   handleRowClick = (rowIndex: any) => {
-    const row = this.props.data.main[rowIndex]
+    const row = this.state.data[rowIndex]
 
     if (row && row.id && this.props.onRowClick) {
       return this.props.onRowClick(this.props.table, row.id)
