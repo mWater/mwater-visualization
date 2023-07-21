@@ -93,9 +93,7 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
     prevState: Readonly<TableContentsComponentState>,
     snapshot?: any
   ): void {
-    if (this.state.sort !== prevState.sort) {
-      this.setState({ data: this.sortData() })
-    }
+    this.setState({ data: this.sortData() })
   }
 
   sortData = () => {
