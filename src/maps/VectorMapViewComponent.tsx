@@ -15,6 +15,7 @@ import {
   getFilterableTables as utilsGetFilterableTables,
   MapScope
 } from "./MapUtils"
+import { memoizedDebounce } from "../memoizedDebounce"
 
 import "maplibre-gl/dist/maplibre-gl.css"
 import "./VectorMapViewComponent.css"
@@ -115,6 +116,9 @@ export function VectorMapViewComponent(props: {
     initialLegendDisplay == "closed" || (props.width < 500 && initialLegendDisplay == "closedIfSmall")
   )
 
+  // Last feature that mouse entered
+  const lastFeature = useRef()
+
   // Load map
   const map = useVectorMap({
     divRef: mapDiv,
@@ -165,9 +169,14 @@ export function VectorMapViewComponent(props: {
     }
   })
 
-  const handleLayerHoverDebounced = useMemo(() => {
-    return _.debounce(handleLayerHover, 250, { leading: true, trailing: false })
-  }, [handleLayerHover])
+  const handleLayerHoverDebounced = memoizedDebounce(
+    (layerViewId: string, ev: { data: any; event: any }) => {
+      handleLayerHover(layerViewId, ev)
+    },
+    250,
+    { leading: true, trailing: false },
+    (layerViewId, ev) => ev.data.id
+  )
 
   /** Handle a click on a layer */
   const handleLayerClick = useStableCallback((layerViewId: string, ev: { data: any; event: any }) => {
@@ -592,7 +601,14 @@ export function VectorMapViewComponent(props: {
     for (const clickHandler of layerClickHandlers) {
       const onEnter = (ev: MapLayerMouseEvent) => {
         if (!ev.features || !ev.features[0].properties) {
+          lastFeature.current = undefined
+          setHoverContents(null)
           return
+        }
+
+        if (ev.features![0].properties.id !== lastFeature.current) {
+          setHoverContents(null)
+          lastFeature.current = ev.features![0].properties.id
         }
 
         handleLayerHoverDebounced(clickHandler.layerViewId, {
@@ -601,13 +617,13 @@ export function VectorMapViewComponent(props: {
         })
       }
       const onLeave = (ev: MapLayerMouseEvent) => {
+        lastFeature.current = undefined
         setHoverContents(null)
       }
-      // todo:  https://github.com/mapbox/mapbox-gl-js/issues/5539#issuecomment-340311798
-      map.on("mouseenter", clickHandler.mapLayerId, onEnter)
+      map.on("mousemove", clickHandler.mapLayerId, onEnter)
       map.on("mouseleave", clickHandler.mapLayerId, onLeave)
       removes.push(() => {
-        map.off("mouseenter", clickHandler.mapLayerId, onEnter)
+        map.off("mousemove", clickHandler.mapLayerId, onEnter)
         map.off("mouseleave", clickHandler.mapLayerId, onLeave)
       })
     }
