@@ -13,7 +13,7 @@ import { MarkersLayerDesign } from "./MarkersLayerDesign"
 import { compileColorMapToMapbox, compileColorToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
-import { FilterSpecification, LayerSpecification } from "maplibre-gl"
+import { ExpressionSpecification, FilterSpecification, LayerSpecification } from "maplibre-gl"
 import HoverContent from "./HoverContent"
 
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
@@ -36,21 +36,18 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     // If color axes, add color conditions
     const color = compileColorMapToMapbox(design.axes.color, design.color || "#666666")
 
-    // Add markers
-    const libreFilters: FilterSpecification = []
-
+    const baseFilters: FilterSpecification[] = []
     const excludedValues = design.axes.color?.excludedValues ?? []
     if (excludedValues.length > 0) {
-      libreFilters.push("all")
-      libreFilters.push(["has", "color"])
-      libreFilters.push(["!", ["in", ["get", "color"], ["literal", excludedValues]]])
+      baseFilters.push(["!", ["in", ["get", "color"], ["literal", excludedValues]]])
     }
 
-    const addFilter = (f: FilterSpecification) => {
-      if (libreFilters.length > 0) {
-        return libreFilters.concat([f])
+    /** Adds a filter to the libreFilters */
+    const addFilter = (f: ExpressionSpecification): FilterSpecification => {
+      if (baseFilters.length > 0) {
+        return ["all", ...baseFilters, f] as FilterSpecification
       } else {
-        return libreFilters.concat(f)
+        return f
       }
     }
 
@@ -62,7 +59,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       "source-layer": "main",
       paint: {
         "fill-color": color,
-        "fill-opacity": 0.25 * opacity
+        "fill-opacity": (design.polygonFillOpacity ?? 0.25) * opacity
       },
       filter: addFilter([
         "any",
@@ -78,7 +75,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       source: sourceId,
       "source-layer": "main",
       paint: {
-        "line-color": color,
+        "line-color": design.polygonBorderColor || color,
         "line-width": design.lineWidth != null ? design.lineWidth : 3,
         "line-opacity": opacity
       },
@@ -543,7 +540,7 @@ line-width: ` +
   polygon-fill: ` +
       (design.color || "#666666") +
       `;
-  polygon-opacity: 0.25;
+  polygon-opacity: ${design.polygonFillOpacity ?? 0.25};
 }
 \
 `
@@ -580,6 +577,7 @@ line-width: ` +
 polygon-fill: ` +
             item.color +
             `;\
+${design.polygonBorderColor ? "line-color: " + design.polygonBorderColor + ";" : ""}\
 }\
 `
         }

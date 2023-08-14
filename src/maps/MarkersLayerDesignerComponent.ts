@@ -1,9 +1,8 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import { FilterExprComponent } from "mwater-expressions-ui"
-import { DataSource, ExprUtils, Schema } from "mwater-expressions"
+import { DataSource, ExprUtils, OpExpr, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisComponent from "./../axes/AxisComponent"
 import ColorComponent from "../ColorComponent"
@@ -14,13 +13,15 @@ import MarkerSymbolSelectComponent from "./MarkerSymbolSelectComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import * as ui from "react-library/lib/bootstrap"
 import EditHoverOver from "./EditHoverOver"
+import { MarkersLayerDesign } from "./MarkersLayerDesign"
+import { default as Rcslider } from "rc-slider"
 
 export interface MarkersLayerDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource
   /** Design of the marker layer */
-  design: any
+  design: MarkersLayerDesign
   /** Called with new design */
   onDesignChange: any
   filters?: any
@@ -53,6 +54,12 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
   }
   handleColorChange = (color: any) => {
     return this.update({ color })
+  }
+  handlePolygonBorderColorChange = (polygonBorderColor: any) => {
+    return this.update({ polygonBorderColor })
+  }
+  handlePolygonFillOpacityChange = (polygonFillOpacity: any) => {
+    return this.update({ polygonFillOpacity: polygonFillOpacity / 100 })
   }
   handleSymbolChange = (symbol: any) => {
     return this.update({ symbol })
@@ -99,7 +106,7 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
       const exprCompiler = new ExprCompiler(this.props.schema)
       const jsonql = exprCompiler.compileExpr({ expr: this.props.design.filter, tableAlias: "{alias}" })
       if (jsonql) {
-        filters.push({ table: this.props.design.filter.table, jsonql })
+        filters.push({ table: (this.props.design.filter as OpExpr).table, jsonql })
       }
     }
 
@@ -135,7 +142,7 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
       const exprCompiler = new ExprCompiler(this.props.schema)
       const jsonql = exprCompiler.compileExpr({ expr: this.props.design.filter, tableAlias: "{alias}" })
       if (jsonql) {
-        filters.push({ table: this.props.design.filter.table, jsonql })
+        filters.push({ table: (this.props.design.filter as OpExpr).table, jsonql })
       }
     }
 
@@ -237,6 +244,52 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
     )
   }
 
+  renderPolygonBorderColor() {
+    if (!this.props.design.axes.geometry) {
+      return
+    }
+
+    return R(
+      "div",
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, "Polygon border color (blank for same as fill color)"),
+      R(
+        "div",
+        null,
+        R(ColorComponent, {
+          color: this.props.design.polygonBorderColor,
+          onChange: this.handlePolygonBorderColorChange
+        })
+      )
+    )
+  }
+
+  renderPolygonFillOpacity() {
+    if (!this.props.design.axes.geometry) {
+      return
+    }
+
+    const opacity = this.props.design.polygonFillOpacity != null ? this.props.design.polygonFillOpacity : 0.25
+
+    return R(
+      "div",
+      { className: "mb-3"},
+      R("label", { className: "text-muted" }, R("span", null, `Polygon Fill Opacity: ${Math.round(opacity * 100)}%`)),
+      R(
+        "div",
+        { style: { padding: "10px" } },
+        React.createElement(Rcslider, {
+          min: 0,
+          max: 100,
+          step: 1,
+          tipTransitionName: "rc-slider-tooltip-zoom-down",
+          value: opacity * 100,
+          onChange: this.handlePolygonFillOpacityChange
+        })
+      )
+    )
+      }
+
   renderFilter() {
     // If no data, hide
     if (!this.props.design.axes.geometry) {
@@ -302,7 +355,14 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
       this.renderColor(),
       this.renderSymbol(),
       this.renderMarkerSize(),
-      this.renderLineWidth(),
+      R(ui.CollapsibleSection, {
+        label: "Shape Options",
+        labelMuted: true
+      }, [
+        this.renderLineWidth(),
+        this.renderPolygonBorderColor(),
+        this.renderPolygonFillOpacity(),
+      ]),
       this.renderFilter(),
       this.renderPopup(),
       this.renderHoverOver(),

@@ -2,12 +2,13 @@ import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import EditPopupComponent from "./EditPopupComponent";
 import MarkerSymbolSelectComponent from "./MarkerSymbolSelectComponent";
+import { MarkersLayerDesign } from "./MarkersLayerDesign";
 export interface MarkersLayerDesignerComponentProps {
     /** Schema to use */
     schema: Schema;
     dataSource: DataSource;
     /** Design of the marker layer */
-    design: any;
+    design: MarkersLayerDesign;
     /** Called with new design */
     onDesignChange: any;
     filters?: any;
@@ -20,6 +21,8 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
     handleColorAxisChange: (axis: any) => any;
     handleFilterChange: (expr: any) => any;
     handleColorChange: (color: any) => any;
+    handlePolygonBorderColorChange: (polygonBorderColor: any) => any;
+    handlePolygonFillOpacityChange: (polygonFillOpacity: any) => any;
     handleSymbolChange: (symbol: any) => any;
     handleNameChange: (e: any) => any;
     handleMarkerSizeChange: (markerSize: any) => any;
@@ -36,6 +39,12 @@ export default class MarkersLayerDesignerComponent extends React.Component<Marke
         className: string;
     }, HTMLElement> | undefined;
     renderLineWidth(): React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement> | undefined;
+    renderPolygonBorderColor(): React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement> | undefined;
+    renderPolygonFillOpacity(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | undefined;
     renderFilter(): React.DetailedReactHTMLElement<{

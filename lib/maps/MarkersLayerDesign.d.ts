@@ -22,6 +22,10 @@ export interface MarkersLayerDesign {
     markerSize?: number;
     /** size of the lines in pixels. Default 3 */
     lineWidth?: number;
+    /** opacity of polygon fill (0-1). Default is 0.25 */
+    polygonFillOpacity?: number;
+    /** color of polygon borders (defaults to color of fill) */
+    polygonBorderColor?: string;
     /** contains items: which is BlocksLayoutManager items. Will be displayed when the marker is clicked TODO */
     popup: {
         items: any;
