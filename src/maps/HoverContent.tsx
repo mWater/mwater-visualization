@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { DataSource, ExprCompiler, Schema, injectTableAlias } from "mwater-expressions"
+import { DataSource, ExprCompiler, ExprUtils, Schema, injectTableAlias } from "mwater-expressions"
 import { JsonQLSelectQuery } from "jsonql"
 import { JsonQLFilter } from ".."
 import { compact } from "lodash"
 import { HoverOverItem } from "./maps"
+import { canFormatType } from "../valueFormatter"
+import { formatValue } from "../valueFormatter"
 
 export interface HoverContentProps {
   /** Schema to use */
@@ -20,7 +22,8 @@ export interface HoverContentProps {
 }
 
 const HoverContent: React.FC<HoverContentProps> = props => {
-  const [value, setValue] = useState<{ [key: string]: string }>({})
+  const [values, setValues] = useState<{ [key: string]: string }>({})
+  const exprUtils = new ExprUtils(props.schema)
   useEffect(() => {
     const items = props.design.hoverOver?.items ?? []
     if (items.length > 0) {
@@ -56,18 +59,36 @@ const HoverContent: React.FC<HoverContentProps> = props => {
       }
 
       props.dataSource.performQuery(query, (error: any, data: any) => {
-        setValue(data?.[0] ?? {})
+        setValues(data?.[0] ?? {})
       })
     }
   }, [])
   return (
     <div className="_mviz-map-hover-content">
-      {props.design.hoverOver?.items.map((item: HoverOverItem) => (
-        <>
-          <span>{item.label}:</span>
-          <span className="text-muted">{value[item.id] === null ? "n/a" : value[item.id] ?? "■■■■"}</span>
-        </>
-      ))}
+      {props.design.hoverOver?.items.map((item: HoverOverItem) => {
+        let value = values[item.id]
+
+        if (value !== null && item.value) {
+          // Get expression type
+          const exprType = exprUtils.getExprType(item.value)
+
+          // Format if can format
+          if (exprType && canFormatType(exprType)) {
+            value = formatValue(exprType, value, undefined)
+          } else {
+            value = exprUtils.stringifyExprLiteral(item.value, value)
+          }
+        } else {
+          value = "■■■■"
+        }
+
+        return (
+          <>
+            <span>{item.label}:</span>
+            <span className="text-muted">{values[item.id] === null ? "n/a" : values[item.id] ?? "■■■■"}</span>
+          </>
+        )
+      })}
     </div>
   )
 }
